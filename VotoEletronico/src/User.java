@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,9 @@ public class User implements Serializable {
     }
 
 
+    public void addVoto(Eleicao eleicao, String departamento){
+        localVoto.put(eleicao,departamento);
+    }
 
 
 }
