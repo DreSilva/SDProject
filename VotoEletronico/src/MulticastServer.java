@@ -2,6 +2,9 @@ import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.util.Scanner;
 
 public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
@@ -21,49 +24,82 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null, socketR = null;
         long counter = 0;
         System.out.println(this.getName() + " running...");
+        String message, messageR;
+        String[] arrOfStr;
+        String clientID;
         try {
+            //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
             socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
             InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
             socketR.joinGroup(groupR);
+
+            //part to connect to the rmi server
+            Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+
             while (true) {
-                //falta fazer aqui a selecção do cliente
 
-                //recebe mensagem do cliente
-                byte[] bufferR = new byte[256];
-                DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
-                socketR.receive(packetR);
+                //pedir nr do CC do eleitor
+                System.out.print("Insira o número do CC do eleitor: ");
+                Scanner scan = new Scanner(System.in);
+                String CC = scan.nextLine();
 
-                System.out.println("Received packet from " + packetR.getAddress().getHostAddress() + ":" + packetR.getPort() + " with message:");
-                String messageR = new String(packetR.getData(), 0, packetR.getLength());
-                System.out.println(messageR);
-                //tratamento da resposta
-                if (true/*ver se a mensagem é de um cliente e não de si próprio. Tem de ser de um cliente selecionado tbm*/) {
-                    String[] arrOfStr = messageR.split("[|;]");
-                    if (arrOfStr[0] == "login") {
-                        if (true/*check if person is present in storage through the rmi server*/) {
-                            //resposta
-                            String message = "type|status;logged|on;msg|Welcome to eVoting\n";
-                            byte[] buffer = message.getBytes();
+                if (voto.identificarLeitor(CC)) {
+                    //seleção do terminal de voto
+                    message = "type|status;client|locked";
+                    byte[] buffer = message.getBytes();
+                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                    socket.send(packet);
 
-                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                            socket.send(packet);
-                        }
+                    do {
+                        byte[] bufferR = new byte[256];
+                        DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                        socketR.receive(packetR);
+                        messageR = new String(packetR.getData(), 0, packetR.getLength());
+                        arrOfStr = messageR.split("[|; ]");
+                    } while (arrOfStr[3] == "locked");
+
+                    clientID = arrOfStr[1];
+
+                    message = "client|" + arrOfStr[1] + ";locked|false";
+                    buffer = message.getBytes();
+                    group = InetAddress.getByName(MULTICAST_ADDRESS);
+                    packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                    socket.send(packet);
+                    System.out.println("O terminal " + arrOfStr[1] + " está desbloqueado.");
+
+                    //recebe login do cliente em questão
+                    do {
+                        byte[] bufferR = new byte[256];
+                        DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                        socketR.receive(packetR);
+                        messageR = new String(packetR.getData(), 0, packetR.getLength());
+                        arrOfStr = messageR.split("[|; ]");
+                    } while (arrOfStr[1] == clientID && arrOfStr[3] == "login");
+
+                    if (voto.login(arrOfStr[5],arrOfStr[7],CC)) {
+                        //resposta
+                        message = "type|status;logged|on;msg|Welcome to eVoting";
+                        buffer = message.getBytes();
+                        group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+
+                        //votação============================================================
+
                     } else {
-                        //send message u are not logged in
+                        message = "type|status;logged|off;msg|Wrong Login.\n";
+                        buffer = message.getBytes();
+                        group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
                     }
-
                 } else {
-                    //sum
-                }
-
-                try {
-                    sleep((long) (Math.random() * SLEEP_TIME));
-                } catch (InterruptedException e) {
+                    System.out.println("Eleitor não identificado.");
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | NotBoundException e) {
             e.printStackTrace();
         } finally {
             socket.close();
