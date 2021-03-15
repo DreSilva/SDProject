@@ -2,6 +2,8 @@ import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
+import java.sql.SQLOutput;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -17,11 +19,21 @@ import java.util.Scanner;
  * @author Raul Barbosa
  * @version 1.0
  */
+class Globals {
+    public static String clientID;
+    public static String command;
+    public static boolean locked = true;
+    public static String login = "off";
+}
+
 public class MulticastClient extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 4321;
 
     public static void main(String[] args) {
+        Random rand = new Random();
+        Globals.clientID = Integer.toString(rand.nextInt(100000000));
+        System.out.println("ClientID-> " + Globals.clientID);
         MulticastClient client = new MulticastClient();
         client.start();
         MulticastUser user = new MulticastUser();
@@ -38,10 +50,19 @@ public class MulticastClient extends Thread {
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-
-                System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
                 String message = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(message);
+                String[] arrOfStr = message.split("[|; ]");
+                Globals.command = arrOfStr[3];
+
+                if (arrOfStr[1] == Globals.clientID) {
+                    if (Globals.command == "locked" && arrOfStr[1] == Globals.clientID) {
+                        Globals.locked = false;
+                        Globals.command = "unlocked";
+                    } else if (arrOfStr[5] != "empty") {
+                        System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
+                        System.out.println(arrOfStr[5]);
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,12 +87,26 @@ class MulticastUser extends Thread {
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
             Scanner keyboardScanner = new Scanner(System.in);
             while (true) {
-                String readKeyboard = keyboardScanner.nextLine();
-                byte[] buffer = readKeyboard.getBytes();
-
-                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                socket.send(packet);
+                if (Globals.command == "locked") {
+                    String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + " answer;msg|" + Globals.locked;
+                    byte[] buffer = message.getBytes();
+                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                    socket.send(packet);
+                } else if (Globals.command == "unlock") {
+                    //make the login
+                } else {
+                    String readKeyboard = keyboardScanner.nextLine();
+                    if (!Globals.locked) {
+                        readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + " answer;msg|" + readKeyboard;
+                        byte[] buffer = readKeyboard.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    } else {
+                        System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto");
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
