@@ -9,5 +9,20 @@ public interface Voto extends Remote {
     public String listarVotacoes() throws java.rmi.RemoteException;
     public boolean identificarLeitor(String CC) throws java.rmi.RemoteException;
     public void votar(int opcao,User user,Eleicao eleicao, DepMesa mesa) throws java.rmi.RemoteException;
-
+    public String listarEleicoes() throws java.rmi.RemoteException;
+    public Eleicao getEleicao(int n) throws java.rmi.RemoteException;
+    public void criarLista(Lista lista) throws java.rmi.RemoteException;
+    public String listarListas() throws java.rmi.RemoteException;
+    public Lista getLista(int n) throws java.rmi.RemoteException;
+    public void addLista(Lista lista)throws java.rmi.RemoteException;
+    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException;
+    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException;
+    public String printUsers() throws java.rmi.RemoteException;
+    public User getUser(int pos) throws java.rmi.RemoteException;
+    public void addUserList(User user,Lista lista) throws java.rmi.RemoteException;
+    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException;
+    public void removeLista(Lista lista)throws java.rmi.RemoteException;
+    public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException;
+    public String getEleicoesVelhas() throws  java.rmi.RemoteException;
+    public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException;
 }

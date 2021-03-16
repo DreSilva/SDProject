@@ -4,15 +4,16 @@ import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.net.*;
 import java.io.*;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-class TempoEleicoes{
-
-}
 
 public class RMIServer extends UnicastRemoteObject implements Voto {
-    static ArrayList<User> users = new ArrayList<>();
-    public static ArrayList<Eleicao> eleicoes = new ArrayList<>();
+    static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
+    public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
+    public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
+    public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
 
     public RMIServer() throws RemoteException {
         super();
@@ -36,8 +37,12 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
-    public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException{
+    public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException   {
         eleicoes.add(eleicao);
+        Lista lista = new Lista("Branco");
+        eleicao.addLista(lista);
+        lista = new Lista("Nulo");
+        eleicao.addLista(lista);
     }
 
     public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException{
@@ -49,17 +54,144 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    public void criarLista(Lista lista) throws java.rmi.RemoteException{
+        listas.add(lista);
+    }
+
+    public String listarListas() throws java.rmi.RemoteException {
+        StringBuilder listasS = new StringBuilder();
+        int count = 1;
+        for (Lista listaV : listas) {
+            listasS.append(count);
+            listasS.append("- ");
+            listasS.append(listaV.nome);
+            listasS.append("\n");
+            count+=1;
+        }
+        return listasS.toString();
+    }
+
+    public String listarEleicoes() throws java.rmi.RemoteException {
+        StringBuilder votacoes = new StringBuilder();
+        int count = 1;
+        for (Eleicao eleicao : eleicoes) {
+            votacoes.append(count);
+            votacoes.append("- ");
+            votacoes.append(eleicao.titulo);
+            votacoes.append("\n");
+            votacoes.append(eleicao.descicao);
+            votacoes.append("\n");
+            count+=1;
+        }
+        return votacoes.toString();
+    }
+
+    public Eleicao getEleicao(int n) throws java.rmi.RemoteException {
+        return eleicoes.get(n);
+    }
+
+    public Lista getLista(int n) throws java.rmi.RemoteException {
+        return listas.get(n);
+    }
+
+    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+        eleicao.addLista(lista);
+    }
+
+    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+        eleicao.addLista(lista);
+    }
+
+    public void removeLista(Lista lista)throws java.rmi.RemoteException {
+        listas.remove(lista);
+    }
+
+    public void addLista(Lista lista)throws java.rmi.RemoteException{
+        listas.add(lista);
+    }
+
+    public void addUserList(User user,Lista lista) throws java.rmi.RemoteException{
+        lista.addUser(user);
+    }
+
+    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException{
+        eleicoes.remove(eleicao);
+    }
+
+    public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException{
+        lista.removeUser(user);
+    }
+
+    public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException{
+        StringBuilder info = new StringBuilder();
+        Eleicao eleicao = eleicoesVelhas.get(pos);
+        ArrayList<Lista> listas = eleicao.listas;
+        ArrayList<Integer> votos = eleicao.votosDone;
+        Map<Lista,Integer> votacaoLista = new LinkedHashMap<>();
+        int totalVotos = 0;
+        for (int i = 0; i < votos.size(); i++) {
+            votacaoLista.put(listas.get(i),votos.get(i));
+            totalVotos+=votos.get(i);
+        }
+        int count = 1;
+        for (Map.Entry<Lista,Integer> entry : votacaoLista.entrySet()) {
+            String nome = entry.getKey().nome;
+            int numVoto = entry.getValue();
+            info.append(count).append("º-").append(nome).append(" Votos-").append(numVoto).append(" Percentagem-")
+                    .append(numVoto/totalVotos).append("\n");
+        }
+        return info.toString();
+    }
+
+    public String getEleicoesVelhas() throws  java.rmi.RemoteException{
+        Date now = new Date();
+        for (Eleicao eleicao : eleicoes) {
+            if(eleicao.fim.before(now)){
+                eleicoes.remove(eleicao);
+                eleicoesVelhas.add(eleicao);
+            }
+        }
+
+        StringBuilder votacoes = new StringBuilder();
+        int counter = 1;
+        for (Eleicao eleicao:eleicoesVelhas) {
+            votacoes.append(counter).append("- ").append(eleicao.titulo).append("\n");
+            counter+=1;
+        }
+        return  votacoes.toString();
+    }
+
+    public String printUsers() throws java.rmi.RemoteException { //not anymore hehe
+        StringBuilder votacoes = new StringBuilder();
+        int count = 1;
+        for (User user: users) {
+            votacoes.append(count);
+            votacoes.append("- ");
+            votacoes.append(user.user);
+            votacoes.append("\n");
+            count+=1;
+        }
+        return votacoes.toString();
+
+    }
+
+    public User getUser(int pos) throws java.rmi.RemoteException {
+        return users.get(pos);
+    }
+
 
     public String listarVotacoes() throws java.rmi.RemoteException{
         StringBuilder votacoes = new StringBuilder();
         for (Eleicao eleicao : eleicoes){
             votacoes.append(eleicao.titulo);
-            votacoes.append(eleicao.titulo);
+            votacoes.append("\n");
             votacoes.append(eleicao.descicao);
             for (Lista lista : eleicao.listas){
                 votacoes.append(lista.nome);
+                votacoes.append("\n");
                 for(User user: lista.lista){
                     votacoes.append(user.user);
+                    votacoes.append("\n");
                 }
             }
         }
