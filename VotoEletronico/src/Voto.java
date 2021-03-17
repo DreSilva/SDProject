@@ -25,4 +25,5 @@ public interface Voto extends Remote {
     public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException;
     public String getEleicoesVelhas() throws  java.rmi.RemoteException;
     public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException;
+    public void writeFile() throws java.rmi.RemoteException; //debug
 }
