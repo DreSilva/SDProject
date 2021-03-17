@@ -8,6 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+class UDPTalk extends Thread{
+
+}
+
 
 public class RMIServer extends UnicastRemoteObject implements Voto {
     static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
@@ -19,6 +23,51 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         super();
     }
 
+    public void writeFile() throws java.rmi.RemoteException{
+        try {
+            FileOutputStream f = new FileOutputStream("myObjects.txt");
+            ObjectOutputStream o = new ObjectOutputStream(f);
+
+            // Write objects to file
+            o.writeObject(users);
+            o.writeObject(eleicoes);
+            o.writeObject(eleicoesVelhas);
+            o.writeObject(listas);
+
+            o.close();
+            f.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+        }
+    }
+
+
+    public void readFile () throws java.rmi.RemoteException{
+        try {
+            FileInputStream fi = new FileInputStream("myObjects.txt");
+            ObjectInputStream oi = new ObjectInputStream(fi);
+
+            // Read objects
+            users = (CopyOnWriteArrayList<User>) oi.readObject();
+            eleicoes = (CopyOnWriteArrayList<Eleicao>) oi.readObject();
+            eleicoesVelhas = (CopyOnWriteArrayList<Eleicao>) oi.readObject();
+            listas = (CopyOnWriteArrayList<Lista>) oi.readObject();
+
+            oi.close();
+            fi.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+        }  catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void registo(User user) throws java.rmi.RemoteException{
         users.add(user);
     }
@@ -26,12 +75,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public boolean login(String user,String password, String CC) throws java.rmi.RemoteException{
         for(User userL : users){
             if(userL.password.equals(password) && userL.user.equals(user)){
-                if(userL.CC.equals(CC)){
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return userL.CC.equals(CC);
             }
         }
         return  false;
@@ -179,7 +223,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return users.get(pos);
     }
 
-
     public String listarVotacoes() throws java.rmi.RemoteException{
         StringBuilder votacoes = new StringBuilder();
         for (Eleicao eleicao : eleicoes){
@@ -200,7 +243,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     public boolean identificarLeitor(String CC) throws java.rmi.RemoteException{
         for(User userL : users){
-            if(userL.password.equals(CC)){
+            if(userL.CC.equals(CC)){
                 return true;
             }
         }
@@ -226,6 +269,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         try {
             //User user = new User();
             RMIServer h = new RMIServer();
+            h.readFile();
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("votacao", h);
             System.out.println("Hello Server ready.");

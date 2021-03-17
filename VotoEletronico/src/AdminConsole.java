@@ -239,6 +239,10 @@ public class AdminConsole {
                     System.out.println(input);
                     break;
 
+                case 7:
+                    votoObj.writeFile();
+                    return;
+
                 default:
                     System.out.println("Escolha uma das opções");
                     break;
