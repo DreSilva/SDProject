@@ -21,7 +21,7 @@ import java.util.Scanner;
  */
 class Globals {
     public static String clientID;
-    public static String command;
+    public static String command = "no cmd";
     public static boolean locked = true;
     public static String login = "off";
 }
@@ -33,7 +33,7 @@ public class MulticastClient extends Thread {
     public static void main(String[] args) {
         Random rand = new Random();
         Globals.clientID = Integer.toString(rand.nextInt(100000000));
-        System.out.println("ClientID-> " + Globals.clientID);
+        System.out.println("ClientID -> " + Globals.clientID);
         MulticastClient client = new MulticastClient();
         client.start();
         MulticastUser user = new MulticastUser();
@@ -51,16 +51,30 @@ public class MulticastClient extends Thread {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength());
-                String[] arrOfStr = message.split("[|; ]");
+                String[] arrOfStr = message.split("[|;]");
                 Globals.command = arrOfStr[3];
 
-                if (arrOfStr[1] == Globals.clientID) {
-                    if (Globals.command == "locked" && arrOfStr[1] == Globals.clientID) {
+                if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
+                    if (Globals.command.equals("logged off")) {
+                        Globals.command = "login";
+                        Globals.login = "off";
+                        System.out.println(arrOfStr[5]);
+                    } else if (Globals.command.equals("logged on")) {
+                        Globals.command = "login";
+                        Globals.login = "on";
+                        System.out.println(arrOfStr[5]);
+                    } else if (Globals.command.equals("locked")) {
                         Globals.locked = false;
-                        Globals.command = "unlocked";
-                    } else if (arrOfStr[5] != "empty" && arrOfStr[1] == Globals.clientID) {
+                        System.out.println("Terminal Desbloqueado");
+                        System.out.println(arrOfStr[5]);
+                        Globals.command = "login";
+                    } else if (!arrOfStr[5].equals("empty")) {
                         System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
                         System.out.println(arrOfStr[5]);
+                    }
+                } else if (arrOfStr[1].equals("all")) {
+                    if (Globals.command.equals("locked")) {
+                        System.out.println("Terminal vai ser desbloqueado");
                     }
                 }
             }
@@ -87,16 +101,16 @@ class MulticastUser extends Thread {
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
             Scanner keyboardScanner = new Scanner(System.in);
             while (true) {
-                if (Globals.command == "locked") {
-                    String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + " answer;msg|" + Globals.locked;
-                    byte[] buffer = message.getBytes();
-                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                    socket.send(packet);
-                    Globals.command = "no cmd";
-                } else if (Globals.command == "unlock") {
-                    Globals.command = "no cmd";
-                } else {
+                sleep(500);
+                if (Globals.command.equals("locked")) {
+                    if (Globals.locked) {
+                        String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
+                        byte[] buffer = message.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    }
+                } else if (!Globals.command.equals("no cmd")) {
                     String readKeyboard = keyboardScanner.nextLine();
                     if (!Globals.locked) {
                         readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
@@ -107,10 +121,10 @@ class MulticastUser extends Thread {
                     } else {
                         System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto");
                     }
-                    Globals.command = "no cmd";
                 }
+                if (!Globals.command.equals("login")) Globals.command = "no cmd";
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             socket.close();
