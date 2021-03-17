@@ -95,12 +95,11 @@ class MulticastUser extends Thread {
                     socket.send(packet);
                     Globals.command = "no cmd";
                 } else if (Globals.command == "unlock") {
-                    //make the login
                     Globals.command = "no cmd";
                 } else {
                     String readKeyboard = keyboardScanner.nextLine();
                     if (!Globals.locked) {
-                        readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + " answer;msg|" + readKeyboard;
+                        readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
                         byte[] buffer = readKeyboard.getBytes();
                         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);

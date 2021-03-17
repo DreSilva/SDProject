@@ -14,6 +14,8 @@ public class MulticastServer extends Thread {
     public static void main(String[] args) {
         MulticastServer server = new MulticastServer();
         server.start();
+        Console console = new Console();
+        console.start();
     }
 
     public MulticastServer() {
@@ -23,7 +25,6 @@ public class MulticastServer extends Thread {
     public void run() {
         MulticastSocket socket = null, socketR = null;
         long counter = 0;
-        System.out.println(this.getName() + " running...");
         String message, messageR;
         String[] arrOfStr;
         String clientID, cmd;
@@ -84,11 +85,6 @@ class Console extends Thread {
     private int PORT = 4321;
     private long SLEEP_TIME = 5000;
 
-    public static void main(String[] args) {
-        Console console = new Console();
-        console.start();
-    }
-
     public Console() {
         super("Server " + (long) (Math.random() * 1000));
     }
@@ -96,7 +92,6 @@ class Console extends Thread {
     public void run() {
         MulticastSocket socket = null, socketR = null;
         long counter = 0;
-        System.out.println(this.getName() + " running...");
         String message, messageR;
         String[] arrOfStr;
         String clientID;
