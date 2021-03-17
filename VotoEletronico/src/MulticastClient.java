@@ -58,7 +58,7 @@ public class MulticastClient extends Thread {
                     if (Globals.command == "locked" && arrOfStr[1] == Globals.clientID) {
                         Globals.locked = false;
                         Globals.command = "unlocked";
-                    } else if (arrOfStr[5] != "empty") {
+                    } else if (arrOfStr[5] != "empty" && arrOfStr[1] == Globals.clientID) {
                         System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
                         System.out.println(arrOfStr[5]);
                     }
@@ -93,8 +93,10 @@ class MulticastUser extends Thread {
                     InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
+                    Globals.command = "no cmd";
                 } else if (Globals.command == "unlock") {
                     //make the login
+                    Globals.command = "no cmd";
                 } else {
                     String readKeyboard = keyboardScanner.nextLine();
                     if (!Globals.locked) {
@@ -106,6 +108,7 @@ class MulticastUser extends Thread {
                     } else {
                         System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto");
                     }
+                    Globals.command = "no cmd";
                 }
             }
         } catch (IOException e) {

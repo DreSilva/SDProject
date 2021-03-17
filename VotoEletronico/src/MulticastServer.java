@@ -26,7 +26,7 @@ public class MulticastServer extends Thread {
         System.out.println(this.getName() + " running...");
         String message, messageR;
         String[] arrOfStr;
-        String clientID;
+        String clientID, cmd;
         try {
             //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -37,43 +37,38 @@ public class MulticastServer extends Thread {
             //part to connect to the rmi server
             Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
 
+            byte[] buffer;
+            InetAddress group;
+            DatagramPacket packet;
+
             while (true) {
-
-                    do {
-                        message = "client|" + arrOfStr[1] + ";locked|false;msg|Insira login no formato <username> <password> \n";
-                        buffer = message.getBytes();
-                        group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-                        System.out.println("O terminal " + arrOfStr[1] + " está desbloqueado.");
-
-                        //recebe login do cliente em questão
-                        do {
-                            byte[] bufferR = new byte[256];
-                            DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
-                            socketR.receive(packetR);
-                            messageR = new String(packetR.getData(), 0, packetR.getLength());
-                            arrOfStr = messageR.split("[|; ]");
-                        } while (arrOfStr[1] == clientID && arrOfStr[3] == "login");
-
-                        if (voto.login(arrOfStr[5], arrOfStr[7], CC)) {
+                //recebe mensagem
+                byte[] bufferR = new byte[256];
+                DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                socketR.receive(packetR);
+                messageR = new String(packetR.getData(), 0, packetR.getLength());
+                arrOfStr = messageR.split("[|; ]");
+                if (arrOfStr[0] != "server") {
+                    clientID = arrOfStr[1];
+                    cmd = arrOfStr[3];
+                    if (cmd == "login") {
+                        arrOfStr = arrOfStr[5].split(" ");
+                        if (voto.login(arrOfStr[0], arrOfStr[1], arrOfStr[2])) {
                             //resposta
                             message = "client|" + arrOfStr[1] + ";logged|on;msg|Welcome to eVoting";
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
-
-                            //votação============================================================
-
                         } else {
-                            message = "client|" + arrOfStr[1] + ";logged|off;msg|Wrong Login.\n";
+                            message = "client|" + arrOfStr[1] + ";logged|off;msg|Wrong Login.Try again: \n";
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
                         }
-                    } while (message == "client|" + arrOfStr[1] + ";logged|off;msg|Wrong Login.\n");
+                    }
+                }
             }
         } catch (IOException | NotBoundException e) {
             e.printStackTrace();
@@ -140,12 +135,12 @@ class Console extends Thread {
 
                     clientID = arrOfStr[1];
 
-                    message = "server|"+clientID+";cmd|locked;msg|empty";
+                    message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username> <password> <CC>\n";
                     buffer = message.getBytes();
                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
-
+                    System.out.println("O terminal " + arrOfStr[1] + " está desbloqueado.");
                 } else {
                     System.out.println("Eleitor não identificado.");
                 }
