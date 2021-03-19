@@ -4,14 +4,111 @@ import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.net.*;
 import java.io.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-class UDPTalk extends Thread{
+class Global{
+   static volatile boolean prim = false;
+   static volatile RMIServer rmiServer;
+
+    static {
+        try {
+            rmiServer = new RMIServer();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class UDPPrim extends Thread{
+    DatagramSocket aSocket;
+    public UDPPrim(DatagramSocket aSocket){
+        this.aSocket=aSocket;
+        this.start();
+    }
+
+    @Override
+    public void run() {
+        String s;
+        try{
+            System.out.println("Socket Datagram a escuta no porto 6789");
+            while(true){
+                byte[] buffer = new byte[1000];
+                System.out.println("Esperando pacote");
+                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                aSocket.receive(request);
+                s=new String(request.getData(), 0, request.getLength());
+                System.out.println("Server Recebeu: " + s);
+                DatagramPacket reply = new DatagramPacket(request.getData(),
+                        request.getLength(), request.getAddress(), request.getPort());
+                aSocket.send(reply);
+                Global.rmiServer.writeFile();
+                Thread.sleep(4000);
+
+            }
+        }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
+        }catch (IOException e) {System.out.println("IO: " + e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {if(aSocket != null) aSocket.close();}
+    }
+}
+
+class UDPSec extends Thread{
+    public UDPSec(){this.start();}
+
+    @Override
+    public void run() {
+        try (DatagramSocket aSocket = new DatagramSocket()) {
+
+            String texto = "";
+            InputStreamReader input = new InputStreamReader(System.in);
+            aSocket.setSoTimeout(3000);
+
+            while (true) {
+                texto = "ping";
+
+                byte[] m = texto.getBytes();
+                InetAddress aHost = InetAddress.getByName("localhost");
+                int serverPort = 6789;
+                DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
+                aSocket.send(request);
+                byte[] buffer = new byte[1000];
+                DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+                aSocket.receive(reply);
+                System.out.println("Recebeu: " + new String(reply.getData(), 0, reply.getLength()));
+                Thread.sleep(2500);
+            } // while
+        } catch (SocketException e) {
+            System.out.println("Socket: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Server primario morreu");
+            Global.prim=true;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
 
+class UDPSecPrim extends Thread{
+
+    public UDPSecPrim(){
+        this.start();
+    }
+
+    @Override
+    public void run() {
+        while (true){
+            try {
+                Global.rmiServer.writeFile();
+                Thread.sleep(4000);
+            } catch (RemoteException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
 
 public class RMIServer extends UnicastRemoteObject implements Voto {
     static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
@@ -43,7 +140,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             System.out.println("Error initializing stream");
         }
     }
-
 
     public void readFile () throws java.rmi.RemoteException{
         try {
@@ -89,13 +185,23 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao.addLista(lista);
     }
 
-    public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException{
+    public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException{ // provavelmente vai ser preciso mudar
         if(opcao.equals("Remover")){
                 eleicao.removeMaquina(cliente);
         }
         else{
             eleicao.addMaquina(cliente);
         }
+    }
+
+    public String listaCandidatos(int n) throws java.rmi.RemoteException{
+        Eleicao eleicao = eleicoes.get(n);
+        StringBuilder s = new StringBuilder();
+        int count = 1;
+        for (Lista lista: eleicao.listas) {
+            s.append(count).append("- ").append(lista.nome).append("\n");
+        }
+        return s.toString();
     }
 
     public void criarLista(Lista lista) throws java.rmi.RemoteException{
@@ -123,7 +229,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             votacoes.append("- ");
             votacoes.append(eleicao.titulo);
             votacoes.append("\n");
-            votacoes.append(eleicao.descicao);
+            votacoes.append(eleicao.descricao);
             votacoes.append("\n");
             count+=1;
         }
@@ -138,31 +244,68 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return listas.get(n);
     }
 
-    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException { // provavelmente vai ser preciso mudar
         eleicao.addLista(lista);
     }
 
-    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException { // provavelmente vai ser preciso mudar
         eleicao.addLista(lista);
     }
 
-    public void removeLista(Lista lista)throws java.rmi.RemoteException {
+    public void removeLista(Lista lista)throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
         listas.remove(lista);
+    }
+
+    public void setTitulo(String titulo,Eleicao eleicao) throws java.rmi.RemoteException{
+        for (Eleicao eleicao1: eleicoes) {
+            if(eleicao.equals(eleicao1)){
+                eleicao1.setTitulo(titulo);
+            }
+
+        }
+    }
+
+    public void setDescricao(String Descricao,Eleicao eleicao) throws java.rmi.RemoteException{
+        for (Eleicao eleicao1: eleicoes) {
+            if(eleicao.equals(eleicao1)){
+                eleicao1.setDescicao(Descricao);
+            }
+
+        }
+    }
+
+    public void setDatas(Date dataI,Date dataf,Eleicao eleicao) throws java.rmi.RemoteException{
+        for (Eleicao eleicao1: eleicoes) {
+            if(eleicao.equals(eleicao1)){
+                eleicao.setInicio(dataI);
+                eleicao.setFim(dataf);
+            }
+
+        }
+    }
+
+    public void setTipo(String Tipo,Eleicao eleicao) throws java.rmi.RemoteException{
+        for (Eleicao eleicao1: eleicoes) {
+            if(eleicao.equals(eleicao1)){
+                eleicao.setTipo(Tipo);
+            }
+
+        }
     }
 
     public void addLista(Lista lista)throws java.rmi.RemoteException{
         listas.add(lista);
     }
 
-    public void addUserList(User user,Lista lista) throws java.rmi.RemoteException{
+    public void addUserList(User user,Lista lista) throws java.rmi.RemoteException{ // provavelmente vai ser preciso mudar
         lista.addUser(user);
     }
 
-    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException{
+    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException{ //provavelmente vai ser preciso mudar
         eleicoes.remove(eleicao);
     }
 
-    public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException{
+    public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException{//provavelmente vai ser preciso mudar
         lista.removeUser(user);
     }
 
@@ -205,7 +348,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  votacoes.toString();
     }
 
-    public String printUsers() throws java.rmi.RemoteException { //not anymore hehe
+    public String printUsers() throws java.rmi.RemoteException {
         StringBuilder votacoes = new StringBuilder();
         int count = 1;
         for (User user: users) {
@@ -228,7 +371,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         for (Eleicao eleicao : eleicoes){
             votacoes.append(eleicao.titulo);
             votacoes.append("\n");
-            votacoes.append(eleicao.descicao);
+            votacoes.append(eleicao.descricao);
             for (Lista lista : eleicao.listas){
                 votacoes.append(lista.nome);
                 votacoes.append("\n");
@@ -250,7 +393,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
-    public void votar(int opcao,User user,Eleicao eleicao,DepMesa mesa) throws java.rmi.RemoteException {
+    public void votar(int opcao,User user,Eleicao eleicao,DepMesa mesa) throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
         user.addVoto(eleicao,mesa.departamento);
         eleicao.addVoto(opcao);
     }
@@ -264,22 +407,44 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         System.setSecurityManager(new RMISecurityManager());
 
         InputStreamReader input = new InputStreamReader(System.in);
-        BufferedReader reader = new BufferedReader(input);
 
+        DatagramSocket aSocket = null;
+        boolean primario = false;
+
+        try{
+            aSocket = new DatagramSocket(6789);
+            System.out.println("Sou primario");
+            primario = true;
+        }catch (SocketException e){
+            System.out.println("Sou Secundario");
+
+        }
         try {
-            //User user = new User();
-            RMIServer h = new RMIServer();
-            h.readFile();
-            Registry r = LocateRegistry.createRegistry(7000);
-            r.rebind("votacao", h);
-            System.out.println("Hello Server ready.");
-            while (true) {
-                //System.out.print("> ");
-                //a = reader.readLine();
-                //for(Hello_C_I  client : listClient){
-                    //client.print_on_client(a);
-                //}
+            if(primario) {
+                new UDPPrim(aSocket);
 
+                Global.rmiServer.readFile();
+                Registry r = LocateRegistry.createRegistry(7000);
+                r.rebind("votacao", Global.rmiServer);
+                System.out.println("Hello Server ready.");
+                while (true) {
+
+                }
+            }
+            else{
+                new UDPSec();
+                while (true){
+                    if(Global.prim){ //perguntar pq eq n funcionaaaaa
+                        new UDPSecPrim();
+                        Global.rmiServer.readFile();
+                        Registry r = LocateRegistry.createRegistry(7000);
+                        r.rebind("votacao", Global.rmiServer);
+                        System.out.println("Hello Server ready.");
+                        while (true) {
+
+                        }
+                    }
+                }
             }
         } catch (Exception re) {
             System.out.println("Exception in HelloServer.main: " + re);

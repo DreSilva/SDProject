@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class AdminConsole {
-    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, ParseException {
+    public static void main(String[] args) throws RemoteException, NotBoundException, ParseException {
         Voto votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
         Scanner readInput = new Scanner(System.in);
         ArrayList<String> opcoes =  new ArrayList<>();
@@ -25,6 +25,7 @@ public class AdminConsole {
         // o admin escolhe q eleicao quer receber notificação ou recebe de todas ao mesmo tempo?
         // termino da eleicao e´automatico? assim que acabar é suposto notificar a admin console?
         while(true){
+            System.out.println();
             for (String s: opcoes) {
                 System.out.println(s);
             }
@@ -41,41 +42,184 @@ public class AdminConsole {
                     String username = readInput.nextLine();
                     System.out.println("Insira Password: ");
                     String password = readInput.nextLine();
-                    System.out.println("Insira Departamento: "); // so aceita departamentos do dei?
-                    String departamento =  readInput.nextLine();
-                    System.out.println("Insira Faculdade: "); // so aceita faculdades do dei?
-                    String faculdade = readInput.nextLine();
+                    System.out.println("Insira Departamento: ");
+                    System.out.println("1- DARQ");
+                    System.out.println("2- DCT");
+                    System.out.println("3- DCV");
+                    System.out.println("4- DEI");
+                    System.out.println("5- DEEC");
+                    System.out.println("6- DEM");
+                    System.out.println("7- DEQ");
+                    System.out.println("8- DF");
+                    System.out.println("9- DEC");
+                    System.out.println("10- DM");
+                    System.out.println("11- DQ");
+                    System.out.println("12- FLUC");
+                    System.out.println("13- FDUC");
+                    System.out.println("14- FCDEF");
+                    System.out.println("15- FPCE");
+                    System.out.println("16- FEUC");
+                    System.out.println("17- FFUC");
+                    System.out.println("17- FMUC");
+                    n3 = Integer.parseInt(readInput.nextLine());
+                    String departamento;
+                    switch (n3){
+                        case 1:
+                            departamento = "DARQ";
+                            break;
+                        case 2:
+                            departamento = "DCT";
+                            break;
+                        case 3:
+                            departamento = "DCV";
+                            break;
+                        case 4:
+                            departamento = "DEI";
+                            break;
+                        case 5:
+                            departamento = "DEEC";
+                            break;
+                        case 6:
+                            departamento = "DEM";
+                            break;
+                        case 7:
+                            departamento = "DEQ";
+                            break;
+                        case 8:
+                            departamento = "DF";
+                            break;
+                        case 9:
+                            departamento = "DEC";
+                            break;
+                        case 10:
+                            departamento = "DM";
+                            break;
+                        case 11:
+                            departamento = "DQ";
+                            break;
+                        case 12:
+                            departamento = "FLUC";
+                            break;
+                        case 13:
+                            departamento = "FDUC";
+                            break;
+                        case 14:
+                            departamento = "FCDEF";
+                            break;
+                        case 15:
+                            departamento = "FPCE";
+                            break;
+                        case 16:
+                            departamento = "FEUC";
+                            break;
+                        case 17:
+                            departamento = "FFUC";
+                            break;
+                        case 18:
+                            departamento = "FMUC";
+                            break;
+                        default:
+                            departamento="DEI";
+                            System.out.println("Por default é DEI");
+                    }
+
                     System.out.println("Insira Contacto: ");
                     String contacto = readInput.nextLine();
-                    System.out.println("Insira Funcao: "); // só docentes/estudantes/funcionario?
-                    String funcao = readInput.nextLine();
+                    System.out.println("Insira Funcao: ");
+                    System.out.println("1- Estudante");
+                    System.out.println("2- Docente");
+                    System.out.println("3- Funcionario");
+                    n3=Integer.parseInt(readInput.nextLine());
+                    String funcao;
+                    switch (n3){
+                        case 1:
+                            funcao="Estudante";
+                            break;
+                        case 2:
+                            funcao="Docente";
+                            break;
+                        case 3:
+                            funcao="Funcionario";
+                            break;
+                        default:
+                            System.out.println("Por Default é Estudante");
+                            funcao="Estudante";
+                    }
                     System.out.println("Insira Morada: ");
                     String morada = readInput.nextLine();
                     System.out.println("Insira Cartao de Cidadao: ");
                     String CC = readInput.nextLine();
-                    System.out.println("Insira Data de Validade: ");
-                    String dataV = readInput.nextLine();
-                    Date dataF = new SimpleDateFormat("dd/MM/yyyy").parse(dataV) ;
-                    user = new User(username,password,departamento,faculdade,contacto,funcao,morada,CC,dataF);
-                    votoObj.registo(user);
+                    System.out.println("Insira Data de Validade (dd/MM/yyyy): ");
+                    boolean check = false;
+                    do{
+                        try {
+                            String dataV = readInput.nextLine();
+                            Date dataF = new SimpleDateFormat("dd/MM/yyyy").parse(dataV);
+                            check = true;
+                            user = new User(username,password,departamento,contacto,funcao,morada,CC,dataF);
+                            votoObj.registo(user);
+                        } catch (ParseException e) {
+                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                        }
+                    }while (!check);
+
                     break;
 
                 case 2:
-                    System.out.println("Insira Data de Inicio: ");
-                    String dataEI = readInput.nextLine();
-                    Date dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEI);
-                    System.out.println("Insira Data Final: ");
-                    String dataEF = readInput.nextLine();
-                    Date dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEF);
+                    System.out.println("Insira Data de Inicio (dd/MM/yyyy HH:MM");
+                    check = false;
+                    Date dataEIF = null,dataEFF=null;
+                    do{
+                        try {
+                            String dataEI = readInput.nextLine();
+                            dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEI);
+                            check = true;
+                        } catch (ParseException e) {
+                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                        }
+                    }while (!check);
+
+                    check = false;
+                    System.out.println("Insira Data Final (dd/MM/yyyy HH:MM): ");
+                    do{
+                        try {
+                            String dataEF = readInput.nextLine();
+                            dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEF);
+                            check = true;
+
+                            if(dataEFF.before(dataEIF)){
+                                System.out.println("A data final devera ser depois da data inicial");
+                                check=false;
+                            }
+                        } catch (ParseException e) {
+                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                        }
+                    }while (!check);
+
                     System.out.println("Insira Titulo: ");
                     String titulo = readInput.nextLine();
                     System.out.println("Insira Descricao: ");
                     String descricao = readInput.nextLine();
-                    System.out.println("Insira Nucleo: "); // para q nucleo se vota
-                    String nucleo = readInput.nextLine();
-                    System.out.println("Insira Tipo de Eleicoes: ");  //se é eleições de estudantes/docente/funcionarios
-                    String tipo = readInput.nextLine();
-                    eleicao = new Eleicao(dataEIF,dataEFF,titulo,descricao,nucleo,tipo);
+                    System.out.println("Insira Tipo de Eleicoes: ");
+                    System.out.println("1- Estudante");
+                    System.out.println("2- Docente");
+                    System.out.println("3- Funcionario");
+                    n3=Integer.parseInt(readInput.nextLine());
+                    switch (n3){
+                        case 1:
+                            funcao="Estudante";
+                            break;
+                        case 2:
+                            funcao="Docente";
+                            break;
+                        case 3:
+                            funcao="Funcionario";
+                            break;
+                        default:
+                            System.out.println("Por Default é Estudante");
+                            funcao="Estudante";
+                    }
+                    eleicao = new Eleicao(dataEIF,dataEFF,titulo,descricao,funcao);
                     votoObj.criarEleicao(eleicao);
                     break;
 
@@ -196,7 +340,7 @@ public class AdminConsole {
                         System.out.println("1-Editar Titulo da Eleicao");
                         System.out.println("2-Editar Descricao da Eleicao");
                         System.out.println("3-Editar Datas");
-                        System.out.println("3-Editar Tipo de Eleicao");
+                        System.out.println("4-Editar Tipo de Eleicao");
                         n2 = Integer.parseInt(readInput.nextLine());
                     }while (n2!=1 && n2!=2 && n2!=3 && n2!=4);
 
@@ -204,12 +348,12 @@ public class AdminConsole {
                         case 1:
                             System.out.println("Indique novo titulo");
                             input = readInput.nextLine();
-                            eleicao.setTitulo(input);
+                            votoObj.setTitulo(input,eleicao);
                             break;
                         case 2:
                             System.out.println("Indique nova Descricao");
                             input = readInput.nextLine();
-                            eleicao.setDescicao(input);
+                            votoObj.setDescricao(input,eleicao);
                             break;
                         case 3:
                             System.out.println("Indique nova Data Inicio");
@@ -217,15 +361,31 @@ public class AdminConsole {
                             eleicao.setTitulo(input);
                             dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(input);
                             System.out.println("Insira nova Data Final");
-                            dataEF = readInput.nextLine();
-                            dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEF);
-                            eleicao.setInicio(dataEIF);
-                            eleicao.setFim(dataEFF);
+                            input = readInput.nextLine();
+                            dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(input);
+                            votoObj.setDatas(dataEIF,dataEFF,eleicao);
                             break;
                         case 4:
-                            System.out.println("Indique novo Tipo");
-                            input = readInput.nextLine();
-                            eleicao.setTipo(input);
+                            System.out.println("Indique novo Tipo de Eleicoes: ");  //se é eleições de estudantes/docente/funcionarios
+                            System.out.println("1- Estudante");
+                            System.out.println("2- Docente");
+                            System.out.println("3- Funcionario");
+                            n3=Integer.parseInt(readInput.nextLine());
+                            switch (n3){
+                                case 1:
+                                    funcao="Estudante";
+                                    break;
+                                case 2:
+                                    funcao="Docente";
+                                    break;
+                                case 3:
+                                    funcao="Funcionario";
+                                    break;
+                                default:
+                                    System.out.println("Por Default é Estudante");
+                                    funcao="Estudante";
+                            }
+                            votoObj.setTipo(funcao,eleicao);
                             break;
                     }
                     break;
@@ -239,12 +399,12 @@ public class AdminConsole {
                     System.out.println(input);
                     break;
 
-                case 7:
+                case 7: //remover isto depois, so para debug!
                     votoObj.writeFile();
-                    return;
+                    break;
 
                 default:
-                    System.out.println("Escolha uma das opções");
+                    System.out.println("Escolha uma das opcoes");
                     break;
             }
 
