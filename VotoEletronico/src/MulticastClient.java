@@ -23,7 +23,9 @@ class Globals {
     public static String clientID;
     public static String command = "no cmd";
     public static boolean locked = true;
-    public static String login = "off";
+    public static String login = "empty";
+    public static int n_election;
+    public static String CC;
 }
 
 public class MulticastClient extends Thread {
@@ -68,6 +70,12 @@ public class MulticastClient extends Thread {
                         System.out.println("Terminal Desbloqueado");
                         System.out.println(arrOfStr[5]);
                         Globals.command = "login";
+                    } else if (Globals.command.equals("select election")) {
+                        System.out.println(arrOfStr[5]);
+                        Globals.command = "election";
+                    } else if (Globals.command.equals("select candidate")) {
+                        System.out.println(arrOfStr[5]);
+                        Globals.command = "candidate";
                     } else if (!arrOfStr[5].equals("empty")) {
                         System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
                         System.out.println(arrOfStr[5]);
@@ -112,8 +120,18 @@ class MulticastUser extends Thread {
                     }
                 } else if (!Globals.command.equals("no cmd")) {
                     String readKeyboard = keyboardScanner.nextLine();
+                    if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
+                    if (Globals.command.equals("login") && Globals.login.equals("empty")){
+                        String[] arrOfStr = readKeyboard.split(" ");
+                        Globals.CC= arrOfStr[0];
+                    }
                     if (!Globals.locked) {
-                        readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
+                        if (Globals.command.equals("candidate")) {
+                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
+
+                        } else {
+                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
+                        }
                         byte[] buffer = readKeyboard.getBytes();
                         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
