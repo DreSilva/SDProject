@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Eleicao implements Serializable {
     Date inicio,fim;
-    String titulo,descicao,tipo;
+    String titulo,descricao,tipo;
     int votos;
     ArrayList<DepMesa> maquinasVotacao = new ArrayList<>();
     ArrayList<Lista> listas = new ArrayList<>();
@@ -13,7 +13,7 @@ public class Eleicao implements Serializable {
         this.inicio=inicio;
         this.fim=fim;
         this.titulo=titulo;
-        this.descicao=descricao;
+        this.descricao=descricao;
         this.tipo=tipo;
         this.votos = 0;
     }
@@ -23,7 +23,7 @@ public class Eleicao implements Serializable {
     };
 
     public void setDescicao(String descicao) {
-        this.descicao = descicao;
+        this.descricao = descicao;
     }
 
     public void setFim(Date fim) {
@@ -78,7 +78,7 @@ public class Eleicao implements Serializable {
 
         if (titulo != null ? !titulo.equals(eleicao.titulo) : eleicao.titulo != null) return false;
 
-        if (descicao != null ? !descicao.equals(eleicao.descicao) : eleicao.descicao != null) return false;
+        if (descricao != null ? !descricao.equals(eleicao.descricao) : eleicao.descricao != null) return false;
 
         return (tipo.equals(eleicao.tipo));
     }
@@ -88,7 +88,7 @@ public class Eleicao implements Serializable {
         int result = inicio != null ? inicio.hashCode() : 0;
         result = 31 * result + (fim != null ? fim.hashCode() : 0);
         result = 31 * result + (titulo != null ? titulo.hashCode() : 0);
-        result = 31 * result + (descicao != null ? descicao.hashCode() : 0);
+        result = 31 * result + (descricao != null ? descricao.hashCode() : 0);
         result = 31 * result + (tipo != null ? tipo.hashCode() : 0);
         result = 31 * result + votos;
         result = 31 * result + (maquinasVotacao != null ? maquinasVotacao.hashCode() : 0);

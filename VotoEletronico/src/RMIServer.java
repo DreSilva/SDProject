@@ -194,6 +194,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    public String listaCandidatos(int n) throws java.rmi.RemoteException{
+        Eleicao eleicao = eleicoes.get(n);
+        StringBuilder s = new StringBuilder();
+        int count = 1;
+        for (Lista lista: eleicao.listas) {
+            s.append(count).append("- ").append(lista.nome).append("\n");
+        }
+        return s.toString();
+    }
+
     public void criarLista(Lista lista) throws java.rmi.RemoteException{
         listas.add(lista);
     }
