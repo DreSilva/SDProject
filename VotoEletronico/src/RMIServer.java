@@ -91,25 +91,6 @@ class UDPSec extends Thread{
 
 }
 
-class UDPSecPrim extends Thread{
-
-    public UDPSecPrim(){
-        this.start();
-    }
-
-    @Override
-    public void run() {
-        while (true){
-            try {
-                Global.rmiServer.writeFile();
-                Thread.sleep(4000);
-            } catch (RemoteException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
-
 public class RMIServer extends UnicastRemoteObject implements Voto {
     static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
@@ -393,7 +374,15 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
-    public void votar(int opcao,User user,Eleicao eleicao,DepMesa mesa) throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
+    public void votar(int opcao,String CC,int nEleicao,DepMesa mesa) throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
+        User user = null;
+        for (User userS:users) {
+            if(userS.CC.equals(CC)){
+                user = userS;
+                break;
+            }
+        }
+        Eleicao eleicao = eleicoes.get(nEleicao);
         user.addVoto(eleicao,mesa.departamento);
         eleicao.addVoto(opcao);
     }
@@ -434,8 +423,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             else{
                 new UDPSec();
                 while (true){
-                    if(Global.prim){ //perguntar pq eq n funcionaaaaa
-                        new UDPSecPrim();
+                    if(Global.prim){ //not working
+                        aSocket = new DatagramSocket(6789);
+                        new UDPPrim(aSocket);
                         Global.rmiServer.readFile();
                         Registry r = LocateRegistry.createRegistry(7000);
                         r.rebind("votacao", Global.rmiServer);

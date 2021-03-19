@@ -8,7 +8,7 @@ public interface Voto extends Remote {
     public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException;
     public String listarVotacoes() throws java.rmi.RemoteException;
     public boolean identificarLeitor(String CC) throws java.rmi.RemoteException;
-    public void votar(int opcao,User user,Eleicao eleicao, DepMesa mesa) throws java.rmi.RemoteException;
+    public void votar(int opcao,String CC,int nEleicao, DepMesa mesa) throws java.rmi.RemoteException;
     public String listarEleicoes() throws java.rmi.RemoteException;
     public Eleicao getEleicao(int n) throws java.rmi.RemoteException;
     public void criarLista(Lista lista) throws java.rmi.RemoteException;
