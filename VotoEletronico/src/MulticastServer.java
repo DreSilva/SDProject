@@ -10,8 +10,16 @@ public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 4321;
     private long SLEEP_TIME = 5000;
+    private static DepMesa depMesa = new DepMesa();
 
     public static void main(String[] args) {
+        if(args.length==1){
+            depMesa.setDepartamento(args[0]);
+        }
+        else{
+            System.out.println("Corra com com o número de departamento: java MulticastServer <departamento>");
+            System.exit(0);
+        }
         MulticastServer server = new MulticastServer();
         server.start();
         Console console = new Console();
@@ -62,7 +70,7 @@ public class MulticastServer extends Thread {
                     }else if (cmd == "candidate") {
                         arrOfStr = arrOfStr[5].split();
                         int n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]),arrOfStr[0],arrOfStr[1]);
+                        message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]),arrOfStr[0],Integer.parseInt(arrOfStr[1]),depMesa);
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
