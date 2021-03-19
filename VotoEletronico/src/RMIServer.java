@@ -229,7 +229,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             votacoes.append("- ");
             votacoes.append(eleicao.titulo);
             votacoes.append("\n");
-            votacoes.append(eleicao.descicao);
+            votacoes.append(eleicao.descricao);
             votacoes.append("\n");
             count+=1;
         }
@@ -371,7 +371,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         for (Eleicao eleicao : eleicoes){
             votacoes.append(eleicao.titulo);
             votacoes.append("\n");
-            votacoes.append(eleicao.descicao);
+            votacoes.append(eleicao.descricao);
             for (Lista lista : eleicao.listas){
                 votacoes.append(lista.nome);
                 votacoes.append("\n");
