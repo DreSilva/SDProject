@@ -68,7 +68,7 @@ public class MulticastServer extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     }else if (cmd == "candidate") {
-                        arrOfStr = arrOfStr[5].split();
+                        arrOfStr = arrOfStr[5].split(" ");
                         int n = Integer.parseInt(arrOfStr[5]);
                         message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]),arrOfStr[0],Integer.parseInt(arrOfStr[1]),depMesa);
                         buffer = message.getBytes();
@@ -76,7 +76,7 @@ public class MulticastServer extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
 
-                        int n = Integer.parseInt(arrOfStr[5]);
+                        n = Integer.parseInt(arrOfStr[5]);
                         message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.listaCandidatos(n);
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
