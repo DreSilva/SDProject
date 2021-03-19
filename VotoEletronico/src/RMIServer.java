@@ -374,7 +374,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
-    public void votar(int opcao,String CC,int nEleicao,DepMesa mesa) throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
+    public String votar(int opcao,String CC,int nEleicao,DepMesa mesa) throws java.rmi.RemoteException { //provavelmente vai ser preciso mudar
         User user = null;
         for (User userS:users) {
             if(userS.CC.equals(CC)){
@@ -385,6 +385,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         Eleicao eleicao = eleicoes.get(nEleicao);
         user.addVoto(eleicao,mesa.departamento);
         eleicao.addVoto(opcao);
+        return "Andre para de ser fking gay seu fking tard";
     }
 
     // =======================================================
