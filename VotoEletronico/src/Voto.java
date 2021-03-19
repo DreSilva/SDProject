@@ -26,4 +26,8 @@ public interface Voto extends Remote {
     public String getEleicoesVelhas() throws  java.rmi.RemoteException;
     public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException;
     public void writeFile() throws java.rmi.RemoteException; //debug
+    public void setTitulo(String titulo,Eleicao eleicao) throws java.rmi.RemoteException;
+    public void setDescricao(String Descricao,Eleicao eleicao) throws java.rmi.RemoteException;
+    public void setDatas(Date dataI,Date dataf,Eleicao eleicao) throws java.rmi.RemoteException;
+    public void setTipo(String Tipo,Eleicao eleicao) throws java.rmi.RemoteException;
 }
