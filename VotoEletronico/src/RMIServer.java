@@ -7,6 +7,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Classe que vai ficar com as variaveis que precisam de ser guardadas entre threads
+ * @
+ */
 class Global{
     static volatile boolean prim = false;
     static volatile RMIServer rmiServer;
@@ -21,12 +25,26 @@ class Global{
     }
 }
 
+
+/**
+ * Classe para o RMI primario que vai servir como UDP server
+ */
 class UDPPrim extends Thread{
     DatagramSocket aSocket;
+
+    /**
+     * Construtor para o UDPrim
+     * @param aSocket socket criada para o UDP server
+     */
     public UDPPrim(DatagramSocket aSocket){
         this.aSocket=aSocket;
         this.start();
     }
+
+    /**
+     * UDP server vai comunicar com o UDP client de 4 a 4 segundos para verificar que está vivo, ao mesmo tempo vai
+     * escrevendo no ficheiro para ir guarando os dados
+     */
 
     @Override
     public void run() {
@@ -55,9 +73,20 @@ class UDPPrim extends Thread{
     }
 }
 
+/**
+ * Classe para o RMI secundario que vai servir como UDP client
+ */
 class UDPSec extends Thread{
+    /**
+     * Inicializa o cliente
+     */
     public UDPSec(){this.start();}
 
+    /**
+     * UDP client vai comunicar com o UDP server de 4 a 4 segundos para verificar que ele está vivo, caso o servidor nao
+     * responda nos 4 segundos é entao levantada uma excpetion que vai fazer com que o RMI secundario passe a primario
+     * fazendo assim as ações dele
+     */
     @Override
     public void run() {
         try (DatagramSocket aSocket = new DatagramSocket()) {
@@ -90,9 +119,18 @@ class UDPSec extends Thread{
     }
 }
 
+/**
+ * Thread que vai correr toda a lista de eleições para ver se há alguma que acabou
+ */
 class RealTimeUpdate extends Thread{
+    /**
+     * Inicializa a thread
+     */
     public RealTimeUpdate(){this.start();}
 
+    /**
+     * Corre a função para verificar horas da thread
+     */
     @Override
     public void run() {
         try {
@@ -103,21 +141,34 @@ class RealTimeUpdate extends Thread{
     }
 }
 
+
+/**
+ * Classe para o RMI server
+ */
 public class RMIServer extends UnicastRemoteObject implements Voto {
     static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
 
-
+    /**
+     * Construtor para a classe
+     * @throws RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
     public RMIServer() throws RemoteException {
         super();
     }
 
+    /**
+     *  @inheritDoc
+     */
     public void subscribeAdmin(Notifications nAdmin) throws RemoteException {
         Global.admin = nAdmin;
     }
 
+    /**
+     *  @inheritDoc
+     */
     public void writeFile() throws java.rmi.RemoteException{
         try {
             FileOutputStream f = new FileOutputStream("myObjects.ser");
@@ -139,6 +190,10 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * Vai ler no ficheiro os users,listas e eleições ao inicializar o servidor
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
     public void readFile () throws java.rmi.RemoteException{
         try {
             FileInputStream fi = new FileInputStream("myObjects.ser");
@@ -161,6 +216,11 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * Vai percorrer todas as eleições e caso a data de fim tenha passado a data final remove das eleições atuais e
+     * muda para eleições passadas
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
     public void realTimeEleicao() throws java.rmi.RemoteException{
         Date now = new Date();
         for (Eleicao eleicao : eleicoes) {
@@ -172,10 +232,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public void registo(User user) throws java.rmi.RemoteException{
         users.add(user);
     }
 
+    /**
+     * @inheritDoc
+     */
     public boolean login(String user,String password, String CC) throws java.rmi.RemoteException{
         for(User userL : users){
             if(userL.password.equals(password) && userL.user.equals(user)){
@@ -185,6 +251,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
+    /**
+     * @inheritDoc
+     */
     public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException   {
         eleicoes.add(eleicao);
         Lista lista = new Lista("Branco");
@@ -193,6 +262,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao.addLista(lista);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException{
         Eleicao eleicao1=null;
 
@@ -210,20 +282,30 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public String listaCandidatos(int n) throws java.rmi.RemoteException{
         Eleicao eleicao = eleicoes.get(n);
         StringBuilder s = new StringBuilder();
         int count = 1;
         for (Lista lista: eleicao.listas) {
             s.append(count).append("- ").append(lista.nome).append("\n");
+            count++;
         }
         return s.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public void criarLista(Lista lista) throws java.rmi.RemoteException{
         listas.add(lista);
     }
 
+    /**
+     * @inheritDoc
+     */
     public String listarListas() throws java.rmi.RemoteException {
         StringBuilder listasS = new StringBuilder();
         int count = 1;
@@ -237,6 +319,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return listasS.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public String listarEleicoes() throws java.rmi.RemoteException {
         StringBuilder votacoes = new StringBuilder();
         int count = 1;
@@ -252,14 +337,23 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return votacoes.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public Eleicao getEleicao(int n) throws java.rmi.RemoteException {
         return eleicoes.get(n);
     }
 
+    /**
+     * @inheritDoc
+     */
     public Lista getLista(int n) throws java.rmi.RemoteException {
         return listas.get(n);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
         Eleicao eleicao1=null;
 
@@ -271,6 +365,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao1.addLista(lista);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
         Eleicao eleicao1=null;
 
@@ -283,6 +380,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao1.addLista(lista);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeLista(Lista lista)throws java.rmi.RemoteException {
         Lista lista1=null;
 
@@ -294,6 +394,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         listas.remove(lista1);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setTitulo(String titulo,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
@@ -303,6 +406,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setDescricao(String Descricao,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
@@ -312,6 +418,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setDatas(Date dataI,Date dataf,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
@@ -322,6 +431,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setTipo(String Tipo,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
@@ -331,10 +443,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public void addLista(Lista lista)throws java.rmi.RemoteException{
         listas.add(lista);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void addUserList(User user,Lista lista) throws java.rmi.RemoteException{
         Lista lista1=null;
 
@@ -347,6 +465,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         lista1.addUser(user);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException{
         Eleicao eleicao1=null;
 
@@ -359,6 +480,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicoes.remove(eleicao1);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException{
         Lista lista1=null;
 
@@ -378,6 +502,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         lista1.removeUser(user1);
     }
 
+    /**
+     * @inheritDoc
+     */
     public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException{
         StringBuilder info = new StringBuilder();
         Eleicao eleicao = eleicoesVelhas.get(pos);
@@ -399,6 +526,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return info.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public String getEleicoesVelhas() throws  java.rmi.RemoteException{
         StringBuilder votacoes = new StringBuilder();
         int counter = 1;
@@ -409,6 +539,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  votacoes.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public String printUsers() throws java.rmi.RemoteException {
         StringBuilder votacoes = new StringBuilder();
         int count = 1;
@@ -423,10 +556,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     }
 
+    /**
+     * @inheritDoc
+     */
     public User getUser(int pos) throws java.rmi.RemoteException {
         return users.get(pos);
     }
 
+    /**
+     * @inheritDoc
+     */
     public String listarVotacoes() throws java.rmi.RemoteException{
         StringBuilder votacoes = new StringBuilder();
         for (Eleicao eleicao : eleicoes){
@@ -445,6 +584,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return votacoes.toString();
     }
 
+    /**
+     * @inheritDoc
+     */
     public boolean identificarLeitor(String CC) throws java.rmi.RemoteException{
         for(User userL : users){
             if(userL.CC.equals(CC)){
@@ -454,6 +596,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return  false;
     }
 
+    /**
+     * @inheritDoc
+     */
     public String votar(int opcao,String CC,int nEleicao,DepMesa mesa) throws java.rmi.RemoteException {
         User user = null;
         for (User userS:users) {
@@ -481,6 +626,11 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     // =======================================================
 
+    /**
+     * Main da função onde vai ser criada as threads para o UDP Primario/UDP Secundário. O 1º RMI a ser ligado cria a
+     * thread Primario e fica a espera de receber mensagem pelo seundario. Apos o Servidor Primario morrer o Secundario
+     * continua o seu trabalho
+     */
     public static void main(String args[]) {
         String a;
 

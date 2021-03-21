@@ -2,6 +2,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Classe com todos os atributos necessários para uma eleição
+ */
 public class Eleicao implements Serializable {
     Date inicio,fim;
     String titulo,descricao,tipo;
@@ -9,6 +12,15 @@ public class Eleicao implements Serializable {
     ArrayList<DepMesa> maquinasVotacao = new ArrayList<>();
     ArrayList<Lista> listas = new ArrayList<>();
     ArrayList<Integer> votosDone = new ArrayList<>();
+
+    /**
+     * Objeto para uma elição
+     * @param inicio Data de inicio da eleição
+     * @param fim Data de fim da eleição
+     * @param titulo Titulo da Eleição
+     * @param descricao Descrição da Eleição
+     * @param tipo Tipo da eleição, se é para estudates,docentes ou docentes
+     */
     public Eleicao(Date inicio, Date fim, String titulo, String descricao, String tipo){
         this.inicio=inicio;
         this.fim=fim;
@@ -18,50 +30,94 @@ public class Eleicao implements Serializable {
         this.votos = 0;
     }
 
+    /**
+     * Muda data de inicio da eleição
+     * @param inicio Nova data de Inicio
+     */
     public void setInicio(Date inicio){
         this.inicio=inicio;
     };
 
+    /**
+     * Muda descrição da eleição
+     * @param descicao Nova Descrição da eleição
+     */
     public void setDescicao(String descicao) {
         this.descricao = descicao;
     }
 
+    /**
+     * Muda data de fim da eleição
+     * @param fim Nova data de fim
+     */
     public void setFim(Date fim) {
         this.fim = fim;
     }
 
-
+    /**
+     * Muda o tipo da eleição
+     * @param tipo Novo tipo de eleição
+     */
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
+    /**
+     * Muda o titulo da eleição
+     * @param titulo novo titulo da eleição
+     */
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
 
+    /**
+     * Adiciona uma lista para votar na eleição
+     * @param lista Lista a adicionar
+     */
     public void addLista(Lista lista){
         listas.add(lista);
         votosDone.add(0);
     }
 
+    /**
+     * Remove uma lista para votar na eleição
+     * @param lista Lista a Remover
+     */
     public void removeLista(Lista lista){
         int pos = listas.indexOf(lista);
         votosDone.remove(pos);
         listas.remove(lista);
     }
 
+    /**
+     * Adiciona mesa de eleição
+     * @param maq Mesa a adicionar
+     */
     public void addMaquina(DepMesa maq){
         maquinasVotacao.add(maq);
     }
 
+    /**
+     * Remover mesa de eleição
+     * @param maq Mesa a Remover
+     */
     public void removeMaquina(DepMesa maq){
         maquinasVotacao.remove(maq);
     }
 
+    /**
+     * Adicionar voto a uma lista
+     * @param opcao lista á qual se adiciona um voto
+     */
     public void addVoto(int opcao){
         votosDone.set(opcao, votosDone.get(opcao)+1);
     }
 
+    /**
+     * Verifica se as eleições passadas são iguais ou n
+     * @param o objeto a comparar
+     * @return True se forem False se não forem
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,17 +139,4 @@ public class Eleicao implements Serializable {
         return (tipo.equals(eleicao.tipo));
     }
 
-    @Override
-    public int hashCode() {
-        int result = inicio != null ? inicio.hashCode() : 0;
-        result = 31 * result + (fim != null ? fim.hashCode() : 0);
-        result = 31 * result + (titulo != null ? titulo.hashCode() : 0);
-        result = 31 * result + (descricao != null ? descricao.hashCode() : 0);
-        result = 31 * result + (tipo != null ? tipo.hashCode() : 0);
-        result = 31 * result + votos;
-        result = 31 * result + (maquinasVotacao != null ? maquinasVotacao.hashCode() : 0);
-        result = 31 * result + (listas != null ? listas.hashCode() : 0);
-        result = 31 * result + (votosDone != null ? votosDone.hashCode() : 0);
-        return result;
-    }
 }

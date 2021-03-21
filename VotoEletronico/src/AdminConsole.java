@@ -1,6 +1,4 @@
-import java.net.MalformedURLException;
 import java.rmi.ConnectException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -13,24 +11,43 @@ import java.util.Scanner;
 
 public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
+    /**
+     * Cria objeto da consola para passar ao RMI Server
+     * @throws RemoteException
+     */
     public AdminConsole() throws RemoteException {
         super();
     }
 
+    /**
+     * @inheritDoc
+     */
     public void estadoMesa() throws  java.rmi.RemoteException{
 
     }
 
+    /**
+     * @inheritDoc
+     */
     public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
         System.out.println("Eleicao "+nome+" acabou.\nResultados");
         System.out.println(votos);
     }
+
+    /**
+     * @inheritDoc
+     */
     public void novoEleitor() throws  java.rmi.RemoteException{
 
     }
 
-
-    public static void main(String[] args) throws RemoteException, NotBoundException, ParseException {
+    /**
+     * Esta função vai permitir ao admin fazer todas as ações necessárias para por as votações a funcionar. Permite
+     * criar e remover eleições,utilizadores e listas.
+     * @throws RemoteException excepção que pode ocorrer na execução de uma remote call
+     * @throws NotBoundException Acontece caso o o objeto a procurar no registo nao exista
+     */
+    public static void main(String[] args) throws RemoteException, NotBoundException {
         Scanner readInput = new Scanner(System.in);
         AdminConsole admin = new AdminConsole();
         Voto votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
@@ -43,8 +60,6 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         opcoes.add("4-Gerir Mesas de Voto");
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
-
-        // notificações em relacao a mesa de voto ? Q notificações, sobre oq? -> ainda n percebi bem
 
         while(true){
             try {
@@ -189,7 +204,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 2:
-                        System.out.println("Insira Data de Inicio (dd/MM/yyyy HH:MM");
+                        System.out.println("Insira Data de Inicio (dd/MM/yyyy HH:MM)");
                         check = false;
                         Date dataEIF = null, dataEFF = null;
                         do {

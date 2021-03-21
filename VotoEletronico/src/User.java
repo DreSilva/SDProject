@@ -4,11 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Classe que corresponde a cada utilizador assim como os seus atributos necessários
+ */
 public class User implements Serializable {
     String user,password,departamento,contacto,tipo,morada,CC;
     Date validade;
     Map<Eleicao,String> localVoto = new HashMap<>();
 
+    /**
+     * Objeto user tem as caracteristicas necessárias
+     * @param user Nome do utilizador
+     * @param password Password do utilizador
+     * @param departamento Departamento do utilizador
+     * @param contacto Contato do utilizador
+     * @param tipo Tipo do utilizador
+     * @param morada Morada do utilizador
+     * @param CC Cartao de Cidadao do utilizador
+     * @param validade Validade do CC
+     */
     public User(String user, String password, String departamento,
                         String contacto, String tipo, String morada, String CC, Date validade){
         this.CC=CC;
@@ -21,12 +35,21 @@ public class User implements Serializable {
         this.validade=validade;
     }
 
-
+    /**
+     * Guarda local de voto e departamento onde votou
+     * @param eleicao Eleição ao qual votou
+     * @param departamento Departamento onde votou
+     */
     public void addVoto(Eleicao eleicao, String departamento){
         localVoto.put(eleicao,departamento);
     }
 
 
+    /**
+     * Comparação entre users
+     * @param o Utilizador a comprar
+     * @return True se  for igual false se nao for igual
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -35,8 +58,4 @@ public class User implements Serializable {
         return user.equals(user1.user) && password.equals(user1.password) && departamento.equals(user1.departamento) && contacto.equals(user1.contacto) && tipo.equals(user1.tipo) && morada.equals(user1.morada) && CC.equals(user1.CC) && validade.equals(user1.validade);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, password, departamento, contacto, tipo, morada, CC, validade);
-    }
 }
