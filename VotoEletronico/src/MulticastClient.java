@@ -103,49 +103,56 @@ class MulticastUser extends Thread {
     }
 
     public void run() {
-        MulticastSocket socket = null;
-        System.out.println(this.getName() + " ready...");
-        try {
-            socket = new MulticastSocket();  // create socket without binding it (only for sending)
-            Scanner keyboardScanner = new Scanner(System.in);
-            while (true) {
-                sleep(500);
-                if (Globals.command.equals("locked")) {
-                    if (Globals.locked) {
-                        String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
-                        byte[] buffer = message.getBytes();
-                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-                    }
-                } else if (!Globals.command.equals("no cmd")) {
-                    String readKeyboard = keyboardScanner.nextLine();
-                    if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
-                    if (Globals.command.equals("login") && Globals.login.equals("empty")){
-                        String[] arrOfStr = readKeyboard.split(" ");
-                        Globals.CC= arrOfStr[0];
-                    }
-                    if (!Globals.locked) {
-                        if (Globals.command.equals("candidate")) {
-                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
-
-                        } else {
-                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
+        while (true) {
+            MulticastSocket socket = null;
+            System.out.println(this.getName() + " ready...");
+            try {
+                socket = new MulticastSocket();  // create socket without binding it (only for sending)
+                socket.setSoTimeout(10000);
+                Scanner keyboardScanner = new Scanner(System.in);
+                while (true) {
+                    sleep(500);
+                    if (Globals.command.equals("locked")) {
+                        if (Globals.locked) {
+                            String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
+                            byte[] buffer = message.getBytes();
+                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
                         }
-                        byte[] buffer = readKeyboard.getBytes();
-                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-                    } else {
-                        System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto");
+                    } else if (!Globals.command.equals("no cmd")) {
+                        String readKeyboard = keyboardScanner.nextLine();
+                        if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
+                        if (Globals.command.equals("login") && Globals.login.equals("empty")) {
+                            String[] arrOfStr = readKeyboard.split(" ");
+                            Globals.CC = arrOfStr[0];
+                        }
+                        if (!Globals.locked) {
+                            if (Globals.command.equals("candidate")) {
+                                readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
+
+                            } else {
+                                readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
+                            }
+                            byte[] buffer = readKeyboard.getBytes();
+                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        } else {
+                            System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
+                        }
                     }
+                    if (!Globals.command.equals("login")) Globals.command = "no cmd";
                 }
-                if (!Globals.command.equals("login")) Globals.command = "no cmd";
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Globals.locked = true;
+                Globals.login = "empty";
+                System.out.println("O terminal está bloqueado.\n");
+            } finally {
+                socket.close();
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
         }
     }
 }
