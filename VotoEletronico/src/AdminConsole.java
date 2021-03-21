@@ -20,6 +20,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
     public void estadoMesa() throws  java.rmi.RemoteException{
 
     }
+
     public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
         System.out.println("Eleicao "+nome+" acabou.\nResultados");
         System.out.println(votos);
