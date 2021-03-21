@@ -61,8 +61,8 @@ public class MulticastClient extends Thread {
                         Globals.command = "login";
                         Globals.login = "off";
                         System.out.println(arrOfStr[5]);
-                    } else if (Globals.command.equals("logged on")) {
-                        Globals.command = "login";
+                    } else if (Globals.command.equals("logged on & select election")) {
+                        Globals.command = "election";
                         Globals.login = "on";
                         System.out.println(arrOfStr[5]);
                     } else if (Globals.command.equals("locked")) {
@@ -71,8 +71,8 @@ public class MulticastClient extends Thread {
                         System.out.println(arrOfStr[5]);
                         Globals.command = "login";
                     } else if (Globals.command.equals("select election")) {
-                        System.out.println(arrOfStr[5]);
                         Globals.command = "election";
+                        System.out.println(arrOfStr[5]);
                     } else if (Globals.command.equals("select candidate")) {
                         System.out.println(arrOfStr[5]);
                         Globals.command = "candidate";
@@ -108,7 +108,7 @@ class MulticastUser extends Thread {
             System.out.println(this.getName() + " ready...");
             try {
                 socket = new MulticastSocket();  // create socket without binding it (only for sending)
-                socket.setSoTimeout(10000);
+                socket.setSoTimeout(120000);
                 Scanner keyboardScanner = new Scanner(System.in);
                 while (true) {
                     sleep(500);
