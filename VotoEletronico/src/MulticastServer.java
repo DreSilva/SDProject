@@ -60,9 +60,9 @@ public class MulticastServer extends Thread {
                 if (arrOfStr[0] != "server") {
                     clientID = arrOfStr[1];
                     cmd = arrOfStr[3];
-                    if (cmd == "election") {
+                    if (cmd == "election" || cmd == "logged on & select election") {
                         int n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.listaCandidatos(n);
+                        message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n);
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -166,12 +166,7 @@ class Console extends Thread {
                             if (CC.equals(arrOfStr[2])) {
                                 if (voto.login(arrOfStr[0], arrOfStr[1], arrOfStr[2])) {
                                     //resposta
-                                    message = "server|" + clientID + ";cmd|logged on;msg|Welcome to eVoting";
-                                    buffer = message.getBytes();
-                                    group = InetAddress.getByName(MULTICAST_ADDRESS);
-                                    packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                                    socket.send(packet);
-                                    message = "server|" + clientID + ";cmd|select election;msg|" + voto.listarEleicoes();
+                                    message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting\n"+ voto.listarEleicoes();
                                     buffer = message.getBytes();
                                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
