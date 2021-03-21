@@ -291,7 +291,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         int count = 1;
         for (Lista lista: eleicao.listas) {
             s.append(count).append("- ").append(lista.nome).append("\n");
-            count++;
+            count+=1;
         }
         return s.toString();
     }
