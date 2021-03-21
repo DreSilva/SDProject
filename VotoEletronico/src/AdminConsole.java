@@ -34,7 +34,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         AdminConsole admin = new AdminConsole();
         Voto votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
         ArrayList<String> opcoes =  new ArrayList<>();
-        votoObj.subscribeAdmin(admin);
+        votoObj.subscribeAdmin((Notifications) admin);
         opcoes.add("Escolher Opcao");
         opcoes.add("1-Registar Pessoa");
         opcoes.add("2-Criar Eleicao");
@@ -261,86 +261,117 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             case 1:
                                 System.out.println("Selecione Eleicao");
                                 input = votoObj.listarEleicoes();
-                                System.out.println(input);
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                Eleicao eleicao1 = votoObj.getEleicao(n3 - 1);
-                                input = votoObj.listarListas();
-                                System.out.println(input);
-                                n4 = Integer.parseInt(readInput.nextLine());
-                                lista = votoObj.getLista(n4 - 1);
-                                votoObj.addListaEleicao(eleicao1, lista);
+                                if(!input.equals("")) {
+                                    System.out.println(input);
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    Eleicao eleicao1 = votoObj.getEleicao(n3 - 1);
+                                    input = votoObj.listarListas();
+                                    System.out.println(input);
+                                    n4 = Integer.parseInt(readInput.nextLine());
+                                    lista = votoObj.getLista(n4 - 1);
+                                    votoObj.addListaEleicao(eleicao1, lista);
+                                }
+                                else{
+                                    System.out.println("Não ha eleicoes registadas!");
+                                }
                                 break;
                             case 2:
                                 System.out.println("Selecione Eleicao");
                                 input = votoObj.listarEleicoes();
-                                System.out.println(input);
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                eleicao = votoObj.getEleicao(n3 - 1);
-                                input = votoObj.listarListas();
-                                System.out.println(input);
-                                n4 = Integer.parseInt(readInput.nextLine());
-                                lista = votoObj.getLista(n4 - 1);
-                                votoObj.removeListaEleicao(eleicao, lista);
+                                if(!input.equals("")) {
+                                    System.out.println(input);
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    eleicao = votoObj.getEleicao(n3 - 1);
+                                    input = votoObj.listarListas();
+                                    System.out.println(input);
+                                    n4 = Integer.parseInt(readInput.nextLine());
+                                    lista = votoObj.getLista(n4 - 1);
+                                    votoObj.removeListaEleicao(eleicao, lista);
+                                }
+                                else{
+                                    System.out.println("Não ha eleicoes registadas!");
+                                }
                                 break;
 
                             case 3:
                                 System.out.println("Indique nome da Lista");
-                                votoObj.listarEleicoes();
-                                input = readInput.nextLine();
-                                lista = new Lista(input);
-                                votoObj.addLista(lista);
-                                System.out.println("Adicione elementos á lista - Clique 0 quando quiser terminar");
-                                input = votoObj.printUsers();
-                                System.out.println(input);
-                                do {
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    if (n3 != 0) {
-                                        user = votoObj.getUser(n3 - 1);
-                                        votoObj.addUserList(user, lista);
-                                    }
-                                } while (n3 != 0);
+                                input=votoObj.listarEleicoes();
+                                if(!input.equals("")) {
+                                    System.out.println(input);
+                                    input = readInput.nextLine();
+                                    lista = new Lista(input);
+                                    votoObj.addLista(lista);
+                                    System.out.println("Adicione elementos á lista - Clique 0 quando quiser terminar");
+                                    input = votoObj.printUsers();
+                                    System.out.println(input);
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        if (n3 != 0) {
+                                            user = votoObj.getUser(n3 - 1);
+                                            votoObj.addUserList(user, lista);
+                                        }
+                                    } while (n3 != 0);
+                                }
+                                else{
+                                    System.out.println("Não ha listas registadas!");
+                                }
                                 break;
 
                             case 4:
                                 System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
-                                System.out.println(input);
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                lista = votoObj.getLista(n3 - 1);
-                                votoObj.removeLista(lista);
+                                if(!input.equals("")) {
+                                    System.out.println(input);
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    lista = votoObj.getLista(n3 - 1);
+                                    votoObj.removeLista(lista);
+                                }
+                                else{
+                                    System.out.println("Nao ha listas registadas!");
+                                }
                                 break;
                             case 5:
                                 System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
-                                System.out.println(input);
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                lista = votoObj.getLista(n3 - 1);
-                                input = votoObj.printUsers();
-                                System.out.println(input);
-                                do {
+                                if(!input.equals("")) {
+                                    System.out.println(input);
                                     n3 = Integer.parseInt(readInput.nextLine());
-                                    if (n3 != 0) {
-                                        user = votoObj.getUser(n3 - 1);
-                                        votoObj.addUserList(user, lista);
-                                    }
-                                } while (n3 != 0);
+                                    lista = votoObj.getLista(n3 - 1);
+                                    input = votoObj.printUsers();
+                                    System.out.println(input);
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        if (n3 != 0) {
+                                            user = votoObj.getUser(n3 - 1);
+                                            votoObj.addUserList(user, lista);
+                                        }
+                                    } while (n3 != 0);
+                                }
+                                else{
+                                    System.out.println("Nao ha listas registadas!");
+                                }
                                 break;
 
                             case 6:
                                 System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
-                                System.out.println(input);
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                lista = votoObj.getLista(n3 - 1);
-                                input = votoObj.printUsers();
-                                System.out.println(input);
-                                do {
+                                if(!input.equals("")) {
+                                    System.out.println(input);
                                     n3 = Integer.parseInt(readInput.nextLine());
-                                    if (n3 != 0) {
-                                        user = votoObj.getUser(n3 - 1);
-                                        votoObj.removeUserList(lista, user);
-                                    }
-                                } while (n3 != 0);
+                                    lista = votoObj.getLista(n3 - 1);
+                                    input = votoObj.printUsers();
+                                    System.out.println(input);
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        if (n3 != 0) {
+                                            user = votoObj.getUser(n3 - 1);
+                                            votoObj.removeUserList(lista, user);
+                                        }
+                                    } while (n3 != 0);
+                                }
+                                else {
+                                    System.out.println("Nao ha listas registadas!");
+                                }
                                 break;
                         }
 
@@ -355,70 +386,103 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                     case 5:
                         System.out.println("Selecione Eleicao");
                         input = votoObj.listarEleicoes();
-                        System.out.println(input);
-                        n3 = Integer.parseInt(readInput.nextLine());
-                        eleicao = votoObj.getEleicao(n3 - 1);
-                        do {
-                            System.out.println("1-Editar Titulo da Eleicao");
-                            System.out.println("2-Editar Descricao da Eleicao");
-                            System.out.println("3-Editar Datas");
-                            System.out.println("4-Editar Tipo de Eleicao");
-                            n2 = Integer.parseInt(readInput.nextLine());
-                        } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4);
+                        if(!input.equals("")) {
+                            System.out.println(input);
+                            n3 = Integer.parseInt(readInput.nextLine());
+                            eleicao = votoObj.getEleicao(n3 - 1);
+                            do {
+                                System.out.println("1-Editar Titulo da Eleicao");
+                                System.out.println("2-Editar Descricao da Eleicao");
+                                System.out.println("3-Editar Datas");
+                                System.out.println("4-Editar Tipo de Eleicao");
+                                n2 = Integer.parseInt(readInput.nextLine());
+                            } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4);
 
-                        switch (n2) {
-                            case 1:
-                                System.out.println("Indique novo titulo");
-                                input = readInput.nextLine();
-                                votoObj.setTitulo(input, eleicao);
-                                break;
-                            case 2:
-                                System.out.println("Indique nova Descricao");
-                                input = readInput.nextLine();
-                                votoObj.setDescricao(input, eleicao);
-                                break;
-                            case 3:
-                                System.out.println("Indique nova Data Inicio");
-                                input = readInput.nextLine();
-                                eleicao.setTitulo(input);
-                                dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(input);
-                                System.out.println("Insira nova Data Final");
-                                input = readInput.nextLine();
-                                dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(input);
-                                votoObj.setDatas(dataEIF, dataEFF, eleicao);
-                                break;
-                            case 4:
-                                System.out.println("Indique novo Tipo de Eleicoes: ");  //se é eleições de estudantes/docente/funcionarios
-                                System.out.println("1- Estudante");
-                                System.out.println("2- Docente");
-                                System.out.println("3- Funcionario");
-                                n3 = Integer.parseInt(readInput.nextLine());
-                                switch (n3) {
-                                    case 1:
-                                        funcao = "Estudante";
-                                        break;
-                                    case 2:
-                                        funcao = "Docente";
-                                        break;
-                                    case 3:
-                                        funcao = "Funcionario";
-                                        break;
-                                    default:
-                                        System.out.println("Por Default é Estudante");
-                                        funcao = "Estudante";
-                                }
-                                votoObj.setTipo(funcao, eleicao);
-                                break;
+                            switch (n2) {
+                                case 1:
+                                    System.out.println("Indique novo titulo");
+                                    input = readInput.nextLine();
+                                    votoObj.setTitulo(input, eleicao);
+                                    break;
+                                case 2:
+                                    System.out.println("Indique nova Descricao");
+                                    input = readInput.nextLine();
+                                    votoObj.setDescricao(input, eleicao);
+                                    break;
+                                case 3:
+                                    System.out.println("Indique nova Data Inicio");
+                                    check = false;
+                                    dataEFF=null;
+                                    dataEIF=null;
+                                    do {
+                                        try {
+                                            String dataEI = readInput.nextLine();
+                                            dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEI);
+                                            check = true;
+                                        } catch (ParseException e) {
+                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                                        }
+                                    } while (!check);
+
+                                    check = false;
+                                    System.out.println("Insira Data Final (dd/MM/yyyy HH:MM): ");
+                                    do {
+                                        try {
+                                            String dataEF = readInput.nextLine();
+                                            dataEFF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEF);
+                                            check = true;
+
+                                            if (dataEFF.before(dataEIF)) {
+                                                System.out.println("A data final devera ser depois da data inicial");
+                                                check = false;
+                                            }
+                                        } catch (ParseException e) {
+                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                                        }
+                                    } while (!check);
+                                    votoObj.setDatas(dataEIF, dataEFF, eleicao);
+                                    break;
+                                case 4:
+                                    System.out.println("Indique novo Tipo de Eleicoes: ");  //se é eleições de estudantes/docente/funcionarios
+                                    System.out.println("1- Estudante");
+                                    System.out.println("2- Docente");
+                                    System.out.println("3- Funcionario");
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    switch (n3) {
+                                        case 1:
+                                            funcao = "Estudante";
+                                            break;
+                                        case 2:
+                                            funcao = "Docente";
+                                            break;
+                                        case 3:
+                                            funcao = "Funcionario";
+                                            break;
+                                        default:
+                                            System.out.println("Por Default é Estudante");
+                                            funcao = "Estudante";
+                                    }
+                                    votoObj.setTipo(funcao, eleicao);
+                                    break;
+                            }
+                        }
+                        else{
+                            System.out.println("Não ha eleicoes registadas!");
                         }
                         break;
 
                     case 6:
                         System.out.println("Escolha uma Eleicao");
                         input = votoObj.getEleicoesVelhas();
-                        System.out.println(input);
-                        n3 = Integer.parseInt(readInput.nextLine());
-                        input = votoObj.getInfoEleicaoVelha(n3 - 1);
-                        System.out.println(input);
+                        if(!input.equals("")) {
+                            System.out.println(input);
+                            n3 = Integer.parseInt(readInput.nextLine());
+                            input = votoObj.getInfoEleicaoVelha(n3 - 1);
+                            System.out.println(input);
+                        }
+                        else{
+                            System.out.println("Não ha eleicoes registadas!");
+                        }
                         break;
 
                     case 7: //remover isto depois, so para debug!
