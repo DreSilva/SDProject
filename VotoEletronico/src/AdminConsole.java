@@ -4,17 +4,37 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class AdminConsole {
+public class AdminConsole extends UnicastRemoteObject implements Notifications {
+
+    public AdminConsole() throws RemoteException {
+        super();
+    }
+
+    public void estadoMesa() throws  java.rmi.RemoteException{
+
+    }
+    public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
+        System.out.println("Eleicao "+nome+" acabou.\nResultados");
+        System.out.println(votos);
+    }
+    public void novoEleitor() throws  java.rmi.RemoteException{
+
+    }
+
+
     public static void main(String[] args) throws RemoteException, NotBoundException, ParseException {
         Scanner readInput = new Scanner(System.in);
+        AdminConsole admin = new AdminConsole();
         Voto votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
         ArrayList<String> opcoes =  new ArrayList<>();
+        votoObj.subscribeAdmin(admin);
         opcoes.add("Escolher Opcao");
         opcoes.add("1-Registar Pessoa");
         opcoes.add("2-Criar Eleicao");
@@ -22,9 +42,9 @@ public class AdminConsole {
         opcoes.add("4-Gerir Mesas de Voto");
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
+
         // notificações em relacao a mesa de voto ? Q notificações, sobre oq? -> ainda n percebi bem
-        // o admin escolhe q eleicao quer receber notificação ou recebe de todas ao mesmo tempo? -> todas ao mesmo tempo
-        // termino da eleicao e´automatico? assim que acabar é suposto notificar a admin console? -> sim/falta criar threads para isto
+
         while(true){
             try {
                 System.out.println();

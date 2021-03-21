@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 class Global{
    static volatile boolean prim = false;
    static volatile RMIServer rmiServer;
+   static volatile AdminConsole admin;
 
     static {
         try {
@@ -91,19 +92,37 @@ class UDPSec extends Thread{
 
 }
 
+class RealTimeUpdate extends Thread{
+    public RealTimeUpdate(){this.start();}
+
+    @Override
+    public void run() {
+        try {
+            Global.rmiServer.realTimeEleicao();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
 public class RMIServer extends UnicastRemoteObject implements Voto {
     static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
 
+
     public RMIServer() throws RemoteException {
         super();
     }
 
+    public void subscribeAdmin(AdminConsole nAdmin) throws RemoteException {
+        Global.admin = nAdmin;
+    }
+
     public void writeFile() throws java.rmi.RemoteException{
         try {
-            FileOutputStream f = new FileOutputStream("myObjects.txt");
+            FileOutputStream f = new FileOutputStream("myObjects.ser");
             ObjectOutputStream o = new ObjectOutputStream(f);
 
             // Write objects to file
@@ -124,7 +143,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     public void readFile () throws java.rmi.RemoteException{
         try {
-            FileInputStream fi = new FileInputStream("myObjects.txt");
+            FileInputStream fi = new FileInputStream("myObjects.ser");
             ObjectInputStream oi = new ObjectInputStream(fi);
 
             // Read objects
@@ -142,6 +161,17 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }  catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+    }
+
+    public void realTimeEleicao() throws java.rmi.RemoteException{
+        Date now = new Date();
+        for (Eleicao eleicao : eleicoes) {
+            if(eleicao.fim.before(now)){
+                eleicoes.remove(eleicao);
+                eleicoesVelhas.add(eleicao);
+                Global.admin.fimEleicao(eleicao.titulo,Global.rmiServer.getInfoEleicaoVelha(eleicoesVelhas.size()-1));
+            }
         }
     }
 
@@ -312,14 +342,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     }
 
     public String getEleicoesVelhas() throws  java.rmi.RemoteException{
-        Date now = new Date();
-        for (Eleicao eleicao : eleicoes) {
-            if(eleicao.fim.before(now)){
-                eleicoes.remove(eleicao);
-                eleicoesVelhas.add(eleicao);
-            }
-        }
-
         StringBuilder votacoes = new StringBuilder();
         int counter = 1;
         for (Eleicao eleicao:eleicoesVelhas) {
@@ -411,6 +433,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         try {
             if(primario) {
+                new RealTimeUpdate();
                 new UDPPrim(aSocket);
 
                 Global.rmiServer.readFile();
@@ -424,7 +447,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             else{
                 new UDPSec();
                 while (true){
-                    if(Global.prim){ //not working
+                    if(Global.prim){
+                        new RealTimeUpdate();
                         aSocket = new DatagramSocket(6789);
                         new UDPPrim(aSocket);
                         Global.rmiServer.readFile();
@@ -432,7 +456,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                         r.rebind("votacao", Global.rmiServer);
                         System.out.println("Hello Server ready.");
                         while (true) {
-
                         }
                     }
                 }
