@@ -13,10 +13,9 @@ public class MulticastServer extends Thread {
     private static DepMesa depMesa = new DepMesa();
 
     public static void main(String[] args) {
-        if(args.length==1){
+        if (args.length == 1) {
             depMesa.setDepartamento(args[0]);
-        }
-        else{
+        } else {
             System.out.println("Corra com com o número de departamento: java MulticastServer <departamento>");
             System.exit(0);
         }
@@ -56,28 +55,23 @@ public class MulticastServer extends Thread {
                 DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
                 socketR.receive(packetR);
                 messageR = new String(packetR.getData(), 0, packetR.getLength());
-                arrOfStr = messageR.split("[|; ]");
+                arrOfStr = messageR.split("[|;]");
                 if (arrOfStr[0] != "server") {
                     clientID = arrOfStr[1];
                     cmd = arrOfStr[3];
-                    if (cmd == "election" || cmd == "logged on & select election") {
+                    if (cmd.equals("election")) {
                         int n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n);
+                        message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
-                    }else if (cmd == "candidate") {
+                    } else if (cmd.equals("candidate")) {
+                        System.out.println(messageR);
                         arrOfStr = arrOfStr[5].split(" ");
-                        int n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]),arrOfStr[0],Integer.parseInt(arrOfStr[1]),depMesa);
-                        buffer = message.getBytes();
-                        group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-
-                        n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|" + voto.listaCandidatos(n);
+                        System.out.println(arrOfStr[1]);
+                        System.out.println(arrOfStr[2]);
+                        message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -166,7 +160,7 @@ class Console extends Thread {
                             if (CC.equals(arrOfStr[2])) {
                                 if (voto.login(arrOfStr[0], arrOfStr[1], arrOfStr[2])) {
                                     //resposta
-                                    message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting\n"+ voto.listarEleicoes();
+                                    message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
                                     buffer = message.getBytes();
                                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -185,14 +179,14 @@ class Console extends Thread {
                                 packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                                 socket.send(packet);
                             }
-                        }catch (IndexOutOfBoundsException e){
+                        } catch (IndexOutOfBoundsException e) {
                             message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
                         }
-                    }while(message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
+                    } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
                 } else {
                     System.out.println("Eleitor não identificado.");
                 }

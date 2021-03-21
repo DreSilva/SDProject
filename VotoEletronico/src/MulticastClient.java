@@ -124,8 +124,8 @@ class MulticastUser extends Thread {
                         String readKeyboard = keyboardScanner.nextLine();
                         if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                         if (Globals.command.equals("login") && Globals.login.equals("empty")) {
-                            String[] arrOfStr = readKeyboard.split(" ");
-                            Globals.CC = arrOfStr[0];
+                            String[] arrOfStr = readKeyboard.split("/");
+                            Globals.CC = arrOfStr[2];
                         }
                         if (!Globals.locked) {
                             if (Globals.command.equals("candidate")) {
