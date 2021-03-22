@@ -609,11 +609,18 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         Eleicao eleicao = eleicoes.get(nEleicao);
 
+        for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
+            if (entry.getKey().equals(eleicao)){
+                return "Utilizador já votou nesta eleição!";
+            }
+        }
+
+
         if(user.departamento.equals(mesa.departamento)){
             if(user.tipo.equals(eleicao.tipo)){
                 user.addVoto(eleicao,mesa.departamento);
                 eleicao.addVoto(opcao);
-                return "Voto como sucesso";
+                return "Voto com sucesso";
             }
             else{
                 return "User nao pode votar nesta eleicao, e para uma funcao diferente!";
