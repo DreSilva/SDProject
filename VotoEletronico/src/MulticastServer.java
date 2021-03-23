@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
 
 public class MulticastServer extends Thread {
@@ -15,6 +17,8 @@ public class MulticastServer extends Thread {
     public static void main(String[] args) {
         if (args.length == 1) {
             depMesa.setDepartamento(args[0]);
+            Date date = new Date();
+            depMesa.setId(date.getTime());
         } else {
             System.out.println("Corra com com o número de departamento: java MulticastServer <departamento>");
             System.exit(0);

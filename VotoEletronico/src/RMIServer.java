@@ -647,6 +647,61 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         mesasVoto.add(mesa);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public String addMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException{
+        DepMesa mesa1=null;
+        Eleicao eleicao1=null;
+        for (DepMesa mesa: mesasVoto) {
+            if(mesa.equals(Mesa)){
+                mesa1=mesa;
+                break;
+            }
+        }
+        for (Eleicao eleicao2: eleicoes) {
+            if(eleicao.equals(eleicao2)){
+                eleicao1=eleicao2;
+            }
+        }
+        for (DepMesa mesa: eleicao1.maquinasVotacao){
+            if(mesa1.departamento.equals(mesa.departamento)){
+                return "Já existe uma mesa de voto para essa eleicao";
+            }
+        }
+        eleicao1.maquinasVotacao.add(mesa1);
+        return "Mesa adicionada com sucesso";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void removeMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException{
+        DepMesa mesa1=null;
+        Eleicao eleicao1=null;
+        for (DepMesa mesa: mesasVoto) {
+            if(mesa.equals(Mesa)){
+                mesa1=mesa;
+                break;
+            }
+        }
+        for (Eleicao eleicao2: eleicoes) {
+            if(eleicao.equals(eleicao2)){
+                eleicao1=eleicao2;
+            }
+        }
+
+        eleicao1.removeMaquina(mesa1);
+    }
+
+    /**
+     *
+     * @inheritDoc
+     */
+    public DepMesa getMesa(int opcao) throws java.rmi.RemoteException{
+        return mesasVoto.get(opcao);
+    }
+
     // =======================================================
 
     /**
