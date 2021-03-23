@@ -44,6 +44,8 @@ public class MulticastServer extends Thread {
 
             //part to connect to the rmi server
             Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+            voto.addMesa(depMesa);
+
 
             byte[] buffer;
             InetAddress group;

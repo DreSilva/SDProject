@@ -133,10 +133,12 @@ class RealTimeUpdate extends Thread{
      */
     @Override
     public void run() {
-        try {
-            Global.rmiServer.realTimeEleicao();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        while (true) {
+            try {
+                Global.rmiServer.realTimeEleicao();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
@@ -150,6 +152,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
+    public static CopyOnWriteArrayList<DepMesa> mesasVoto = new CopyOnWriteArrayList<>();
 
     /**
      * Construtor para a classe
@@ -225,9 +228,12 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         Date now = new Date();
         for (Eleicao eleicao : eleicoes) {
             if(eleicao.fim.before(now)){
+                System.out.println("sim");
                 eleicoes.remove(eleicao);
                 eleicoesVelhas.add(eleicao);
-                Global.admin.fimEleicao(eleicao.titulo,Global.rmiServer.getInfoEleicaoVelha(eleicoesVelhas.size()-1));
+                if(Global.admin!=null) {
+                    Global.admin.fimEleicao(eleicao.titulo, Global.rmiServer.getInfoEleicaoVelha(eleicoesVelhas.size() - 1));
+                }
             }
         }
     }
@@ -424,8 +430,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public void setDatas(Date dataI,Date dataf,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
-                eleicao.setInicio(dataI);
-                eleicao.setFim(dataf);
+                eleicao1.setInicio(dataI);
+                eleicao1.setFim(dataf);
             }
 
         }
@@ -437,7 +443,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public void setTipo(String Tipo,Eleicao eleicao) throws java.rmi.RemoteException{
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
-                eleicao.setTipo(Tipo);
+                eleicao1.setTipo(Tipo);
             }
 
         }
@@ -517,6 +523,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             totalVotos+=votos.get(i);
         }
         int count = 1;
+        if(totalVotos==0){
+            totalVotos+=1;
+        }
         for (Map.Entry<Lista,Integer> entry : votacaoLista.entrySet()) {
             String nome = entry.getKey().nome;
             int numVoto = entry.getValue();
@@ -629,6 +638,13 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         else{
             return "O utilizador não pode votar nesta mesa";
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void addMesa(DepMesa mesa) throws java.rmi.RemoteException{
+        mesasVoto.add(mesa);
     }
 
     // =======================================================
