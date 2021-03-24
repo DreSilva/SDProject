@@ -1,10 +1,9 @@
-import java.net.MulticastSocket;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.net.*;
 import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The MulticastClient class joins a multicast group and loops receiving
@@ -43,53 +42,61 @@ public class MulticastClient extends Thread {
     }
 
     public void run() {
-        MulticastSocket socket = null;
-        try {
-            socket = new MulticastSocket(PORT);  // create socket and bind it
-            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-            socket.joinGroup(group);
-            while (true) {
-                byte[] buffer = new byte[256];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                socket.receive(packet);
-                String message = new String(packet.getData(), 0, packet.getLength());
-                String[] arrOfStr = message.split("[|;]");
-                Globals.command = arrOfStr[3];
+        while(true) {
+            MulticastSocket socket = null;
+            try {
+                socket = new MulticastSocket(PORT);  // create socket and bind it
+                socket.setSoTimeout(120000);
+                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                socket.joinGroup(group);
+                while (true) {
+                    byte[] buffer = new byte[256];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(packet);
+                    String message = new String(packet.getData(), 0, packet.getLength());
+                    String[] arrOfStr = message.split("[|;]");
+                    Globals.command = arrOfStr[3];
 
-                if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
-                    if (Globals.command.equals("logged off")) {
-                        Globals.command = "login";
-                        Globals.login = "off";
-                        System.out.println(arrOfStr[5]);
-                    } else if (Globals.command.equals("logged on & select election")) {
-                        Globals.command = "election";
-                        Globals.login = "on";
-                        System.out.println(arrOfStr[5]);
-                    } else if (Globals.command.equals("locked")) {
-                        Globals.locked = false;
-                        System.out.println("Terminal Desbloqueado");
-                        System.out.println(arrOfStr[5]);
-                        Globals.command = "login";
-                    } else if (Globals.command.equals("select election")) {
-                        Globals.command = "election";
-                        System.out.println(arrOfStr[5]);
-                    } else if (Globals.command.equals("select candidate")) {
-                        System.out.println(arrOfStr[5]);
-                        Globals.command = "candidate";
-                    } else if (!arrOfStr[5].equals("empty")) {
-                        System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
-                        System.out.println(arrOfStr[5]);
-                    }
-                } else if (arrOfStr[1].equals("all")) {
-                    if (Globals.command.equals("locked")) {
-                        System.out.println("Terminal vai ser desbloqueado");
+                    if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
+                        if (Globals.command.equals("logged off")) {
+                            Globals.command = "login";
+                            Globals.login = "off";
+                            System.out.println(arrOfStr[5]);
+                        } else if (Globals.command.equals("logged on & select election")) {
+                            Globals.command = "election";
+                            Globals.login = "on";
+                            System.out.println(arrOfStr[5]);
+                        } else if (Globals.command.equals("locked")) {
+                            Globals.locked = false;
+                            System.out.println("Terminal Desbloqueado");
+                            System.out.println(arrOfStr[5]);
+                            Globals.command = "login";
+                        } else if (Globals.command.equals("select election")) {
+                            Globals.command = "election";
+                            System.out.println(arrOfStr[5]);
+                        } else if (Globals.command.equals("select candidate")) {
+                            System.out.println(arrOfStr[5]);
+                            Globals.command = "candidate";
+                        } else if (!arrOfStr[5].equals("empty")) {
+                            System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
+                            System.out.println(arrOfStr[5]);
+                        }
+                    } else if (arrOfStr[1].equals("all")) {
+                        if (Globals.command.equals("locked")) {
+                            System.out.println("Terminal vai ser desbloqueado");
+                        }
                     }
                 }
+            }catch(SocketTimeoutException e){
+                if (Globals.locked == false) System.out.println("O terminal está bloqueado.");
+                Globals.locked=true;
+                Globals.login="empty";
+                Globals.command="no cmd";
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
         }
     }
 }
@@ -103,56 +110,52 @@ class MulticastUser extends Thread {
     }
 
     public void run() {
-        while (true) {
-            MulticastSocket socket = null;
-            System.out.println(this.getName() + " ready...");
-            try {
-                socket = new MulticastSocket();  // create socket without binding it (only for sending)
-                socket.setSoTimeout(120000);
-                Scanner keyboardScanner = new Scanner(System.in);
-                while (true) {
-                    sleep(500);
-                    if (Globals.command.equals("locked")) {
-                        if (Globals.locked) {
-                            String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
-                            byte[] buffer = message.getBytes();
-                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                            socket.send(packet);
-                        }
-                    } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = keyboardScanner.nextLine();
-                        if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
-                        if (Globals.command.equals("login") && Globals.login.equals("empty")) {
-                            String[] arrOfStr = readKeyboard.split("/");
-                            Globals.CC = arrOfStr[2];
-                        }
-                        if (!Globals.locked) {
-                            if (Globals.command.equals("candidate")) {
-                                readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
 
-                            } else {
-                                readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
-                            }
-                            byte[] buffer = readKeyboard.getBytes();
-                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                            socket.send(packet);
-                        } else {
-                            System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
-                        }
+        MulticastSocket socket = null;
+        System.out.println(this.getName() + " ready...");
+        try {
+            socket = new MulticastSocket();  // create socket without binding it (only for sending)
+            Scanner keyboardScanner = new Scanner(System.in);
+            while (true) {
+                sleep(500);
+                if (Globals.command.equals("locked")) {
+                    if (Globals.locked) {
+                        String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
+                        byte[] buffer = message.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
                     }
-                    if (!Globals.command.equals("login")) Globals.command = "no cmd";
+                } else if (!Globals.command.equals("no cmd")) {
+                    String readKeyboard = keyboardScanner.nextLine();
+                    if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
+                    if (Globals.command.equals("login") && Globals.login.equals("empty")) {
+                        String[] arrOfStr = readKeyboard.split("/");
+                        Globals.CC = arrOfStr[2];
+                    }
+                    if (!Globals.locked) {
+                        if (Globals.command.equals("candidate")) {
+                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
+
+                        } else {
+                            readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + readKeyboard;
+                        }
+                        byte[] buffer = readKeyboard.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    } else {
+                        System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
+                    }
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                Globals.locked = true;
-                Globals.login = "empty";
-                System.out.println("O terminal está bloqueado.\n");
-            } finally {
-                socket.close();
+                if (!Globals.command.equals("login")) Globals.command = "no cmd";
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
         }
     }
 }
