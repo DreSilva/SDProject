@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 class Global{
     static volatile boolean prim = false;
     static volatile RMIServer rmiServer;
-    static volatile Notifications admin;
+    static volatile ArrayList<Notifications> admin = new ArrayList<>();
 
     static {
         try {
@@ -24,7 +24,6 @@ class Global{
         }
     }
 }
-
 
 /**
  * Classe para o RMI primario que vai servir como UDP server
@@ -166,7 +165,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      *  @inheritDoc
      */
     public void subscribeAdmin(Notifications nAdmin) throws RemoteException {
-        Global.admin = nAdmin;
+        Global.admin.add(nAdmin);
     }
 
     /**
@@ -232,7 +231,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 eleicoes.remove(eleicao);
                 eleicoesVelhas.add(eleicao);
                 if(Global.admin!=null) {
-                    Global.admin.fimEleicao(eleicao.titulo, Global.rmiServer.getInfoEleicaoVelha(eleicoesVelhas.size() - 1));
+                    for (Notifications notifications: Global.admin) {
+                        notifications.fimEleicao(eleicao.titulo, Global.rmiServer.getInfoEleicaoVelha(eleicoesVelhas.size() - 1));
+                    }
                 }
             }
         }
@@ -529,8 +530,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         for (Map.Entry<Lista,Integer> entry : votacaoLista.entrySet()) {
             String nome = entry.getKey().nome;
             int numVoto = entry.getValue();
-            info.append(count).append("º-").append(nome).append(" Votos-").append(numVoto).append(" Percentagem-")
+            info.append(count).append("-").append(nome).append(" Votos-").append(numVoto).append(" Percentagem-")
                     .append(numVoto/totalVotos).append("\n");
+            count+=1;
+        }
+        for (User user: users) {
+            for (Map.Entry<Eleicao,String> entry : user.localVoto.entrySet()) {
+                if (entry.getKey().equals(eleicao)){
+                    info.append(user.user).append("- ").append(entry.getValue()).append("\n");
+                }
+            }
         }
         return info.toString();
     }
@@ -618,16 +627,34 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         Eleicao eleicao = eleicoes.get(nEleicao);
 
+        Date date = new Date();
+
+        if(eleicao.inicio.after(date)){
+            return "A votacao nesta eleicao ainda nao comecou";
+        }
+
+        int flag=0;
+        for (DepMesa mesaEleicao: eleicao.maquinasVotacao) {
+            if(mesaEleicao.equals(mesa)){
+                flag=1;
+                break;
+            }
+        }
+
+        if(flag==0){
+            return "Esta mesa nao se encontra registada para esta eleicao";
+        }
+
         for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
             if (entry.getKey().equals(eleicao)){
-                return "Utilizador já votou nesta eleição!";
+                return "Utilizador ja votou nesta eleição!";
             }
         }
 
 
         if(user.departamento.equals(mesa.departamento)){
             if(user.tipo.equals(eleicao.tipo)){
-                user.addVoto(eleicao,mesa.departamento);
+                user.addVoto(eleicao,mesa.departamento+" "+date.toString());
                 eleicao.addVoto(opcao);
                 return "Voto com sucesso";
             }
@@ -695,7 +722,19 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     }
 
     /**
-     *
+     * @inheritDoc
+     */
+    public String listaMaquina() throws java.rmi.RemoteException{
+        StringBuilder stringBuilder = new StringBuilder();
+        int count = 1;
+        for (DepMesa mesa: mesasVoto) {
+            stringBuilder.append(count).append(" -").append(mesa.id).append("- ").append(mesa.departamento).append("\n");
+            count+=1;
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
      * @inheritDoc
      */
     public DepMesa getMesa(int opcao) throws java.rmi.RemoteException{
