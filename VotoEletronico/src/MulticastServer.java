@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Date;
-import java.util.Random;
 import java.util.Scanner;
 
 public class MulticastServer extends Thread {
@@ -35,7 +34,6 @@ public class MulticastServer extends Thread {
 
     public void run() {
         MulticastSocket socket = null, socketR = null;
-        long counter = 0;
         String message, messageR;
         String[] arrOfStr;
         String clientID, cmd;
@@ -62,7 +60,7 @@ public class MulticastServer extends Thread {
                 socketR.receive(packetR);
                 messageR = new String(packetR.getData(), 0, packetR.getLength());
                 arrOfStr = messageR.split("[|;]");
-                if (arrOfStr[0] != "server") {
+                if (!arrOfStr[0].equals("server")) {
                     clientID = arrOfStr[1];
                     cmd = arrOfStr[3];
                     if (cmd.equals("election")) {
@@ -73,6 +71,7 @@ public class MulticastServer extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     } else if (cmd.equals("candidate")) {
+
                         arrOfStr = arrOfStr[5].split(" ");
                         message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
                         buffer = message.getBytes();
@@ -80,6 +79,8 @@ public class MulticastServer extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     }
+
+
                 }
             }
         } catch (IOException | NotBoundException e) {
@@ -94,7 +95,6 @@ public class MulticastServer extends Thread {
 class Console extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 4321;
-    private long SLEEP_TIME = 5000;
 
     public Console() {
         super("Server " + (long) (Math.random() * 1000));
@@ -102,10 +102,6 @@ class Console extends Thread {
 
     public void run() {
         MulticastSocket socket = null, socketR = null;
-        long counter = 0;
-        String message, messageR;
-        String[] arrOfStr;
-        String clientID;
         try {
             //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -144,7 +140,6 @@ class Console extends Thread {
 class Login extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 4321;
-    private long SLEEP_TIME = 5000;
     private String CC;
 
     public Login(String CC) {
@@ -154,7 +149,6 @@ class Login extends Thread {
 
     public void run() {
         MulticastSocket socket = null, socketR = null;
-        long counter = 0;
         String message, messageR;
         String[] arrOfStr;
         String clientID;

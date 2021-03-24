@@ -56,40 +56,37 @@ public class MulticastClient extends Thread {
                     String message = new String(packet.getData(), 0, packet.getLength());
                     String[] arrOfStr = message.split("[|;]");
 
+
                     if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
-                        Globals.command = arrOfStr[3];
-                        if (Globals.command.equals("logged off")) {
+                        //Globals.command = arrOfStr[3];
+                        if (arrOfStr[3].equals("logged off")) {
                             Globals.command = "login";
                             Globals.login = "off";
                             System.out.println(arrOfStr[5]);
-                        } else if (Globals.command.equals("logged on & select election")) {
+                        } else if (arrOfStr[3].equals("logged on & select election")) {
                             Globals.command = "election";
                             Globals.login = "on";
                             System.out.println(arrOfStr[5]);
-                        } else if (Globals.command.equals("locked")) {
+                        } else if (arrOfStr[3].equals("locked")) {
                             Globals.locked = false;
                             System.out.println("Terminal Desbloqueado");
                             System.out.println(arrOfStr[5]);
                             Globals.command = "login";
-                        } else if (Globals.command.equals("select election")) {
+                        } else if (arrOfStr[3].equals("select election")) {
                             Globals.command = "election";
                             System.out.println(arrOfStr[5]);
-                        } else if (Globals.command.equals("select candidate")) {
+                        } else if (arrOfStr[3].equals("select candidate")) {
                             System.out.println(arrOfStr[5]);
                             Globals.command = "candidate";
-                        } else if (!arrOfStr[5].equals("empty")) {
-                            System.out.println("Received packet from " + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " with message:");
-                            System.out.println(arrOfStr[5]);
                         }
-                    } else if (arrOfStr[1].equals("all")) {
+                    } else if (arrOfStr[1].equals("all") && Globals.locked) {
                         Globals.command = arrOfStr[3];
-                        if (Globals.command.equals("locked")) {
-                            if (Globals.locked == true) {
-                                //System.out.println("Terminal vai ser desbloqueado");
-                                Globals.CC = arrOfStr[5];
-                            }
+                        if (arrOfStr[3].equals("locked")) {
+                            //System.out.println("Terminal vai ser desbloqueado");
+                            Globals.CC = arrOfStr[5];
                         }
                     }
+
                 }
             } catch (SocketTimeoutException e) {
                 if (Globals.locked == false) System.out.println("O terminal está bloqueado.");
