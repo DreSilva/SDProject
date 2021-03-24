@@ -42,7 +42,7 @@ public class MulticastClient extends Thread {
     }
 
     public void run() {
-        while(true) {
+        while (true) {
             MulticastSocket socket = null;
             try {
                 socket = new MulticastSocket(PORT);  // create socket and bind it
@@ -55,9 +55,9 @@ public class MulticastClient extends Thread {
                     socket.receive(packet);
                     String message = new String(packet.getData(), 0, packet.getLength());
                     String[] arrOfStr = message.split("[|;]");
-                    Globals.command = arrOfStr[3];
 
                     if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
+                        Globals.command = arrOfStr[3];
                         if (Globals.command.equals("logged off")) {
                             Globals.command = "login";
                             Globals.login = "off";
@@ -82,16 +82,20 @@ public class MulticastClient extends Thread {
                             System.out.println(arrOfStr[5]);
                         }
                     } else if (arrOfStr[1].equals("all")) {
+                        Globals.command = arrOfStr[3];
                         if (Globals.command.equals("locked")) {
-                            System.out.println("Terminal vai ser desbloqueado");
+                            if (Globals.locked == true) {
+                                //System.out.println("Terminal vai ser desbloqueado");
+                                Globals.CC = arrOfStr[5];
+                            }
                         }
                     }
                 }
-            }catch(SocketTimeoutException e){
+            } catch (SocketTimeoutException e) {
                 if (Globals.locked == false) System.out.println("O terminal está bloqueado.");
-                Globals.locked=true;
-                Globals.login="empty";
-                Globals.command="no cmd";
+                Globals.locked = true;
+                Globals.login = "empty";
+                Globals.command = "no cmd";
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -117,7 +121,8 @@ class MulticastUser extends Thread {
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
             Scanner keyboardScanner = new Scanner(System.in);
             while (true) {
-                sleep(500);
+                sleep(1000);
+                System.out.println(Globals.command);
                 if (Globals.command.equals("locked")) {
                     if (Globals.locked) {
                         String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
@@ -126,13 +131,10 @@ class MulticastUser extends Thread {
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     }
+                    //Globals.command = "login";
                 } else if (!Globals.command.equals("no cmd")) {
                     String readKeyboard = keyboardScanner.nextLine();
                     if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
-                    if (Globals.command.equals("login") && Globals.login.equals("empty")) {
-                        String[] arrOfStr = readKeyboard.split("/");
-                        Globals.CC = arrOfStr[2];
-                    }
                     if (!Globals.locked) {
                         if (Globals.command.equals("candidate")) {
                             readKeyboard = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.CC + " " + Globals.n_election + " " + readKeyboard;
