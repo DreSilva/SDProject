@@ -265,4 +265,10 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void removeMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException;
+
+    /**
+     * Lista as mesas nos departamentos
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public String listaMaquina() throws java.rmi.RemoteException;
 }

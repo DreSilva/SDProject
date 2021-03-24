@@ -13,7 +13,6 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
     /**
      * Cria objeto da consola para passar ao RMI Server
-     * @throws RemoteException
      */
     public AdminConsole() throws RemoteException {
         super();
@@ -23,7 +22,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
      * @inheritDoc
      */
     public void estadoMesa() throws  java.rmi.RemoteException{
-
+        System.out.println("Idk");
     }
 
     /**
@@ -38,7 +37,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
      * @inheritDoc
      */
     public void novoEleitor() throws  java.rmi.RemoteException{
-
+        System.out.println("Novo Eleitor");
     }
 
     /**
@@ -394,9 +393,47 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 4:
-                        //fica por enqnt como debug pq eu n sei como fazer isto yet
-                        input = votoObj.printUsers();
-                        System.out.println(input);
+                        System.out.println("Selecione Eleicao");
+                        input = votoObj.listarEleicoes();
+                        if(!input.equals("")) {
+                            System.out.println(input);
+                            n3 = Integer.parseInt(readInput.nextLine());
+                            eleicao = votoObj.getEleicao(n3 - 1);
+                            do {
+                                System.out.println("1- Adicionar Mesa \n 2- Remover mesa");
+                                n3 = Integer.parseInt(readInput.nextLine());
+                            }while (n3!=1 && n3!=2);
+                            if(n3==1) {
+                                System.out.println("Selecione Mesa a adicionar");
+                                input = votoObj.listaMaquina();
+                                if (!input.equals("")) {
+                                    System.out.println(input);
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    DepMesa mesa = votoObj.getMesa(n3 - 1);
+                                    votoObj.addMesaEleicao(mesa,eleicao);
+                                } else {
+                                    System.out.println("Não há maquinas no sistema");
+                                }
+                            }
+                            else{
+                                if(eleicao.maquinasVotacao.size()>0) {
+                                    int counter = 1;
+                                    for (DepMesa mesa : eleicao.maquinasVotacao) {
+                                        System.out.println(counter + "- " + mesa.departamento + " " + mesa.id);
+                                    }
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    DepMesa mesa = votoObj.getMesa(n3-1);
+                                    votoObj.removeMesaEleicao(mesa,eleicao);
+                                }
+                                else{
+                                    System.out.println("Nao ha maquinas para remover");
+                                }
+
+                            }
+                        }
+                        else {
+                            System.out.println("Não há eleições a decorrer");
+                        }
                         break;
 
                     case 5:
@@ -426,7 +463,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     votoObj.setDescricao(input, eleicao);
                                     break;
                                 case 3:
-                                    System.out.println("Indique nova Data Inicio");
+                                    System.out.println("Indique nova Data Inicio (dd/MM/yyyy HH:MM):");
                                     check = false;
                                     dataEFF=null;
                                     dataEIF=null;
@@ -436,12 +473,12 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                             dataEIF = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataEI);
                                             check = true;
                                         } catch (ParseException e) {
-                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy HH:mm");
                                         }
                                     } while (!check);
 
                                     check = false;
-                                    System.out.println("Insira Data Final (dd/MM/yyyy HH:MM): ");
+                                    System.out.println("Insira Data Final (dd/MM/yyyy HH:MM):");
                                     do {
                                         try {
                                             String dataEF = readInput.nextLine();
@@ -453,7 +490,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                                 check = false;
                                             }
                                         } catch (ParseException e) {
-                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy");
+                                            System.out.println("Insira uma data valida no formato dd/MM/yyyy HH:mm");
                                         }
                                     } while (!check);
                                     votoObj.setDatas(dataEIF, dataEFF, eleicao);
