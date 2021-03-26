@@ -93,6 +93,7 @@ public class MulticastClient extends Thread {
                 Globals.locked = true;
                 Globals.login = "empty";
                 Globals.command = "no cmd";
+                Globals.CC = null;
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

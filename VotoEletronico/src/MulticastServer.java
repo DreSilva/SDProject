@@ -2,6 +2,7 @@ import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
@@ -55,42 +56,45 @@ public class MulticastServer extends Thread {
             DatagramPacket packet;
 
             while (true) {
-                try{
-                //recebe mensagem
-                byte[] bufferR = new byte[256];
-                DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
-                socketR.receive(packetR);
-                messageR = new String(packetR.getData(), 0, packetR.getLength());
-                arrOfStr = messageR.split("[|;]");
-                if (!arrOfStr[0].equals("server")) {
-                    clientID = arrOfStr[1];
-                    cmd = arrOfStr[3];
-                    if (cmd.equals("election")) {
-                        int n = Integer.parseInt(arrOfStr[5]);
-                        message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
-                        buffer = message.getBytes();
-                        group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-                    } else if (cmd.equals("candidate")) {
+                try {
+                    //recebe mensagem
+                    byte[] bufferR = new byte[256];
+                    DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                    socketR.receive(packetR);
+                    messageR = new String(packetR.getData(), 0, packetR.getLength());
+                    arrOfStr = messageR.split("[|;]");
+                    if (!arrOfStr[0].equals("server")) {
+                        clientID = arrOfStr[1];
+                        cmd = arrOfStr[3];
+                        if (cmd.equals("election")) {
+                            int n = Integer.parseInt(arrOfStr[5]);
+                            message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
+                            buffer = message.getBytes();
+                            group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        } else if (cmd.equals("candidate")) {
 
-                        arrOfStr = arrOfStr[5].split(" ");
-                        message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
-                        buffer = message.getBytes();
-                        group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
+                            arrOfStr = arrOfStr[5].split(" ");
+                            message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
+                            buffer = message.getBytes();
+                            group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        } else if (cmd.equals("failed")) {
+                            arrOfStr = arrOfStr[5].split(" ");
+                            Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID);
+                            fail.start();
+                        }
                     }
-                }
 
-                } catch (ConnectException e){
+                } catch (ConnectException e) {
                     voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
             }
         } catch (IOException | NotBoundException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             socket.close();
             socketR.close();
         }
@@ -132,7 +136,7 @@ class Console extends Thread {
                         System.out.println("Eleitor não identificado.");
                     }
                     sleep(1000);
-                }catch (ConnectException e){
+                } catch (ConnectException e) {
                     voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
             }
@@ -172,7 +176,7 @@ class Login extends Thread {
             Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
 
             //seleção do terminal de voto
-            message = "server|all;cmd|locked;msg|"+ this.CC;
+            message = "server|all;cmd|locked;msg|" + this.CC;
             byte[] buffer = message.getBytes();
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -227,11 +231,66 @@ class Login extends Thread {
                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
-                } catch (ConnectException e){
+                } catch (ConnectException e) {
                     voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
             } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
         } catch (IOException | NotBoundException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
+            socketR.close();
+        }
+    }
+}
+
+class Fail extends Thread {
+    private String MULTICAST_ADDRESS = "224.0.224.0";
+    private int PORT = 4321;
+    private String CC;
+    private String state;
+    private String clientID;
+
+    public Fail(String CC, String state, String clientID) {
+        super("Server " + (long) (Math.random() * 1000));
+        this.CC = CC;
+        this.state = state;
+        this.clientID = clientID;
+    }
+
+    public void run() {
+        MulticastSocket socket = null, socketR = null;
+        try {
+            boolean flag = false;
+
+            while (!flag) {
+                String[] arrOfStr;
+                socket = new MulticastSocket();  // create socket without binding it (only for sending)
+                socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
+                InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
+                socketR.joinGroup(groupR);
+                socketR.setSoTimeout(10000);
+
+                String message = "server|" + this.clientID + ";cmd|fail;msg|" + this.CC + " " + this.state;
+                byte[] buffer = message.getBytes();
+                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket.send(packet);
+                try {
+                    flag = true;
+                    do {
+                        byte[] bufferR = new byte[256];
+                        DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                        socketR.receive(packetR);
+                        String messageR = new String(packetR.getData(), 0, packetR.getLength());
+                        arrOfStr = messageR.split("[|;]");
+                    } while (!arrOfStr[0].equals("client") || !arrOfStr[1].equals(clientID) || !arrOfStr[3].equals("recovered"));
+                } catch (SocketTimeoutException e) {
+                    flag = false;
+                }
+            }
+            System.out.println("\nO cliente " + clientID + " foi recuperado.\n");
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             socket.close();
