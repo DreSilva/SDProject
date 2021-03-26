@@ -2,6 +2,7 @@ import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Date;
@@ -54,6 +55,7 @@ public class MulticastServer extends Thread {
             DatagramPacket packet;
 
             while (true) {
+                try{
                 //recebe mensagem
                 byte[] bufferR = new byte[256];
                 DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
@@ -79,13 +81,16 @@ public class MulticastServer extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     }
+                }
 
-
+                } catch (ConnectException e){
+                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
             }
         } catch (IOException | NotBoundException e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             socket.close();
             socketR.close();
         }
@@ -113,19 +118,23 @@ class Console extends Thread {
             Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
 
             while (true) {
+                try {
 
-                //pedir nr do CC do eleitor
-                System.out.print("Insira o número do CC do eleitor: ");
-                Scanner scan = new Scanner(System.in);
-                String CC = scan.nextLine();
+                    //pedir nr do CC do eleitor
+                    System.out.print("Insira o número do CC do eleitor: ");
+                    Scanner scan = new Scanner(System.in);
+                    String CC = scan.nextLine();
 
-                if (voto.identificarLeitor(CC)) {
-                    Login login = new Login(CC);
-                    login.start();
-                } else {
-                    System.out.println("Eleitor não identificado.");
+                    if (voto.identificarLeitor(CC)) {
+                        Login login = new Login(CC);
+                        login.start();
+                    } else {
+                        System.out.println("Eleitor não identificado.");
+                    }
+                    sleep(1000);
+                }catch (ConnectException e){
+                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
-                sleep(1000);
             }
 
         } catch (IOException | NotBoundException | InterruptedException e) {
@@ -218,6 +227,8 @@ class Login extends Thread {
                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
+                } catch (ConnectException e){
+                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
                 }
             } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
         } catch (IOException | NotBoundException e) {
