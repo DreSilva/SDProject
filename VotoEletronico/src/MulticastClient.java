@@ -29,7 +29,7 @@ class Globals {
     public static boolean locked = true;
     public static String login = "empty";
     public static int n_election;
-    public static String CC;
+    public static String CC = null;
 }
 
 public class MulticastClient extends Thread {
@@ -167,7 +167,7 @@ class MulticastUser extends Thread {
             System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto.");
             Globals.locked = true;
             Globals.command = "no cmd";
-            Globals.login = "off";
+            Globals.login = "empty";
             Globals.CC = null;
         }
         return null;
@@ -199,7 +199,7 @@ class MulticastUser extends Thread {
                         }
 
                     } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = getTimeConsole(keyboardScanner, 10);
+                        String readKeyboard = keyboardScanner.nextLine();//getTimeConsole(keyboardScanner, 10);
                         if (readKeyboard != null){
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
@@ -228,8 +228,6 @@ class MulticastUser extends Thread {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (ExecutionException e) {
-                //e.printStackTrace();
             } finally {
                 socket.close();
             }
