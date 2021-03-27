@@ -1,10 +1,10 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.sql.SQLOutput;
-import java.util.NoSuchElementException;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -149,6 +149,42 @@ class MulticastUser extends Thread {
         super("User " + (long) (Math.random() * 1000));
     }
 
+    //====================================================================================================
+    private String str;
+    TimerTask task = new TimerTask()
+    {
+        public void run()
+        {
+            if( str.equals("") )
+            {
+                System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto.");
+                Globals.locked = true;
+                Globals.command = "no cmd";
+                Globals.login = "empty";
+                Globals.CC = null;
+            }
+            else{
+                str="";
+            }
+        }
+    };
+
+    public String getInput() throws Exception
+    {
+        Timer timer = new Timer();
+        timer.schedule( task, 10*1000 );
+
+        System.out.println( "Input a string within 10 seconds: " );
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader( System.in ) );
+        str= in.readLine();
+
+        timer.cancel();
+        return str;
+    }
+
+    //====================================================================================================
+
     public String getTimeConsole(Scanner scanner, int time) throws NoSuchElementException, ExecutionException, InterruptedException {
         String result;
         try {
@@ -172,6 +208,8 @@ class MulticastUser extends Thread {
         }
         return null;
     }
+
+    //=========================================================================================================
 
     public void run() {
         while (true) {
@@ -199,7 +237,7 @@ class MulticastUser extends Thread {
                         }
 
                     } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = keyboardScanner.nextLine();//getTimeConsole(keyboardScanner, 10);
+                        String readKeyboard = getInput();//keyboardScanner.nextLine();//getTimeConsole(keyboardScanner, 10);
                         if (readKeyboard != null){
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
@@ -228,6 +266,8 @@ class MulticastUser extends Thread {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                //e.printStackTrace();
             } finally {
                 socket.close();
             }
