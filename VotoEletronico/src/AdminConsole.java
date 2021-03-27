@@ -1,3 +1,6 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -5,11 +8,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 
 public class AdminConsole extends UnicastRemoteObject implements Notifications {
+    int porto;
+    ArrayList<String> Departamentos = new ArrayList<>();
 
     /**
      * Cria objeto da consola para passar ao RMI Server
@@ -41,17 +44,66 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
     }
 
     /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readDeps() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoRMI");
+        this.porto = Integer.parseInt(portoInString);
+        String deps = prop.getProperty("departamento");
+        String[] depsSplit = deps.split(",");
+        Departamentos.addAll(Arrays.asList(depsSplit));
+
+    }
+
+    /**
      * Esta função vai permitir ao admin fazer todas as ações necessárias para por as votações a funcionar. Permite
      * criar e remover eleições,utilizadores e listas.
      * @throws RemoteException excepção que pode ocorrer na execução de uma remote call
      * @throws NotBoundException Acontece caso o o objeto a procurar no registo nao exista
      */
-    public static void main(String[] args) throws RemoteException, NotBoundException {
+    public static void main(String[] args) throws IOException, NotBoundException {
         Scanner readInput = new Scanner(System.in);
         AdminConsole admin = new AdminConsole();
-        Voto votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+
+        admin.readDeps();
+        Voto votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
         ArrayList<String> opcoes =  new ArrayList<>();
+
         votoObj.subscribeAdmin((Notifications) admin);
+
+
+        boolean accao = false;
+
         opcoes.add("Escolher Opcao");
         opcoes.add("1-Registar Pessoa");
         opcoes.add("2-Criar Eleicao");
@@ -62,6 +114,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
         while(true){
             try {
+                accao = false;
                 System.out.println();
                 for (String s : opcoes) {
                     System.out.println(s);
@@ -75,91 +128,18 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
                 switch (n) {
                     case 1:
+                        accao = true;
                         System.out.println("Insira Username: ");
                         String username = readInput.nextLine();
                         System.out.println("Insira Password: ");
                         String password = readInput.nextLine();
-                        System.out.println("Insira Departamento: ");
-                        System.out.println("1- DARQ");
-                        System.out.println("2- DCT");
-                        System.out.println("3- DCV");
-                        System.out.println("4- DEI");
-                        System.out.println("5- DEEC");
-                        System.out.println("6- DEM");
-                        System.out.println("7- DEQ");
-                        System.out.println("8- DF");
-                        System.out.println("9- DEC");
-                        System.out.println("10- DM");
-                        System.out.println("11- DQ");
-                        System.out.println("12- FLUC");
-                        System.out.println("13- FDUC");
-                        System.out.println("14- FCDEF");
-                        System.out.println("15- FPCE");
-                        System.out.println("16- FEUC");
-                        System.out.println("17- FFUC");
-                        System.out.println("17- FMUC");
-                        n3 = Integer.parseInt(readInput.nextLine());
-                        String departamento;
-                        switch (n3) {
-                            case 1:
-                                departamento = "DARQ";
-                                break;
-                            case 2:
-                                departamento = "DCT";
-                                break;
-                            case 3:
-                                departamento = "DCV";
-                                break;
-                            case 4:
-                                departamento = "DEI";
-                                break;
-                            case 5:
-                                departamento = "DEEC";
-                                break;
-                            case 6:
-                                departamento = "DEM";
-                                break;
-                            case 7:
-                                departamento = "DEQ";
-                                break;
-                            case 8:
-                                departamento = "DF";
-                                break;
-                            case 9:
-                                departamento = "DEC";
-                                break;
-                            case 10:
-                                departamento = "DM";
-                                break;
-                            case 11:
-                                departamento = "DQ";
-                                break;
-                            case 12:
-                                departamento = "FLUC";
-                                break;
-                            case 13:
-                                departamento = "FDUC";
-                                break;
-                            case 14:
-                                departamento = "FCDEF";
-                                break;
-                            case 15:
-                                departamento = "FPCE";
-                                break;
-                            case 16:
-                                departamento = "FEUC";
-                                break;
-                            case 17:
-                                departamento = "FFUC";
-                                break;
-                            case 18:
-                                departamento = "FMUC";
-                                break;
-                            default:
-                                departamento = "DEI";
-                                System.out.println("Por default é DEI");
+                        int counter = 1;
+                        for (String depName: admin.Departamentos) {
+                            System.out.println(counter+"- "+depName);
+                            counter+=1;
                         }
-
+                        n3 = Integer.parseInt(readInput.nextLine());
+                        String departamento = admin.Departamentos.get(n3-1);
                         System.out.println("Insira Contacto: ");
                         String contacto = readInput.nextLine();
                         System.out.println("Insira Funcao: ");
@@ -203,6 +183,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 2:
+                        accao = true;
                         System.out.println("Insira Data de Inicio (dd/MM/yyyy HH:MM)");
                         check = false;
                         Date dataEIF = null, dataEFF = null;
@@ -261,6 +242,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 3:
+                        accao = true;
                         int n2;
                         do {
                             System.out.println("1-Adicionar Lista a Eleicao");
@@ -393,6 +375,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 4:
+                        accao = true;
                         System.out.println("Selecione Eleicao");
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
@@ -410,14 +393,15 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     System.out.println(input);
                                     n3 = Integer.parseInt(readInput.nextLine());
                                     DepMesa mesa = votoObj.getMesa(n3 - 1);
-                                    votoObj.addMesaEleicao(mesa,eleicao);
+                                    input = votoObj.addMesaEleicao(mesa,eleicao);
+                                    System.out.println(input);
                                 } else {
                                     System.out.println("Não há maquinas no sistema");
                                 }
                             }
                             else{
                                 if(eleicao.maquinasVotacao.size()>0) {
-                                    int counter = 1;
+                                    counter = 1;
                                     for (DepMesa mesa : eleicao.maquinasVotacao) {
                                         System.out.println(counter + "- " + mesa.departamento + " " + mesa.id);
                                     }
@@ -437,6 +421,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 5:
+                        accao = true;
                         System.out.println("Selecione Eleicao");
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
@@ -525,6 +510,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
 
                     case 6:
+                        accao = true;
                         System.out.println("Escolha uma Eleicao");
                         input = votoObj.getEleicoesVelhas();
                         if(!input.equals("")) {
@@ -542,12 +528,22 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         votoObj.writeFile();
                         break;
 
+                    case 8: //debug
+                        input = votoObj.printUsers();
+                        System.out.println(input);
+                        break;
+
                     default:
                         System.out.println("Escolha uma das opcoes");
                         break;
                 }
             } catch (ConnectException e){
-                votoObj = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                if(accao){
+                    System.out.println("Houve um problema com o ultimo comando, volte a efeuta-lo");
+                }
+                votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
+            } catch (NumberFormatException e){
+                System.out.println("Insira um numero e repita o procedimento");
             }
 
         }

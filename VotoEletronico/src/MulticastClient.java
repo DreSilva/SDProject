@@ -1,10 +1,13 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.*;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.sql.SQLOutput;
-import java.util.*;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -29,14 +32,54 @@ class Globals {
     public static boolean locked = true;
     public static String login = "empty";
     public static int n_election;
-    public static String CC = null;
+    public static String CC;
 }
 
 public class MulticastClient extends Thread {
-    private static String MULTICAST_ADDRESS = "224.0.224.0";
-    private static int PORT = 4321;
+    private static String MULTICAST_ADDRESS ;
+    private static int PORT;
 
-    public static void main(String[] args) {
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readConfigs() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoMulticast");
+        this.PORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+
+    }
+
+    public static void main(String[] args) throws IOException {
         if (args.length == 1) {
             Globals.clientID = args[0];
         } else {
@@ -68,8 +111,10 @@ public class MulticastClient extends Thread {
         Random rand = new Random();
         System.out.println("ClientID -> " + Globals.clientID);
         MulticastClient client = new MulticastClient();
+        client.readConfigs();
         client.start();
         MulticastUser user = new MulticastUser();
+        user.readConfigs();
         user.start();
     }
 
@@ -142,48 +187,52 @@ public class MulticastClient extends Thread {
 }
 
 class MulticastUser extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
+    private String MULTICAST_ADDRESS;
+    private int PORT;
+
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readConfigs() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoMulticast");
+        this.PORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+
+    }
 
     public MulticastUser() {
         super("User " + (long) (Math.random() * 1000));
     }
-
-    //====================================================================================================
-    private String str;
-    TimerTask task = new TimerTask()
-    {
-        public void run()
-        {
-            if( str.equals("") )
-            {
-                System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto.");
-                Globals.locked = true;
-                Globals.command = "no cmd";
-                Globals.login = "empty";
-                Globals.CC = null;
-            }
-            else{
-                str="";
-            }
-        }
-    };
-
-    public String getInput() throws Exception
-    {
-        Timer timer = new Timer();
-        timer.schedule( task, 10*1000 );
-
-        System.out.println( "Input a string within 10 seconds: " );
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader( System.in ) );
-        str= in.readLine();
-
-        timer.cancel();
-        return str;
-    }
-
-    //====================================================================================================
 
     public String getTimeConsole(Scanner scanner, int time) throws NoSuchElementException, ExecutionException, InterruptedException {
         String result;
@@ -203,13 +252,11 @@ class MulticastUser extends Thread {
             System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto.");
             Globals.locked = true;
             Globals.command = "no cmd";
-            Globals.login = "empty";
+            Globals.login = "off";
             Globals.CC = null;
         }
         return null;
     }
-
-    //=========================================================================================================
 
     public void run() {
         while (true) {
@@ -237,7 +284,7 @@ class MulticastUser extends Thread {
                         }
 
                     } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = getInput();//keyboardScanner.nextLine();//getTimeConsole(keyboardScanner, 10);
+                        String readKeyboard = getTimeConsole(keyboardScanner, 10);
                         if (readKeyboard != null){
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
@@ -266,7 +313,7 @@ class MulticastUser extends Thread {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (Exception e) {
+            } catch (ExecutionException e) {
                 //e.printStackTrace();
             } finally {
                 socket.close();

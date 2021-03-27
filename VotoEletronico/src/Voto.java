@@ -35,12 +35,6 @@ public interface Voto extends Remote {
      */
     public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException;
 
-    /**
-     * Lista todas as votações atuais ou futuras
-     * @return String com informação sobre as votações
-     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
-     */
-    public String listarVotacoes() throws java.rmi.RemoteException;
 
     /**
      * Verifica se o user com o CC dado existe
@@ -75,13 +69,6 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public Eleicao getEleicao(int n) throws java.rmi.RemoteException;
-
-    /**
-     * Cria uma lista e adiciona-a na BD
-     * @param lista lista a criar
-     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
-     */
-    public void criarLista(Lista lista) throws java.rmi.RemoteException;
 
     /**
      * Lista todas as listas guardadas na BD
@@ -143,13 +130,6 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void addUserList(User user,Lista lista) throws java.rmi.RemoteException;
-
-    /**
-     * Remover eleição da BD
-     * @param eleicao eleição a remover
-     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
-     */
-    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException;
 
     /**
      * Remover lista da BD do servidor

@@ -1,3 +1,5 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.MulticastSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -6,16 +8,59 @@ import java.net.SocketTimeoutException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Scanner;
 
-public class MulticastServer extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
-    private long SLEEP_TIME = 5000;
-    private static DepMesa depMesa = new DepMesa();
 
-    public static void main(String[] args) {
+public class MulticastServer extends Thread {
+    private String MULTICAST_ADDRESS;
+    private int PORT;
+    private static final DepMesa depMesa = new DepMesa();
+
+
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readConfigs() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoMulticast");
+        this.PORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+
+    }
+
+    public static void main(String[] args) throws IOException {
         if (args.length == 1) {
             depMesa.setDepartamento(args[0]);
             Date date = new Date();
@@ -25,8 +70,10 @@ public class MulticastServer extends Thread {
             System.exit(0);
         }
         MulticastServer server = new MulticastServer();
+        server.readConfigs();
         server.start();
         Console console = new Console();
+        console.readConfigs();
         console.start();
     }
 
@@ -103,8 +150,48 @@ public class MulticastServer extends Thread {
 }
 
 class Console extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
+    private String MULTICAST_ADDRESS;
+    private int PORT;
+
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readConfigs() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoMulticast");
+        this.PORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+
+    }
 
     public Console() {
         super("Server " + (long) (Math.random() * 1000));
@@ -132,6 +219,7 @@ class Console extends Thread {
 
                     if (voto.identificarLeitor(CC)) {
                         Login login = new Login(CC);
+                        login.readConfigs();
                         login.start();
                     } else {
                         System.out.println("Eleitor não identificado.");
@@ -152,9 +240,49 @@ class Console extends Thread {
 }
 
 class Login extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
-    private String CC;
+    private String MULTICAST_ADDRESS;
+    private int PORT;
+    private final String CC;
+
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readConfigs() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoMulticast");
+        this.PORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+
+    }
 
     public Login(String CC) {
         super("Server " + (long) (Math.random() * 1000));
@@ -248,9 +376,9 @@ class Login extends Thread {
 class Fail extends Thread {
     private String MULTICAST_ADDRESS = "224.0.224.0";
     private int PORT = 4321;
-    private String CC;
-    private String state;
-    private String clientID;
+    private final String CC;
+    private final String state;
+    private final String clientID;
 
     public Fail(String CC, String state, String clientID) {
         super("Server " + (long) (Math.random() * 1000));

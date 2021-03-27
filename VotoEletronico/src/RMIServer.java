@@ -15,6 +15,7 @@ class Global{
     static volatile boolean prim = false;
     static volatile RMIServer rmiServer;
     static volatile ArrayList<Notifications> admin = new ArrayList<>();
+    static int portoUDP;
 
     static {
         try {
@@ -98,7 +99,7 @@ class UDPSec extends Thread{
 
                 byte[] m = texto.getBytes();
                 InetAddress aHost = InetAddress.getByName("localhost");
-                int serverPort = 6789;
+                int serverPort = Global.portoUDP;
                 DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
                 aSocket.send(request);
                 byte[] buffer = new byte[1000];
@@ -152,6 +153,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<DepMesa> mesasVoto = new CopyOnWriteArrayList<>();
+    int portoRMI;
 
     /**
      * Construtor para a classe
@@ -303,12 +305,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return s.toString();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public void criarLista(Lista lista) throws java.rmi.RemoteException{
-        listas.add(lista);
-    }
 
     /**
      * @inheritDoc
@@ -475,21 +471,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void removeEleicao(Eleicao eleicao) throws java.rmi.RemoteException{
-        Eleicao eleicao1=null;
-
-        for (Eleicao eleicao2: eleicoes) {
-            if(eleicao2.equals(eleicao)){
-                eleicao1 = eleicao2;
-            }
-        }
-
-        eleicoes.remove(eleicao1);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException{
         Lista lista1=null;
 
@@ -579,27 +560,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      */
     public User getUser(int pos) throws java.rmi.RemoteException {
         return users.get(pos);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public String listarVotacoes() throws java.rmi.RemoteException{
-        StringBuilder votacoes = new StringBuilder();
-        for (Eleicao eleicao : eleicoes){
-            votacoes.append(eleicao.titulo);
-            votacoes.append("\n");
-            votacoes.append(eleicao.descricao);
-            for (Lista lista : eleicao.listas){
-                votacoes.append(lista.nome);
-                votacoes.append("\n");
-                for(User user: lista.lista){
-                    votacoes.append(user.user);
-                    votacoes.append("\n");
-                }
-            }
-        }
-        return votacoes.toString();
     }
 
     /**
@@ -740,15 +700,57 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public DepMesa getMesa(int opcao) throws java.rmi.RemoteException{
         return mesasVoto.get(opcao);
     }
+    // ========================================================= Ler config
+    /**
+     * Abre o ficheiro de config para leitura
+     * @param fileName ficheiro para abrir
+     * @return propreties file
+     */
+    public static Properties readPropertiesFile(String fileName) throws IOException {
 
-    // =======================================================
+        FileInputStream fis = null;
+        Properties prop = null;
+        try {
+            fis = new FileInputStream(fileName);
+            // create Properties class object
+            prop = new Properties();
+            // load properties file into it
+            prop.load(fis);
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        } finally {
+            fis.close();
+        }
+
+        return prop;
+    }
+
+    /**
+     * Le as configurações do ficheiro de config
+     */
+    public void readPorto() throws IOException {
+
+        Properties prop = readPropertiesFile("config.properties");
+        String portoInString = prop.getProperty("portoRMI");
+        this.portoRMI = Integer.parseInt(portoInString);
+        String portoUDPSring = prop.getProperty("portoUDP");
+        Global.portoUDP = Integer.parseInt(portoUDPSring);
+
+    }
+
+    // ======================================================== Main
 
     /**
      * Main da função onde vai ser criada as threads para o UDP Primario/UDP Secundário. O 1º RMI a ser ligado cria a
      * thread Primario e fica a espera de receber mensagem pelo seundario. Apos o Servidor Primario morrer o Secundario
      * continua o seu trabalho
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
         String a;
 
         System.getProperties().put("java.security.policy", "policy.all");
@@ -756,6 +758,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
         DatagramSocket aSocket = null;
         boolean primario = false;
+        Global.rmiServer.readPorto();
 
         try{
             aSocket = new DatagramSocket(6789);
@@ -771,7 +774,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 new UDPPrim(aSocket);
 
                 Global.rmiServer.readFile();
-                Registry r = LocateRegistry.createRegistry(7000);
+                Registry r = LocateRegistry.createRegistry(Global.rmiServer.portoRMI);
                 r.rebind("votacao", Global.rmiServer);
                 System.out.println("Hello Server ready.");
                 while (true) {
@@ -786,7 +789,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                         aSocket = new DatagramSocket(6789);
                         new UDPPrim(aSocket);
                         Global.rmiServer.readFile();
-                        Registry r = LocateRegistry.createRegistry(7000);
+                        Registry r = LocateRegistry.createRegistry(Global.rmiServer.portoRMI);
                         r.rebind("votacao", Global.rmiServer);
                         System.out.println("Hello Server ready.");
                         while (true) {
