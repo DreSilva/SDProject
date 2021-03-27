@@ -21,7 +21,7 @@ public class MulticastServer extends Thread {
             Date date = new Date();
             depMesa.setId(date.getTime());
         } else {
-            System.out.println("Corra com com o número de departamento: java MulticastServer <departamento>");
+            System.out.println("Corra com o número de departamento: java MulticastServer <departamento>");
             System.exit(0);
         }
         MulticastServer server = new MulticastServer();
@@ -74,17 +74,18 @@ public class MulticastServer extends Thread {
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
                         } else if (cmd.equals("candidate")) {
-
                             arrOfStr = arrOfStr[5].split(" ");
                             message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
-                        } else if (cmd.equals("failed")) {
+                        } else if (cmd.equals("fail")) {
                             arrOfStr = arrOfStr[5].split(" ");
-                            Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID);
-                            fail.start();
+                            if (arrOfStr[1] == "null") {
+                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID);
+                                //fail.start();
+                            }
                         }
                     }
 
@@ -125,7 +126,7 @@ class Console extends Thread {
                 try {
 
                     //pedir nr do CC do eleitor
-                    System.out.print("Insira o número do CC do eleitor: ");
+                    System.out.println("Insira o número do CC do eleitor: ");
                     Scanner scan = new Scanner(System.in);
                     String CC = scan.nextLine();
 
@@ -262,9 +263,9 @@ class Fail extends Thread {
         MulticastSocket socket = null, socketR = null;
         try {
             boolean flag = false;
-
+            String str ="a a";
+            String[] arrOfStr=str.split(" ");
             while (!flag) {
-                String[] arrOfStr;
                 socket = new MulticastSocket();  // create socket without binding it (only for sending)
                 socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
                 InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -285,13 +286,46 @@ class Fail extends Thread {
                         String messageR = new String(packetR.getData(), 0, packetR.getLength());
                         arrOfStr = messageR.split("[|;]");
                     } while (!arrOfStr[0].equals("client") || !arrOfStr[1].equals(clientID) || !arrOfStr[3].equals("recovered"));
+                    System.out.println("O terminal " + arrOfStr[1] + "está desbloqueado para o CC " + this.CC);
                 } catch (SocketTimeoutException e) {
                     flag = false;
                 }
             }
-            System.out.println("\nO cliente " + clientID + " foi recuperado.\n");
-        } catch (IOException e) {
+            System.out.println("\nO cliente " + this.clientID + " foi recuperado.\n");
+
+
+            if (state.equals("locked")) {
+                Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                try {
+                    arrOfStr = arrOfStr[5].split("/");
+                    if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
+                        //resposta
+                        String message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
+                        byte[] buffer = message.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    } else {
+                        String message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
+                        byte[] buffer = message.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    String message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
+                    byte[] buffer = message.getBytes();
+                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                    socket.send(packet);
+                } catch (ConnectException e) {
+                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                }
+            }
+        } catch (NotBoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            //do nothing
         } finally {
             socket.close();
             socketR.close();
