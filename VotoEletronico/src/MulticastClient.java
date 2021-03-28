@@ -287,7 +287,7 @@ class MulticastUser extends Thread {
                         }
 
                     } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = getTimeConsole(keyboardScanner, 10);
+                        String readKeyboard = keyboardScanner.nextLine(); //getTimeConsole(keyboardScanner, 10);
                         if (readKeyboard != null){
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
@@ -316,9 +316,9 @@ class MulticastUser extends Thread {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (ExecutionException e) {
+            } /*catch (ExecutionException e) {
                 //e.printStackTrace();
-            } finally {
+            } */finally {
                 socket.close();
             }
         }

@@ -146,14 +146,35 @@ public class MulticastServer extends Thread {
                     }
 
                 } catch (ConnectException e) {
-                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
-                    if(voting && response.equals("")){
-                        message = "server|"+clientID+";cmd|votelost;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
-                        buffer = message.getBytes();
-                        group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
+                    Date now = new Date();
+                    Date after = new Date();
+                    after.setTime(now.getTime()+30000);
+                    boolean flag = false;
+                    while (now.before(after)) {
+                        now = new Date();
+                        try {
+                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            flag = true;
+                            break;
+                        }catch (ConnectException e1){
+                            ;
+                        }
                     }
+                    if(!flag){
+                        System.out.println("Erro nos servidores RMI!");
+                        System.exit(0);
+                    }
+                    else {
+                        if (voting && response.equals("") && voto != null) {
+                            System.out.println("Entrei");
+                            message = "server|" + clientID + ";cmd|votelost;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
+                            buffer = message.getBytes();
+                            group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        }
+                    }
+
                 }
             }
         } catch (IOException | NotBoundException e) {
@@ -242,7 +263,24 @@ class Console extends Thread {
                     }
                     sleep(1000);
                 } catch (ConnectException e) {
-                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                    Date now = new Date();
+                    Date after = new Date();
+                    after.setTime(now.getTime()+30000);
+                    boolean flag = false;
+                    while (now.before(after)) {
+                        now = new Date();
+                        try {
+                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            flag = true;
+                            break;
+                        }catch (ConnectException e1){
+                            ;
+                        }
+                    }
+                    if(!flag){
+                        System.out.println("Erro nos servidores RMI!");
+                        System.exit(0);
+                    }
                 }
             }
 
@@ -377,7 +415,24 @@ class Login extends Thread {
                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
                 } catch (ConnectException e) {
-                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                    Date now = new Date();
+                    Date after = new Date();
+                    after.setTime(now.getTime()+30000);
+                    boolean flag = false;
+                    while (now.before(after)) {
+                        now = new Date();
+                        try {
+                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            flag = true;
+                            break;
+                        }catch (ConnectException e1){
+                            ;
+                        }
+                    }
+                    if(!flag){
+                        System.out.println("Erro nos servidores RMI!");
+                        System.exit(0);
+                    }
                 }
             } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
         } catch (IOException | NotBoundException e) {
@@ -463,7 +518,24 @@ class Fail extends Thread {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
                 } catch (ConnectException e) {
-                    voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                    Date now = new Date();
+                    Date after = new Date();
+                    after.setTime(now.getTime()+30000);
+                    flag = false;
+                    while (now.before(after)) {
+                        now = new Date();
+                        try {
+                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            flag = true;
+                            break;
+                        }catch (ConnectException e1){
+                            ;
+                        }
+                    }
+                    if(!flag){
+                        System.out.println("Erro nos servidores RMI!");
+                        System.exit(0);
+                    }
                 }
             }
         } catch (NotBoundException e) {

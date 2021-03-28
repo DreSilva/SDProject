@@ -538,10 +538,29 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         break;
                 }
             } catch (ConnectException e){
-                if(accao){
-                    System.out.println("Houve um problema com o ultimo comando, volte a efeuta-lo");
+                Date now = new Date();
+                Date after = new Date();
+                after.setTime(now.getTime()+30000);
+                boolean flag = false;
+                while (now.before(after)) {
+                    now = new Date();
+                    try {
+                        votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
+                        flag = true;
+                        break;
+                    }catch (ConnectException e1){
+                        ;
+                    }
                 }
-                votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
+                if(!flag){
+                    System.out.println("Erro nos servidores RMI!");
+                    System.exit(0);
+                }
+                else{
+                    if(accao){
+                        System.out.println("Houve um problema com o ultimo comando, volte a efetua-lo");
+                    }
+                }
             } catch (NumberFormatException e){
                 System.out.println("Insira um numero e repita o procedimento");
             }
