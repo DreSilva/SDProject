@@ -2,8 +2,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.*;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.sql.SQLOutput;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Random;
@@ -168,6 +166,11 @@ public class MulticastClient extends Thread {
                             System.out.println("Insira login no formato <username>/<password>:");
                         }
                         Globals.command = "recovered";
+                    }
+                    else if(arrOfStr[3].equals("votelost")){
+                        System.out.println("Houve um problema ao efetuar o voto, pff vote outra vez");
+                        System.out.println(arrOfStr[5]);
+                        Globals.command = "candidate";
                     }
                 } else if (arrOfStr[1].equals("all") && Globals.locked) {
                     Globals.command = arrOfStr[3];

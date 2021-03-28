@@ -85,7 +85,7 @@ public class MulticastServer extends Thread {
         MulticastSocket socket = null, socketR = null;
         String message, messageR;
         String[] arrOfStr;
-        String clientID, cmd;
+        String clientID = "", cmd;
         try {
             //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -101,32 +101,41 @@ public class MulticastServer extends Thread {
             byte[] buffer;
             InetAddress group;
             DatagramPacket packet;
+            boolean voting = false;
+            String response = "";
+            int n=0;
 
             while (true) {
                 try {
+                    voting = false;
                     //recebe mensagem
                     byte[] bufferR = new byte[256];
                     DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
                     socketR.receive(packetR);
                     messageR = new String(packetR.getData(), 0, packetR.getLength());
                     arrOfStr = messageR.split("[|;]");
+
                     if (!arrOfStr[0].equals("server")) {
                         clientID = arrOfStr[1];
                         cmd = arrOfStr[3];
+
                         if (cmd.equals("election")) {
-                            int n = Integer.parseInt(arrOfStr[5]);
+                            n = Integer.parseInt(arrOfStr[5]);
                             message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
                         } else if (cmd.equals("candidate")) {
+                            voting = true;
                             arrOfStr = arrOfStr[5].split(" ");
-                            message = "server|" + clientID + ";cmd|select election;msg|" + voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa) + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
+                            response  = voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa);
+                            message = "server|" + clientID + ";cmd|select election;msg|" + response + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
+                            response="";
                         } else if (cmd.equals("fail")) {
                             arrOfStr = arrOfStr[5].split(" ");
                             if (arrOfStr[1] == "null") {
@@ -138,6 +147,13 @@ public class MulticastServer extends Thread {
 
                 } catch (ConnectException e) {
                     voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                    if(voting && response.equals("")){
+                        message = "server|"+clientID+";cmd|votelost;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
+                        buffer = message.getBytes();
+                        group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
+                    }
                 }
             }
         } catch (IOException | NotBoundException e) {
