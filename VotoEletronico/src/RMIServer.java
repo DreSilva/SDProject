@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Classe que vai ficar com as variaveis que precisam de ser guardadas entre threads
- * @
  */
 class Global{
     static volatile boolean prim = false;
@@ -153,7 +152,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<DepMesa> mesasVoto = new CopyOnWriteArrayList<>();
-    int portoRMI;
+    private static int portoRMI;
+    private static String serverAddress;
 
     /**
      * Construtor para a classe
@@ -752,13 +752,10 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             // load properties file into it
             prop.load(fis);
 
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
         } catch (IOException e) {
-
             e.printStackTrace();
         } finally {
+            assert fis != null;
             fis.close();
         }
 
@@ -772,9 +769,10 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
         Properties prop = readPropertiesFile("config.properties");
         String portoInString = prop.getProperty("portoRMI");
-        this.portoRMI = Integer.parseInt(portoInString);
+        portoRMI = Integer.parseInt(portoInString);
         String portoUDPSring = prop.getProperty("portoUDP");
         Global.portoUDP = Integer.parseInt(portoUDPSring);
+        serverAddress =  prop.getProperty("RMIAddress");
 
     }
 
@@ -787,13 +785,15 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      */
     public static void main(String args[]) throws IOException {
         String a;
+        Global.rmiServer.readPorto();
 
         System.getProperties().put("java.security.policy", "policy.all");
+        System.setProperty("java.rmi.server.hostname", serverAddress);
         System.setSecurityManager(new RMISecurityManager());
 
         DatagramSocket aSocket = null;
         boolean primario = false;
-        Global.rmiServer.readPorto();
+
 
         try{
             aSocket = new DatagramSocket(6789);

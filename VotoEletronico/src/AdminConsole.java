@@ -12,6 +12,7 @@ import java.util.*;
 
 public class AdminConsole extends UnicastRemoteObject implements Notifications {
     int porto;
+    String serverAddress;
     ArrayList<String> Departamentos = new ArrayList<>();
 
     /**
@@ -76,6 +77,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         String deps = prop.getProperty("departamento");
         String[] depsSplit = deps.split(",");
         Departamentos.addAll(Arrays.asList(depsSplit));
+        serverAddress =  prop.getProperty("RMIAddress");
 
     }
 
@@ -90,7 +92,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         AdminConsole admin = new AdminConsole();
 
         admin.readDeps();
-        Voto votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
+        Voto votoObj = (Voto) LocateRegistry.getRegistry(admin.serverAddress,admin.porto).lookup("votacao");
         ArrayList<String> opcoes =  new ArrayList<>();
 
         votoObj.subscribeAdmin((Notifications) admin);
