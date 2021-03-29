@@ -1,15 +1,14 @@
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.*;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
 
 /**
  * The MulticastClient class joins a multicast group and loops receiving
@@ -34,11 +33,12 @@ class Globals {
 }
 
 public class MulticastClient extends Thread {
-    private static String MULTICAST_ADDRESS ;
+    private static String MULTICAST_ADDRESS;
     private static int PORT;
 
     /**
      * Abre o ficheiro de config para leitura
+     *
      * @param fileName ficheiro para abrir
      * @return propreties file
      */
@@ -166,8 +166,7 @@ public class MulticastClient extends Thread {
                             System.out.println("Insira login no formato <username>/<password>:");
                         }
                         Globals.command = "recovered";
-                    }
-                    else if(arrOfStr[3].equals("votelost")){
+                    } else if (arrOfStr[3].equals("votelost")) {
                         System.out.println("Houve um problema ao efetuar o voto, pff vote outra vez");
                         System.out.println(arrOfStr[5]);
                         Globals.command = "candidate";
@@ -195,8 +194,9 @@ class MulticastUser extends Thread {
 
     /**
      * Abre o ficheiro de config para leitura
+     *
      * @param fileName ficheiro para abrir
-     * @return propreties file
+     * @return properties file
      */
     public static Properties readPropertiesFile(String fileName) throws IOException {
         FileInputStream fis = null;
@@ -237,28 +237,22 @@ class MulticastUser extends Thread {
         super("User " + (long) (Math.random() * 1000));
     }
 
-    public String getTimeConsole(Scanner scanner, int time) throws NoSuchElementException, ExecutionException, InterruptedException {
-        String result;
-        try {
+    public String readTimedConsole(NonBlockingInputStream keyboardScanner, int time) throws NoSuchElementException, IOException {
+        int i;
+        char c;
+        StringBuilder sb = new StringBuilder();
 
-            FutureTask<String> task = new FutureTask<>(() -> {
-                return scanner.nextLine();
-            });
+        do{
+            i = keyboardScanner.read(time*1000);
+            System.out.println(i);
+            if(i!=-2 && i!=10) {
+                c=(char)i;
+                sb.append(c);
+            }
+        }while(i!=-2 && i!=10);
 
-            Thread thread = new Thread(task);
-            thread.setDaemon(true);
-            thread.start();
-            result = task.get(time, TimeUnit.SECONDS);
-
-            return result;
-        } catch (TimeoutException e) {
-            System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto.");
-            Globals.locked = true;
-            Globals.command = "no cmd";
-            Globals.login = "off";
-            Globals.CC = null;
-        }
-        return null;
+        if(i==-2) return null;
+        else return sb.toString().substring(0,sb.toString().length()-1);
     }
 
     public void run() {
@@ -266,7 +260,7 @@ class MulticastUser extends Thread {
             MulticastSocket socket = null;
             try {
                 socket = new MulticastSocket();  // create socket without binding it (only for sending)
-                Scanner keyboardScanner = new Scanner(System.in);
+                NonBlockingInputStream keyboardScanner = new NonBlockingInputStream(System.in, true);
                 while (true) {
                     sleep(1000);
                     if (Globals.command.equals("locked")) {
@@ -287,8 +281,8 @@ class MulticastUser extends Thread {
                         }
 
                     } else if (!Globals.command.equals("no cmd")) {
-                        String readKeyboard = keyboardScanner.nextLine(); //getTimeConsole(keyboardScanner, 10);
-                        if (readKeyboard != null){
+                        String readKeyboard = readTimedConsole(keyboardScanner,10);
+                        if (readKeyboard != null) {
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
                                 if (Globals.command.equals("recovered")) {
@@ -308,17 +302,22 @@ class MulticastUser extends Thread {
                             } else {
                                 System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
                             }
+                        } else {
+                            System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto");
+                            Globals.CC=null;
+                            Globals.locked=true;
+                            Globals.login="empty";
+                            Globals.command="no cmd";
                         }
                     }
-                    if (!Globals.command.equals("login") && Globals.command.equals("recovered")) Globals.command = "no cmd";
+                    if (!Globals.command.equals("login") && Globals.command.equals("recovered"))
+                        Globals.command = "no cmd";
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } /*catch (ExecutionException e) {
-                //e.printStackTrace();
-            } */finally {
+            } finally {
                 socket.close();
             }
         }
