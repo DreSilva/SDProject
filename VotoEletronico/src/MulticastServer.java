@@ -331,38 +331,57 @@ class Login extends Thread {
         MulticastSocket socket = null, socketR = null;
         String message, messageR;
         String[] arrOfStr;
-        String clientID;
+        String clientID = null;
         try {
-            socket = new MulticastSocket();  // create socket without binding it (only for sending)
-            socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
-            InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
-            socketR.joinGroup(groupR);
+            boolean flag_r = false;
+            String str ="a a";
+            arrOfStr=str.split(" ");
+
+            //repete envio até haver sucesso
+            while (!flag_r) {
+                socket = new MulticastSocket();  // create socket without binding it (only for sending)
+                socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
+                InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
+                socketR.joinGroup(groupR);
+                socketR.setSoTimeout(2500);
+
+                Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+
+                //mensagem geral para todos os clientes para saber quais se encontram disponiveis
+                message = "server|all;cmd|locked;msg|" + this.CC;
+                byte[] buffer = message.getBytes();
+                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket.send(packet);
+
+                //espera resposta
+                try {
+                    //recebe resposta
+                    flag_r = true;
+                    //espera resposta de um cliente livre
+                    do {
+                        byte[] bufferR = new byte[256];
+                        DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                        socketR.receive(packetR);
+                        messageR = new String(packetR.getData(), 0, packetR.getLength());
+                        arrOfStr = messageR.split("[|; ]");
+                    } while (arrOfStr[0].equals("server") || (arrOfStr[3].equals("locked") && arrOfStr[5].equals("false")));
+                    clientID = arrOfStr[1];
+                } catch (SocketTimeoutException e) {
+                    // deu time out e reenvia a mensagem
+                    flag_r = false;
+                }
+            }
+
+            socketR.setSoTimeout(0);
 
             Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
-            //mensagem geral para todos os clientes para saber quais se encontram disponiveis
-            message = "server|all;cmd|locked;msg|" + this.CC;
+            //envia mensagem de inicio de login ao cliente
+            message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
             byte[] buffer = message.getBytes();
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-            socket.send(packet);
-
-            //espera resposta de um cliente livre
-            do {
-                byte[] bufferR = new byte[256];
-                DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
-                socketR.receive(packetR);
-                messageR = new String(packetR.getData(), 0, packetR.getLength());
-                arrOfStr = messageR.split("[|; ]");
-            } while (arrOfStr[0].equals("server") || (arrOfStr[3].equals("locked") && arrOfStr[5].equals("false")));
-
-            clientID = arrOfStr[1];
-
-            //envia mensagem de inicio de login ao cliente
-            message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
-            buffer = message.getBytes();
-            group = InetAddress.getByName(MULTICAST_ADDRESS);
-            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
             socket.send(packet);
             System.out.println("O terminal " + clientID + " está desbloqueado.");
 
@@ -519,9 +538,6 @@ class Fail extends Thread {
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                 DatagramPacket packet;
 
-
-
-                System.out.println("Entrei aqui");
                 message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
                 buffer = message.getBytes();
                 group = InetAddress.getByName(MULTICAST_ADDRESS);

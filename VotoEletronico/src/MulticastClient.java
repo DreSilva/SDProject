@@ -271,7 +271,7 @@ class MulticastUser extends Thread {
 
                     } else if (!Globals.command.equals("no cmd")) {
                         //leitura da consola
-                        String readKeyboard = readTimedConsole(keyboardScanner,10);
+                        String readKeyboard = readTimedConsole(keyboardScanner,120);
                         //caso não haja time out enviar resposta ao server
                         if (readKeyboard != null) {
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
