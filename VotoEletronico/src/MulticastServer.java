@@ -152,7 +152,7 @@ public class MulticastServer extends Thread {
                             voting = true;
                             arrOfStr = arrOfStr[5].split(" ");
                             response  = voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa);
-                            message = "server|" + clientID + ";cmd|select election;msg|" + response + "\nSelecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
+                            message = "server|" + clientID + ";cmd|select election;msg|" + response + "\nSelecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -160,8 +160,10 @@ public class MulticastServer extends Thread {
                             response="";
                         } else if (cmd.equals("fail")) {
                             arrOfStr = arrOfStr[5].split(" ");
-                            if (arrOfStr[1] == "null") {
-                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT);//fail.start();
+
+                            if (!arrOfStr[1].equals("null")) {
+                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT);
+                                fail.start();
                             }
                         }
                     }
@@ -187,7 +189,6 @@ public class MulticastServer extends Thread {
                     }
                     else {
                         if (voting && response.equals("") && voto != null) {
-                            System.out.println("Entrei");
                             message = "server|" + clientID + ";cmd|votelost;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -290,8 +291,11 @@ class Login extends Thread {
 
 
     /**
-     * construtor
-     * @param CC número do CC da pessoa em questão
+     * Construtor
+     * @param CC Cartao de Cidadao do user
+     * @param MULTICAST_ADDRESS Adress Multicast do departamento
+     * @param PORT Porto Multicast do Departamento
+     * @param RMIPORT Porto do Servidor RMI
      */
     public Login(String CC,String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
@@ -306,7 +310,6 @@ class Login extends Thread {
         String message, messageR;
         String[] arrOfStr;
         String clientID;
-        System.out.println(PORT);
         try {
             //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -355,7 +358,7 @@ class Login extends Thread {
                     arrOfStr = arrOfStr[5].split("/");
                     if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
                         //resposta
-                        message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
+                        message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -405,7 +408,7 @@ class Login extends Thread {
 
 class Fail extends Thread {
     private final String CC;
-    private final String state;
+    private String state;
     private final String clientID;
 
     private String MULTICAST_ADDRESS;
@@ -433,7 +436,7 @@ class Fail extends Thread {
                 socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
                 InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
                 socketR.joinGroup(groupR);
-                socketR.setSoTimeout(10000);
+                socketR.setSoTimeout(2500);
 
                 String message = "server|" + this.clientID + ";cmd|fail;msg|" + this.CC + " " + this.state;
                 byte[] buffer = message.getBytes();
@@ -455,52 +458,89 @@ class Fail extends Thread {
                 }
             }
             System.out.println("\nO cliente " + this.clientID + " foi recuperado.\n");
-
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
             if (state.equals("locked")) {
-                Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
-                try {
-                    arrOfStr = arrOfStr[5].split("/");
-                    if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
-                        //resposta
-                        String message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleição em que pretende votar:\n" + voto.listarEleicoes();
-                        byte[] buffer = message.getBytes();
-                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket = new MulticastSocket();  // create socket without binding it (only for sending)
+                socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
+                InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
+                socketR.joinGroup(groupR);
+                String message,messageR;
+                byte[] buffer;
+
+                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                DatagramPacket packet;
+
+
+
+                System.out.println("Entrei aqui");
+                message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
+                buffer = message.getBytes();
+                group = InetAddress.getByName(MULTICAST_ADDRESS);
+                packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket.send(packet);
+                System.out.println("O terminal " + clientID + " está desbloqueado.");
+
+                //login starts
+                do {
+                    do {
+                        byte[] bufferR = new byte[256];
+                        DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
+                        socketR.receive(packetR);
+                        messageR = new String(packetR.getData(), 0, packetR.getLength());
+                        arrOfStr = messageR.split("[|;]");
+                    } while (!arrOfStr[0].equals("client") || !arrOfStr[1].equals(clientID) || !arrOfStr[3].equals("login"));
+
+                    try {
+                        arrOfStr = arrOfStr[5].split("/");
+                        if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
+                            //resposta
+                            message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
+                            buffer = message.getBytes();
+                            group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        } else {
+                            message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
+                            buffer = message.getBytes();
+                            group = InetAddress.getByName(MULTICAST_ADDRESS);
+                            packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                            socket.send(packet);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
+                        buffer = message.getBytes();
+                        group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
-                    } else {
-                        String message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
-                        byte[] buffer = message.getBytes();
-                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                        socket.send(packet);
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    String message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
-                    byte[] buffer = message.getBytes();
-                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                    socket.send(packet);
-                } catch (ConnectException e) {
-                    Date now = new Date();
-                    Date after = new Date();
-                    after.setTime(now.getTime()+30000);
-                    flag = false;
-                    while (now.before(after)) {
-                        now = new Date();
-                        try {
-                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
-                            flag = true;
-                            break;
-                        }catch (ConnectException e1){
-                            ;
+                    } catch (ConnectException e) {
+                        Date now = new Date();
+                        Date after = new Date();
+                        after.setTime(now.getTime()+30000);
+                        boolean flag2 = false;
+                        while (now.before(after)) {
+                            now = new Date();
+                            try {
+                                voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                                flag2 = true;
+                                break;
+                            }catch (ConnectException e1){
+                                ;
+                            }
+                        }
+                        if(!flag2){
+                            System.out.println("Erro nos servidores RMI!");
+                            System.exit(0);
                         }
                     }
-                    if(!flag){
-                        System.out.println("Erro nos servidores RMI!");
-                        System.exit(0);
-                    }
-                }
+                } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
+            }
+            else if(state.equals("login")){
+                String message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
+                byte[] buffer = message.getBytes();
+                InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                socket.send(packet);
             }
         } catch (NotBoundException e) {
             e.printStackTrace();

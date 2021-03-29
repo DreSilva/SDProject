@@ -100,7 +100,7 @@ public class MulticastClient extends Thread {
                     } else {
                         message = "client|" + Globals.clientID + ";cmd|fail;msg|null null";
                     }
-                    System.out.println(message);
+                    //System.out.println(message);
                     byte[] buffer = message.getBytes();
                     InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -159,18 +159,15 @@ public class MulticastClient extends Thread {
                         System.out.println(arrOfStr[5]);
                         Globals.command = "candidate";
                     } else if (arrOfStr[3].equals("fail")) {
+                        Globals.locked = false;
                         arrOfStr = arrOfStr[5].split(" ");
                         if (arrOfStr[1].equals("login")) {
-                            Globals.CC = arrOfStr[1];
+                            Globals.CC = arrOfStr[0];
                             Globals.login = "on";
-                            Globals.locked = false;
-                            System.out.println("O utilizador com CC" + Globals.CC + "está logged on");
+                            System.out.println("O utilizador com CC " + Globals.CC + " esta logged on");
                         } else {
-                            Globals.CC = arrOfStr[1];
+                            Globals.CC = arrOfStr[0];
                             Globals.login = "off";
-                            Globals.locked = false;
-                            System.out.println("Terminal desbloqueado.");
-                            System.out.println("Insira login no formato <username>/<password>:");
                         }
                         Globals.command = "recovered";
                     } else if (arrOfStr[3].equals("votelost")) {
@@ -224,7 +221,6 @@ class MulticastUser extends Thread {
 
         do{
             i = keyboardScanner.read(time*1000);
-            System.out.println(i);
             if(i!=-2 && i!=10) {
                 c=(char)i;
                 sb.append(c);
@@ -255,13 +251,11 @@ class MulticastUser extends Thread {
                             socket.send(packet);
                         }
                     } else if (Globals.command.equals("recovered")) {
-                        if (Globals.login.equals("on")) {
-                            String message = "client|" + Globals.clientID + ";cmd|recovered;msg|empty";
-                            byte[] buffer = message.getBytes();
-                            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
-                            socket.send(packet);
-                        }
+                        String message = "client|" + Globals.clientID + ";cmd|recovered;msg|empty";
+                        byte[] buffer = message.getBytes();
+                        InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
+                        socket.send(packet);
 
                     } else if (!Globals.command.equals("no cmd")) {
                         String readKeyboard = readTimedConsole(keyboardScanner,10);
