@@ -65,7 +65,16 @@ public class MulticastServer extends Thread {
 
     }
 
+    /**
+     * Cria o listener para o ctrl c para notifição de fecho da mesa
+     * Lê o file de configs para obter a informação associada ao departamento
+     * Lança a thread Multicast server(recebe e responde a requests enviadas pelos clientes)
+     * Lança a thread Console(lê CC's da consola do server para fazer a identificação e login do eleitor)
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
+        //argumentos
         if (args.length == 1) {
             depMesa.setDepartamento(args[0]);
             Date date = new Date();
@@ -74,11 +83,15 @@ public class MulticastServer extends Thread {
             System.out.println("Corra com o número de departamento: java MulticastServer <departamento>");
             System.exit(0);
         }
+
+        //inicialização das threads
         MulticastServer server = new MulticastServer();
         server.readConfigs();
         server.start();
         Console console = new Console(server.MULTICAST_ADDRESS, server.PORT,server.RMIPORT);
         console.start();
+
+        //listener para ctrl C
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
@@ -94,7 +107,7 @@ public class MulticastServer extends Thread {
     }
 
     /**
-     * construtor
+     * construtor da class Multicast server
      */
     public MulticastServer() {
         super("Server " + (long) (Math.random() * 1000));
@@ -127,6 +140,7 @@ public class MulticastServer extends Thread {
             String response = "";
             int n=0;
 
+            //ciclo de requests e answers
             while (true) {
                 try {
                     voting = false;
@@ -137,11 +151,12 @@ public class MulticastServer extends Thread {
                     messageR = new String(packetR.getData(), 0, packetR.getLength());
                     arrOfStr = messageR.split("[|;]");
 
+                    //resposta à mensagem
                     if (!arrOfStr[0].equals("server")) {
                         clientID = arrOfStr[1];
                         cmd = arrOfStr[3];
-
                         if (cmd.equals("election")) {
+                            //resposta a pedido dos candidatos de determinada eleição
                             n = Integer.parseInt(arrOfStr[5]);
                             message = "server|" + clientID + ";cmd|select candidate;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
                             buffer = message.getBytes();
@@ -149,6 +164,7 @@ public class MulticastServer extends Thread {
                             packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                             socket.send(packet);
                         } else if (cmd.equals("candidate")) {
+                            //resposta ao voto realizado
                             voting = true;
                             arrOfStr = arrOfStr[5].split(" ");
                             response  = voto.votar(Integer.parseInt(arrOfStr[2]) - 1, arrOfStr[0], Integer.parseInt(arrOfStr[1]) - 1, depMesa);
@@ -159,8 +175,8 @@ public class MulticastServer extends Thread {
                             socket.send(packet);
                             response="";
                         } else if (cmd.equals("fail")) {
+                            //em caso de falha do cliente cria-se a thread fail para recuperação do mesmo
                             arrOfStr = arrOfStr[5].split(" ");
-
                             if (!arrOfStr[1].equals("null")) {
                                 Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT);
                                 fail.start();
@@ -169,6 +185,7 @@ public class MulticastServer extends Thread {
                     }
 
                 } catch (ConnectException e) {
+                    //recuperação em caso de falha do rmi
                     Date now = new Date();
                     Date after = new Date();
                     after.setTime(now.getTime()+30000);
@@ -189,6 +206,7 @@ public class MulticastServer extends Thread {
                     }
                     else {
                         if (voting && response.equals("") && voto != null) {
+                            //perda do voto por falha dos dois rmis
                             message = "server|" + clientID + ";cmd|votelost;msg|Selecione o candidato:\n" + voto.listaCandidatos(n - 1);
                             buffer = message.getBytes();
                             group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -214,7 +232,7 @@ class Console extends Thread {
 
 
     /**
-     * constructor
+     * construtor da classe console
      */
     public Console(String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
@@ -240,12 +258,12 @@ class Console extends Thread {
 
             while (true) {
                 try {
-
                     //pedir nr do CC do eleitor
                     System.out.println("Insira o número do CC do eleitor: ");
                     Scanner scan = new Scanner(System.in);
                     String CC = scan.nextLine();
 
+                    //identificação do leitor e em caso de sucesso cria-se a thread de login
                     if (voto.identificarLeitor(CC)) {
                         Login login = new Login(CC,MULTICAST_ADDRESS,PORT,RMIPORT);
                         login.start();
@@ -254,6 +272,7 @@ class Console extends Thread {
                     }
                     sleep(1000);
                 } catch (ConnectException e) {
+                    //em caso de falha do servidor RMI primário
                     Date now = new Date();
                     Date after = new Date();
                     after.setTime(now.getTime()+30000);
@@ -305,28 +324,30 @@ class Login extends Thread {
         this.CC = CC;
     }
 
+    /**
+     * Threads responsáveis pela execução do login dos clientes
+     */
     public void run() {
         MulticastSocket socket = null, socketR = null;
         String message, messageR;
         String[] arrOfStr;
         String clientID;
         try {
-            //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
             socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
             InetAddress groupR = InetAddress.getByName(MULTICAST_ADDRESS);
             socketR.joinGroup(groupR);
 
-            //part to connect to the rmi server
             Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
-            //seleção do terminal de voto
+            //mensagem geral para todos os clientes para saber quais se encontram disponiveis
             message = "server|all;cmd|locked;msg|" + this.CC;
             byte[] buffer = message.getBytes();
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
             socket.send(packet);
 
+            //espera resposta de um cliente livre
             do {
                 byte[] bufferR = new byte[256];
                 DatagramPacket packetR = new DatagramPacket(bufferR, bufferR.length);
@@ -337,6 +358,7 @@ class Login extends Thread {
 
             clientID = arrOfStr[1];
 
+            //envia mensagem de inicio de login ao cliente
             message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
             buffer = message.getBytes();
             group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -344,7 +366,7 @@ class Login extends Thread {
             socket.send(packet);
             System.out.println("O terminal " + clientID + " está desbloqueado.");
 
-            //login starts
+            //espera resposta do cliente em questão com a password correta
             do {
                 do {
                     byte[] bufferR = new byte[256];
@@ -357,13 +379,14 @@ class Login extends Thread {
                 try {
                     arrOfStr = arrOfStr[5].split("/");
                     if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
-                        //resposta
+                        //em caso de login correto
                         message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     } else {
+                        //em caso de erro no login
                         message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
                         buffer = message.getBytes();
                         group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -371,12 +394,14 @@ class Login extends Thread {
                         socket.send(packet);
                     }
                 } catch (IndexOutOfBoundsException e) {
+                    //em caso de erro no formato
                     message = "server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: ";
                     buffer = message.getBytes();
                     group = InetAddress.getByName(MULTICAST_ADDRESS);
                     packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
                 } catch (ConnectException e) {
+                    //em caso de falha do RMI
                     Date now = new Date();
                     Date after = new Date();
                     after.setTime(now.getTime()+30000);
@@ -415,6 +440,15 @@ class Fail extends Thread {
     private int PORT,RMIPORT;
 
 
+    /**
+     * Construtor da class fail
+     * @param CC CC CC preciso para a recuperação do cliente
+     * @param state estado do cliente antes de ser fechado
+     * @param clientID ID do cliente que está a ser rescuperado
+     * @param MULTICAST_ADDRESS endereço da rede multicast
+     * @param PORT port da rede multicast
+     * @param RMIPORT porto rmi
+     */
     public Fail(String CC, String state, String clientID,String MULTICAST_ADDRESS,int PORT, int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
         this.CC = CC;
@@ -425,12 +459,17 @@ class Fail extends Thread {
         this.PORT=PORT;
     }
 
+    /**
+     * Threads responsáveis pela recuperação dos clientes
+     */
     public void run() {
         MulticastSocket socket = null, socketR = null;
         try {
             boolean flag = false;
             String str ="a a";
             String[] arrOfStr=str.split(" ");
+
+            //repete envio até haver sucesso
             while (!flag) {
                 socket = new MulticastSocket();  // create socket without binding it (only for sending)
                 socketR = new MulticastSocket(PORT); // server is gonna receive its own messages
@@ -438,12 +477,16 @@ class Fail extends Thread {
                 socketR.joinGroup(groupR);
                 socketR.setSoTimeout(2500);
 
+                //envio da mensagem para recuperação
                 String message = "server|" + this.clientID + ";cmd|fail;msg|" + this.CC + " " + this.state;
                 byte[] buffer = message.getBytes();
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                 socket.send(packet);
+
+                //espera resposta
                 try {
+                    //recebe resposta
                     flag = true;
                     do {
                         byte[] bufferR = new byte[256];
@@ -454,10 +497,15 @@ class Fail extends Thread {
                     } while (!arrOfStr[0].equals("client") || !arrOfStr[1].equals(clientID) || !arrOfStr[3].equals("recovered"));
                     System.out.println("O terminal " + arrOfStr[1] + "está desbloqueado para o CC " + this.CC);
                 } catch (SocketTimeoutException e) {
+                    // deu time out e reenvia a mensagem
                     flag = false;
                 }
             }
+
+            //recuperação com sucesso
             System.out.println("\nO cliente " + this.clientID + " foi recuperado.\n");
+
+            //Se o cliented estivesse apenas unlocked sem login é preciso concluir o login
             Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
             if (state.equals("locked")) {
@@ -514,6 +562,7 @@ class Fail extends Thread {
                         packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                         socket.send(packet);
                     } catch (ConnectException e) {
+                        //em caso de falha do RMI
                         Date now = new Date();
                         Date after = new Date();
                         after.setTime(now.getTime()+30000);
@@ -536,6 +585,7 @@ class Fail extends Thread {
                 } while (message.equals("server|" + clientID + ";cmd|logged off;msg|Wrong Login.Try again: "));
             }
             else if(state.equals("login")){
+                //em caso já estar login enviar a lista de candidatos
                 String message = "server|" + clientID + ";cmd|logged on & select election;msg|Welcome to eVoting. Selecione a eleicao em que pretende votar:\n" + voto.listarEleicoes();
                 byte[] buffer = message.getBytes();
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);

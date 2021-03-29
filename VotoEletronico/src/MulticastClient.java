@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.NoSuchElementException;
 import java.util.Properties;
-import java.util.Random;
 
 
 /**
@@ -38,7 +37,6 @@ public class MulticastClient extends Thread {
 
     /**
      * Abre o ficheiro de config para leitura
-     *
      * @param fileName ficheiro para abrir
      * @return propreties file
      */
@@ -80,7 +78,16 @@ public class MulticastClient extends Thread {
 
     }
 
+    /**
+     * Cria o listener para o ctrl c para eventual recuperação do cliente
+     * Lê o file de configs para obter a informação associada ao departamento
+     * Lança a thread MulticastClient(recebe mensagens)
+     * Lança a thread MulticastServer(envia resposta)
+     * @param args <clientID> ID do cliente multicast <Departamento> departamento a que oterminal de voto pertence
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
+        //argumentos
         if (args.length == 2) {
             Globals.clientID = args[0];
             Departamento = args[1];
@@ -88,6 +95,8 @@ public class MulticastClient extends Thread {
             System.out.println("Corra com o número de departamento: java MulticastClient <clientID> <Departamento>");
             System.exit(0);
         }
+
+        //listener do ctrl C
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
@@ -110,7 +119,8 @@ public class MulticastClient extends Thread {
                 }
             }
         });
-        Random rand = new Random();
+
+        //inicializa e começa as threads
         System.out.println("ClientID -> " + Globals.clientID);
         MulticastClient client = new MulticastClient();
         client.readConfigs();
@@ -122,7 +132,6 @@ public class MulticastClient extends Thread {
     /**
      * Thread responsável por receber mensagens do servidor, escrevê-las no terminal e interpretar os comandos do server
      */
-
     public void run() {
         MulticastSocket socket = null;
         try {
@@ -130,15 +139,15 @@ public class MulticastClient extends Thread {
             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
             socket.joinGroup(group);
             while (true) {
+                //recebe message do client
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength());
                 String[] arrOfStr = message.split("[|;]");
 
-
+                //interpreta o comando do servidor e escreve a mensagem deste na consola
                 if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
-                    //Globals.command = arrOfStr[3];
                     if (arrOfStr[3].equals("logged off")) {
                         Globals.command = "login";
                         Globals.login = "off";
@@ -178,7 +187,6 @@ public class MulticastClient extends Thread {
                 } else if (arrOfStr[1].equals("all") && Globals.locked) {
                     Globals.command = arrOfStr[3];
                     if (arrOfStr[3].equals("locked")) {
-                        //System.out.println("Terminal vai ser desbloqueado");
                         Globals.CC = arrOfStr[5];
                     }
                 }
@@ -197,7 +205,9 @@ class MulticastUser extends Thread {
     private int PORT;
 
     /**
-     * Constructor
+     * Construtor do mcast user
+     * @param MULTICAST_ADDRESS IP do grupo multicast
+     * @param PORT Port do grupo multicast
      */
     public MulticastUser(String MULTICAST_ADDRESS,int PORT) {
         super("User " + (long) (Math.random() * 1000));
@@ -244,6 +254,7 @@ class MulticastUser extends Thread {
                     sleep(1000);
                     if (Globals.command.equals("locked")) {
                         if (Globals.locked) {
+                            // envia a resposta caso este cliente esteja bloqueado(disponivel)
                             String message = "client|" + Globals.clientID + ";cmd|" + Globals.command + ";msg|" + Globals.locked;
                             byte[] buffer = message.getBytes();
                             InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -251,6 +262,7 @@ class MulticastUser extends Thread {
                             socket.send(packet);
                         }
                     } else if (Globals.command.equals("recovered")) {
+                        //Resposta ao pedido de recuperação do client
                         String message = "client|" + Globals.clientID + ";cmd|recovered;msg|empty";
                         byte[] buffer = message.getBytes();
                         InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
@@ -258,7 +270,9 @@ class MulticastUser extends Thread {
                         socket.send(packet);
 
                     } else if (!Globals.command.equals("no cmd")) {
+                        //leitura da consola
                         String readKeyboard = readTimedConsole(keyboardScanner,10);
+                        //caso não haja time out enviar resposta ao server
                         if (readKeyboard != null) {
                             if (Globals.command.equals("election")) Globals.n_election = Integer.parseInt(readKeyboard);
                             if (!Globals.locked) {
@@ -280,6 +294,7 @@ class MulticastUser extends Thread {
                                 System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
                             }
                         } else {
+                            //bloqueio do terminal em caso de time out
                             System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto");
                             Globals.CC=null;
                             Globals.locked=true;
@@ -287,6 +302,7 @@ class MulticastUser extends Thread {
                             Globals.command="no cmd";
                         }
                     }
+                    //reset do command para não haver repetições
                     if (!Globals.command.equals("login") && Globals.command.equals("recovered"))
                         Globals.command = "no cmd";
                 }
