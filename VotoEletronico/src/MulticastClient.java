@@ -116,6 +116,10 @@ public class MulticastClient extends Thread {
         user.start();
     }
 
+    /**
+     * Thread responsável por receber mensagens do servidor, escrevê-las no terminal e interpretar os comandos do server
+     */
+
     public void run() {
         MulticastSocket socket = null;
         try {
@@ -233,10 +237,22 @@ class MulticastUser extends Thread {
 
     }
 
+    /**
+     * Constructor
+     */
     public MulticastUser() {
         super("User " + (long) (Math.random() * 1000));
     }
 
+
+    /**
+     * Lê inputs da consola com um timer
+     * @param keyboardScanner Scanner do teclado
+     * @param time tempo em segundos para o timer
+     * @return strin lida do teclado
+     * @throws NoSuchElementException
+     * @throws IOException
+     */
     public String readTimedConsole(NonBlockingInputStream keyboardScanner, int time) throws NoSuchElementException, IOException {
         int i;
         char c;
@@ -255,6 +271,9 @@ class MulticastUser extends Thread {
         else return sb.toString().substring(0,sb.toString().length()-1);
     }
 
+    /**
+     * Função da thread que lê strings da consola e envia mensagem ao servidor
+     */
     public void run() {
         while (true) {
             MulticastSocket socket = null;

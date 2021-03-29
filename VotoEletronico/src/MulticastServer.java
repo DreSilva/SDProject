@@ -1,14 +1,13 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.MulticastSocket;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.io.IOException;
+import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Scanner;
@@ -77,10 +76,16 @@ public class MulticastServer extends Thread {
         console.start();
     }
 
+    /**
+     * construtor
+     */
     public MulticastServer() {
         super("Server " + (long) (Math.random() * 1000));
     }
 
+    /**
+     * thread responsável pelas resposta aos pedidos enviados pelos clientes
+     */
     public void run() {
         MulticastSocket socket = null, socketR = null;
         String message, messageR;
@@ -230,10 +235,16 @@ class Console extends Thread {
 
     }
 
+    /**
+     * constructor
+     */
     public Console() {
         super("Server " + (long) (Math.random() * 1000));
     }
 
+    /**
+     * Thread reponsável pela leitura de CC's da consola e chamada de threads para executar logins
+     */
     public void run() {
         MulticastSocket socket = null, socketR = null;
         try {
@@ -338,6 +349,10 @@ class Login extends Thread {
 
     }
 
+    /**
+     * construtor
+     * @param CC número do CC da pessoa em questão
+     */
     public Login(String CC) {
         super("Server " + (long) (Math.random() * 1000));
         this.CC = CC;
