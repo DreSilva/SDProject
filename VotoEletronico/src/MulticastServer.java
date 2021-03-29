@@ -7,6 +7,7 @@ import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Date;
 import java.util.Properties;
@@ -15,7 +16,7 @@ import java.util.Scanner;
 
 public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS;
-    private int PORT;
+    private int PORT,RMIPORT;
     private static final DepMesa depMesa = new DepMesa();
 
 
@@ -55,7 +56,12 @@ public class MulticastServer extends Thread {
         Properties prop = readPropertiesFile("config.properties");
         String portoInString = prop.getProperty("portoMulticast");
         this.PORT = Integer.parseInt(portoInString);
-        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+        portoInString = prop.getProperty("portoRMI");
+        this.RMIPORT = Integer.parseInt(portoInString);
+        this.MULTICAST_ADDRESS = prop.getProperty(depMesa.departamento);
+        if(this.MULTICAST_ADDRESS==null){
+            System.out.println("Esse departamente nao se encontra no sistema");
+        }
 
     }
 
@@ -71,9 +77,20 @@ public class MulticastServer extends Thread {
         MulticastServer server = new MulticastServer();
         server.readConfigs();
         server.start();
-        Console console = new Console();
-        console.readConfigs();
+        Console console = new Console(server.MULTICAST_ADDRESS, server.PORT,server.RMIPORT);
         console.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    Voto voto = (Voto) LocateRegistry.getRegistry(server.RMIPORT).lookup("votacao");
+                    voto.removeMesa(depMesa);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -99,7 +116,7 @@ public class MulticastServer extends Thread {
             socketR.joinGroup(groupR);
 
             //part to connect to the rmi server
-            Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
             voto.addMesa(depMesa);
 
 
@@ -144,8 +161,7 @@ public class MulticastServer extends Thread {
                         } else if (cmd.equals("fail")) {
                             arrOfStr = arrOfStr[5].split(" ");
                             if (arrOfStr[1] == "null") {
-                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID);
-                                //fail.start();
+                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT);//fail.start();
                             }
                         }
                     }
@@ -158,7 +174,7 @@ public class MulticastServer extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -193,53 +209,17 @@ public class MulticastServer extends Thread {
 
 class Console extends Thread {
     private String MULTICAST_ADDRESS;
-    private int PORT;
+    private int PORT,RMIPORT;
 
-    /**
-     * Abre o ficheiro de config para leitura
-     * @param fileName ficheiro para abrir
-     * @return propreties file
-     */
-    public static Properties readPropertiesFile(String fileName) throws IOException {
-        FileInputStream fis = null;
-        Properties prop = null;
-        try {
-            fis = new FileInputStream(fileName);
-            // create Properties class object
-            prop = new Properties();
-            // load properties file into it
-            prop.load(fis);
-
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        } finally {
-            fis.close();
-        }
-
-        return prop;
-    }
-
-    /**
-     * Le as configurações do ficheiro de config
-     */
-    public void readConfigs() throws IOException {
-
-        Properties prop = readPropertiesFile("config.properties");
-        String portoInString = prop.getProperty("portoMulticast");
-        this.PORT = Integer.parseInt(portoInString);
-        this.MULTICAST_ADDRESS = prop.getProperty("adress");
-
-    }
 
     /**
      * constructor
      */
-    public Console() {
+    public Console(String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
+        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
+        this.PORT = PORT;
+        this.RMIPORT = RMIPORT;
     }
 
     /**
@@ -255,7 +235,7 @@ class Console extends Thread {
             socketR.joinGroup(groupR);
 
             //part to connect to the rmi server
-            Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
             while (true) {
                 try {
@@ -266,8 +246,7 @@ class Console extends Thread {
                     String CC = scan.nextLine();
 
                     if (voto.identificarLeitor(CC)) {
-                        Login login = new Login(CC);
-                        login.readConfigs();
+                        Login login = new Login(CC,MULTICAST_ADDRESS,PORT,RMIPORT);
                         login.start();
                     } else {
                         System.out.println("Eleitor não identificado.");
@@ -281,7 +260,7 @@ class Console extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -306,55 +285,19 @@ class Console extends Thread {
 
 class Login extends Thread {
     private String MULTICAST_ADDRESS;
-    private int PORT;
+    private int PORT,RMIPORT;
     private final String CC;
 
-    /**
-     * Abre o ficheiro de config para leitura
-     * @param fileName ficheiro para abrir
-     * @return propreties file
-     */
-    public static Properties readPropertiesFile(String fileName) throws IOException {
-        FileInputStream fis = null;
-        Properties prop = null;
-        try {
-            fis = new FileInputStream(fileName);
-            // create Properties class object
-            prop = new Properties();
-            // load properties file into it
-            prop.load(fis);
-
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        } finally {
-            fis.close();
-        }
-
-        return prop;
-    }
-
-    /**
-     * Le as configurações do ficheiro de config
-     */
-    public void readConfigs() throws IOException {
-
-        Properties prop = readPropertiesFile("config.properties");
-        String portoInString = prop.getProperty("portoMulticast");
-        this.PORT = Integer.parseInt(portoInString);
-        this.MULTICAST_ADDRESS = prop.getProperty("adress");
-
-    }
 
     /**
      * construtor
      * @param CC número do CC da pessoa em questão
      */
-    public Login(String CC) {
+    public Login(String CC,String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
+        this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
+        this.PORT = PORT;
+        this.RMIPORT = RMIPORT;
         this.CC = CC;
     }
 
@@ -363,6 +306,7 @@ class Login extends Thread {
         String message, messageR;
         String[] arrOfStr;
         String clientID;
+        System.out.println(PORT);
         try {
             //multicast part
             socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -371,7 +315,7 @@ class Login extends Thread {
             socketR.joinGroup(groupR);
 
             //part to connect to the rmi server
-            Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
 
             //seleção do terminal de voto
             message = "server|all;cmd|locked;msg|" + this.CC;
@@ -437,7 +381,7 @@ class Login extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -460,17 +404,22 @@ class Login extends Thread {
 }
 
 class Fail extends Thread {
-    private String MULTICAST_ADDRESS = "224.0.224.0";
-    private int PORT = 4321;
     private final String CC;
     private final String state;
     private final String clientID;
 
-    public Fail(String CC, String state, String clientID) {
+    private String MULTICAST_ADDRESS;
+    private int PORT,RMIPORT;
+
+
+    public Fail(String CC, String state, String clientID,String MULTICAST_ADDRESS,int PORT, int RMIPORT) {
         super("Server " + (long) (Math.random() * 1000));
         this.CC = CC;
         this.state = state;
         this.clientID = clientID;
+        this.RMIPORT=RMIPORT;
+        this.MULTICAST_ADDRESS=MULTICAST_ADDRESS;
+        this.PORT=PORT;
     }
 
     public void run() {
@@ -509,7 +458,7 @@ class Fail extends Thread {
 
 
             if (state.equals("locked")) {
-                Voto voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
                 try {
                     arrOfStr = arrOfStr[5].split("/");
                     if (voto.login(arrOfStr[0], arrOfStr[1], this.CC)) {
@@ -540,7 +489,7 @@ class Fail extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(7000).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){

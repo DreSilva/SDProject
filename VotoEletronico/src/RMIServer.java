@@ -631,7 +631,42 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public void addMesa(DepMesa mesa) throws java.rmi.RemoteException{
+        for (Notifications notifications: Global.admin) {
+            notifications.estadoMesa("On",mesa.departamento,mesa.id);
+        }
         mesasVoto.add(mesa);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void removeMesa(DepMesa mesa) throws java.rmi.RemoteException{
+        for (Notifications notifications: Global.admin) {
+            notifications.estadoMesa("Off",mesa.departamento,mesa.id);
+        }
+        for (DepMesa mesa1: mesasVoto) {
+            if(mesa1.equals(mesa)){
+                mesasVoto.remove(mesa1);
+                break;
+            }
+        }
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public int numVotantes(int opcao) throws java.rmi.RemoteException{
+        Eleicao eleicao = eleicoes.get(opcao-1);
+        int soma = 0;
+        for (User user: users) {
+            for (Map.Entry<Eleicao,String> entry : user.localVoto.entrySet()) {
+                if (entry.getKey().equals(eleicao)){
+                    soma+=1;
+                }
+            }
+        }
+        return soma;
     }
 
     /**

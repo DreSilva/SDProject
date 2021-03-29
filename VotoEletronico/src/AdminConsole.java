@@ -24,8 +24,8 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
     /**
      * @inheritDoc
      */
-    public void estadoMesa() throws  java.rmi.RemoteException{
-        System.out.println("Idk");
+    public void estadoMesa(String estado,String dep,long num) throws  java.rmi.RemoteException{
+        System.out.println("Mesa: "+num+" Dep: "+dep+" Estado: "+estado);
     }
 
     /**
@@ -36,12 +36,6 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         System.out.println(votos);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public void novoEleitor() throws  java.rmi.RemoteException{
-        System.out.println("Novo Eleitor");
-    }
 
     /**
      * Abre o ficheiro de config para leitura
@@ -111,6 +105,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         opcoes.add("4-Gerir Mesas de Voto");
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
+        opcoes.add("7- Ver Eleitores em Votacao");
 
         while(true){
             try {
@@ -524,11 +519,25 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         }
                         break;
 
-                    case 7: //remover isto depois, so para debug!
+                    case 7:
+                        accao = true;
+                        System.out.println("Escolha uma Eleicao");
+                        input = votoObj.getEleicoesVelhas();
+                        if(!input.equals("")) {
+                            System.out.println(input);
+                            n3 = Integer.parseInt(readInput.nextLine());
+
+                        }
+                        else{
+                            System.out.println("Não ha eleicoes registadas!");
+                        }
+                        break;
+
+                    case 8: //remover isto depois, so para debug!
                         votoObj.writeFile();
                         break;
 
-                    case 8: //debug
+                    case 9: //debug
                         input = votoObj.printUsers();
                         System.out.println(input);
                         break;

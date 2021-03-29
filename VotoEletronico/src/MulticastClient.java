@@ -33,7 +33,7 @@ class Globals {
 }
 
 public class MulticastClient extends Thread {
-    private static String MULTICAST_ADDRESS;
+    private static String MULTICAST_ADDRESS,Departamento;
     private static int PORT;
 
     /**
@@ -73,15 +73,19 @@ public class MulticastClient extends Thread {
         Properties prop = readPropertiesFile("config.properties");
         String portoInString = prop.getProperty("portoMulticast");
         this.PORT = Integer.parseInt(portoInString);
-        this.MULTICAST_ADDRESS = prop.getProperty("adress");
+        this.MULTICAST_ADDRESS = prop.getProperty(Departamento);
+        if(MULTICAST_ADDRESS==null){
+            System.out.println("Nao existe esse departamento registado");
+        }
 
     }
 
     public static void main(String[] args) throws IOException {
-        if (args.length == 1) {
+        if (args.length == 2) {
             Globals.clientID = args[0];
+            Departamento = args[1];
         } else {
-            System.out.println("Corra com o número de departamento: java MulticastClient <clientID>");
+            System.out.println("Corra com o número de departamento: java MulticastClient <clientID> <Departamento>");
             System.exit(0);
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -111,8 +115,7 @@ public class MulticastClient extends Thread {
         MulticastClient client = new MulticastClient();
         client.readConfigs();
         client.start();
-        MulticastUser user = new MulticastUser();
-        user.readConfigs();
+        MulticastUser user = new MulticastUser(MULTICAST_ADDRESS,PORT);
         user.start();
     }
 
@@ -197,51 +200,12 @@ class MulticastUser extends Thread {
     private int PORT;
 
     /**
-     * Abre o ficheiro de config para leitura
-     *
-     * @param fileName ficheiro para abrir
-     * @return properties file
-     */
-    public static Properties readPropertiesFile(String fileName) throws IOException {
-        FileInputStream fis = null;
-        Properties prop = null;
-        try {
-            fis = new FileInputStream(fileName);
-            // create Properties class object
-            prop = new Properties();
-            // load properties file into it
-            prop.load(fis);
-
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        } finally {
-            fis.close();
-        }
-
-        return prop;
-    }
-
-    /**
-     * Le as configurações do ficheiro de config
-     */
-    public void readConfigs() throws IOException {
-
-        Properties prop = readPropertiesFile("config.properties");
-        String portoInString = prop.getProperty("portoMulticast");
-        this.PORT = Integer.parseInt(portoInString);
-        this.MULTICAST_ADDRESS = prop.getProperty("adress");
-
-    }
-
-    /**
      * Constructor
      */
-    public MulticastUser() {
+    public MulticastUser(String MULTICAST_ADDRESS,int PORT) {
         super("User " + (long) (Math.random() * 1000));
+        this.MULTICAST_ADDRESS=MULTICAST_ADDRESS;
+        this.PORT=PORT;
     }
 
 
