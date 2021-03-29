@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 
 public class MulticastServer extends Thread {
-    private String MULTICAST_ADDRESS;
+    private String MULTICAST_ADDRESS,serverAddress;
     private int PORT,RMIPORT;
     private static final DepMesa depMesa = new DepMesa();
 
@@ -59,6 +59,7 @@ public class MulticastServer extends Thread {
         portoInString = prop.getProperty("portoRMI");
         this.RMIPORT = Integer.parseInt(portoInString);
         this.MULTICAST_ADDRESS = prop.getProperty(depMesa.departamento);
+        this.serverAddress = prop.getProperty("RMIAddress");
         if(this.MULTICAST_ADDRESS==null){
             System.out.println("Esse departamente nao se encontra no sistema");
         }
@@ -88,14 +89,14 @@ public class MulticastServer extends Thread {
         MulticastServer server = new MulticastServer();
         server.readConfigs();
         server.start();
-        Console console = new Console(server.MULTICAST_ADDRESS, server.PORT,server.RMIPORT);
+        Console console = new Console(server.MULTICAST_ADDRESS, server.PORT,server.RMIPORT, server.serverAddress);
         console.start();
 
         //listener para ctrl C
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
-                    Voto voto = (Voto) LocateRegistry.getRegistry(server.RMIPORT).lookup("votacao");
+                    Voto voto = (Voto) LocateRegistry.getRegistry(server.serverAddress,server.RMIPORT).lookup("votacao");
                     voto.removeMesa(depMesa);
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -129,7 +130,7 @@ public class MulticastServer extends Thread {
             socketR.joinGroup(groupR);
 
             //part to connect to the rmi server
-            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
             voto.addMesa(depMesa);
 
 
@@ -178,7 +179,7 @@ public class MulticastServer extends Thread {
                             //em caso de falha do cliente cria-se a thread fail para recuperação do mesmo
                             arrOfStr = arrOfStr[5].split(" ");
                             if (!arrOfStr[1].equals("null")) {
-                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT);
+                                Fail fail = new Fail(arrOfStr[0], arrOfStr[1], clientID,MULTICAST_ADDRESS,PORT,RMIPORT,serverAddress);
                                 fail.start();
                             }
                         }
@@ -193,7 +194,7 @@ public class MulticastServer extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -227,18 +228,19 @@ public class MulticastServer extends Thread {
 }
 
 class Console extends Thread {
-    private String MULTICAST_ADDRESS;
+    private String MULTICAST_ADDRESS,serverAddress;
     private int PORT,RMIPORT;
 
 
     /**
      * construtor da classe console
      */
-    public Console(String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
+    public Console(String MULTICAST_ADDRESS,int PORT,int RMIPORT,String serverAddress) {
         super("Server " + (long) (Math.random() * 1000));
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.PORT = PORT;
         this.RMIPORT = RMIPORT;
+        this.serverAddress = serverAddress;
     }
 
     /**
@@ -254,7 +256,7 @@ class Console extends Thread {
             socketR.joinGroup(groupR);
 
             //part to connect to the rmi server
-            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 
             while (true) {
                 try {
@@ -265,7 +267,7 @@ class Console extends Thread {
 
                     //identificação do leitor e em caso de sucesso cria-se a thread de login
                     if (voto.identificarLeitor(CC)) {
-                        Login login = new Login(CC,MULTICAST_ADDRESS,PORT,RMIPORT);
+                        Login login = new Login(CC,MULTICAST_ADDRESS,PORT,RMIPORT,serverAddress);
                         login.start();
                     } else {
                         System.out.println("Eleitor não identificado.");
@@ -280,7 +282,7 @@ class Console extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -304,7 +306,7 @@ class Console extends Thread {
 }
 
 class Login extends Thread {
-    private String MULTICAST_ADDRESS;
+    private String MULTICAST_ADDRESS,serverAddress;
     private int PORT,RMIPORT;
     private final String CC;
 
@@ -316,12 +318,13 @@ class Login extends Thread {
      * @param PORT Porto Multicast do Departamento
      * @param RMIPORT Porto do Servidor RMI
      */
-    public Login(String CC,String MULTICAST_ADDRESS,int PORT,int RMIPORT) {
+    public Login(String CC,String MULTICAST_ADDRESS,int PORT,int RMIPORT,String serverAddress) {
         super("Server " + (long) (Math.random() * 1000));
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.PORT = PORT;
         this.RMIPORT = RMIPORT;
         this.CC = CC;
+        this.serverAddress = serverAddress;
     }
 
     /**
@@ -345,7 +348,7 @@ class Login extends Thread {
                 socketR.joinGroup(groupR);
                 socketR.setSoTimeout(2500);
 
-                Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 
                 //mensagem geral para todos os clientes para saber quais se encontram disponiveis
                 message = "server|all;cmd|locked;msg|" + this.CC;
@@ -375,7 +378,7 @@ class Login extends Thread {
 
             socketR.setSoTimeout(0);
 
-            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 
             //envia mensagem de inicio de login ao cliente
             message = "server|" + clientID + ";cmd|locked;msg|Insira login no formato <username>/<password>:";
@@ -428,7 +431,7 @@ class Login extends Thread {
                     while (now.before(after)) {
                         now = new Date();
                         try {
-                            voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                            voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
                             flag = true;
                             break;
                         }catch (ConnectException e1){
@@ -455,7 +458,7 @@ class Fail extends Thread {
     private String state;
     private final String clientID;
 
-    private String MULTICAST_ADDRESS;
+    private String MULTICAST_ADDRESS, serverAddress;
     private int PORT,RMIPORT;
 
 
@@ -468,7 +471,7 @@ class Fail extends Thread {
      * @param PORT port da rede multicast
      * @param RMIPORT porto rmi
      */
-    public Fail(String CC, String state, String clientID,String MULTICAST_ADDRESS,int PORT, int RMIPORT) {
+    public Fail(String CC, String state, String clientID,String MULTICAST_ADDRESS,int PORT, int RMIPORT,String serverAddress) {
         super("Server " + (long) (Math.random() * 1000));
         this.CC = CC;
         this.state = state;
@@ -476,6 +479,7 @@ class Fail extends Thread {
         this.RMIPORT=RMIPORT;
         this.MULTICAST_ADDRESS=MULTICAST_ADDRESS;
         this.PORT=PORT;
+        this.serverAddress = serverAddress;
     }
 
     /**
@@ -525,7 +529,7 @@ class Fail extends Thread {
             System.out.println("\nO cliente " + this.clientID + " foi recuperado.\n");
 
             //Se o cliented estivesse apenas unlocked sem login é preciso concluir o login
-            Voto voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+            Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 
             if (state.equals("locked")) {
                 socket = new MulticastSocket();  // create socket without binding it (only for sending)
@@ -586,7 +590,7 @@ class Fail extends Thread {
                         while (now.before(after)) {
                             now = new Date();
                             try {
-                                voto = (Voto) LocateRegistry.getRegistry(this.RMIPORT).lookup("votacao");
+                                voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
                                 flag2 = true;
                                 break;
                             }catch (ConnectException e1){
