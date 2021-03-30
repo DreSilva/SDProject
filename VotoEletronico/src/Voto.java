@@ -1,6 +1,9 @@
 import java.rmi.*;
 import java.util.Date;
 
+/**
+ *
+ */
 public interface Voto extends Remote {
     /**
      * Cria registo de utilizador e adiciona-o a lista de utilizadores
@@ -201,6 +204,16 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void setTipo(String Tipo,Eleicao eleicao) throws java.rmi.RemoteException;
+
+
+    /**
+     * Listar elementos de uma lista
+     * @param lista lista a listar elementos
+     * @return Lista dos elemtnos
+     * @throws java.rmi.RemoteException
+     */
+    public String listarLista(Lista lista) throws  java.rmi.RemoteException;
+
 
     /**
      * Vai obter todas as listas inscritas numa eleição

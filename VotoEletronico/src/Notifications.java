@@ -3,6 +3,9 @@ import java.rmi.Remote;
 public interface Notifications extends Remote {
     /**
      * Função que notifica a admin console sobre o estado da mesa
+     * @param estado estado da maquina, on ou off
+     * @param dep departamento da maquina
+     * @param num id da maquina
      */
     public void estadoMesa(String estado,String dep,long num) throws  java.rmi.RemoteException;
 

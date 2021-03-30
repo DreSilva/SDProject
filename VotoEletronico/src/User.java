@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Classe que corresponde a cada utilizador assim como os seus atributos necessários
+ * Class que corresponde a cada utilizador assim como os seus atributos necessários
  */
 public class User implements Serializable {
     String user,password,departamento,contacto,tipo,morada,CC;
     Date validade;
     Map<Eleicao,String> localVoto = new HashMap<>();
+
 
     /**
      * Objeto user tem as caracteristicas necessárias

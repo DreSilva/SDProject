@@ -175,6 +175,17 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      *  @inheritDoc
      */
+    public String listarLista(Lista lista) throws  java.rmi.RemoteException{
+        StringBuilder sb = new StringBuilder();
+        for(User user: lista.lista){
+            sb.append("- ").append(user.user).append(" ").append(user.CC).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     *  @inheritDoc
+     */
     public void writeFile() throws java.rmi.RemoteException{
         try {
             FileOutputStream f = new FileOutputStream("myObjects.ser");
@@ -494,6 +505,11 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             return "Utilizador nao tem a mesma funcao da lista";
         }
         else {
+            for (User user1: lista1.lista) {
+                if(user.equals(user1)){
+                    return "User ja se encontra na lista";
+                }
+            }
             lista1.addUser(user);
             return "Utilizador adicionado com sucesso";
         }
@@ -572,7 +588,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             String nome = entry.getKey().nome;
             int numVoto = entry.getValue();
             info.append(count).append("-").append(nome).append(" Votos-").append(numVoto).append(" Percentagem-")
-                    .append((float) numVoto/totalVotos).append("\n");
+                    .append((float) numVoto/totalVotos*100).append("%").append("\n");
             count+=1;
         }
         for (User user: users) {

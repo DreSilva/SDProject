@@ -107,7 +107,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         opcoes.add("4-Gerir Mesas de Voto");
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
-        opcoes.add("7- Ver Eleitores em Votacao");
+        opcoes.add("7-Ver Eleitores em Votacao");
 
         while(true){
             try {
@@ -248,8 +248,9 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             System.out.println("4-Remover Lista");
                             System.out.println("5-Adicionar Utilizador a Lista");
                             System.out.println("6-Remover Utilizador a Lista");
+                            System.out.println("7-Ver Elementos da Lista");
                             n2 = Integer.parseInt(readInput.nextLine());
-                        } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4);
+                        } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4 && n2!=5 && n2!=6 && n2!=7);
 
                         switch (n2) {
                             case 1:
@@ -385,6 +386,20 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     System.out.println("Nao ha listas registadas!");
                                 }
                                 break;
+
+                            case 7:
+                                System.out.println("Selecione Lista");
+                                input = votoObj.listarListas();
+                                if(!input.equals("")) {
+                                    System.out.println(input);
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    lista = votoObj.getLista(n3 - 1);
+                                    input = votoObj.listarLista(lista);
+                                    System.out.println(input);
+                                }
+                                else {
+                                    System.out.println("Nao ha listas registadas!");
+                                }
                         }
 
                         break;
