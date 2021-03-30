@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -8,12 +9,19 @@ import java.util.Objects;
 public class Lista implements Serializable {
     ArrayList<User> lista = new ArrayList<>();
     String nome;
+    String tipo;
+    long idofList;
 
     /**
      * Objeto lista com determinado nome
      * @param nome Nome da lista criada
      */
-    public Lista(String nome){this.nome=nome;}
+    public Lista(String nome,String tipo){
+        this.nome=nome;
+        Date date = new Date();
+        this.idofList = date.getTime();
+        this.tipo = tipo;
+    }
 
     /**
      * Adicionar elemento à lista
@@ -41,7 +49,7 @@ public class Lista implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lista lista1 = (Lista) o;
-        return lista.equals(lista1.lista) && nome.equals(lista1.nome);
+        return this.idofList == lista1.idofList;
     }
 
 }

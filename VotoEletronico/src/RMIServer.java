@@ -6,6 +6,8 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Comparator;
+
 
 /**
  * Classe que vai ficar com as variaveis que precisam de ser guardadas entre threads
@@ -265,9 +267,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      */
     public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException   {
         eleicoes.add(eleicao);
-        Lista lista = new Lista("Branco");
+        Lista lista = new Lista("Branco",eleicao.tipo);
         eleicao.addLista(lista);
-        lista = new Lista("Nulo");
+        lista = new Lista("Nulo",eleicao.tipo);
         eleicao.addLista(lista);
     }
 
@@ -354,6 +356,21 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return listas.get(n);
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public String listarListasEleicao(int n) throws java.rmi.RemoteException {
+        Eleicao eleicao =  eleicoes.get(n);
+        StringBuilder sb = new StringBuilder();
+        int counter = 1;
+        for (Lista lista: eleicao.listas) {
+            sb.append(counter).append("- ").append(lista.nome).append("\n");
+            counter+=1;
+        }
+        return sb.toString();
+    }
+
     /**
      * @inheritDoc
      */
@@ -380,7 +397,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             }
         }
 
-        eleicao1.addLista(lista);
+        eleicao1.removeLista(lista);
     }
 
     /**
@@ -456,16 +473,23 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void addUserList(User user,Lista lista) throws java.rmi.RemoteException{
+    public String addUserList(User user,Lista lista) throws java.rmi.RemoteException{
         Lista lista1=null;
 
         for (Lista lista2: listas) {
             if(lista2.equals(lista)){
                 lista1 = lista2;
+                break;
             }
         }
 
-        lista1.addUser(user);
+        if(!user.tipo.equals(lista1.tipo)){
+            return "Utilizador nao tem a mesma funcao da lista";
+        }
+        else {
+            lista1.addUser(user);
+            return "Utilizador adicionado com sucesso";
+        }
     }
 
     /**
@@ -504,6 +528,35 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             votacaoLista.put(listas.get(i),votos.get(i));
             totalVotos+=votos.get(i);
         }
+
+        Set<Map.Entry<Lista, Integer>> companyFounderSet = votacaoLista.entrySet();
+
+        // 2. convert LinkedHashMap to List of Map.Entry
+        List<Map.Entry<Lista,Integer>> companyFounderListEntry =
+                new ArrayList<Map.Entry<Lista,Integer>>(companyFounderSet);
+
+        // 3. sort list of entries using Collections class'
+        // utility method sort(ls, cmptr)
+        Collections.sort(companyFounderListEntry,
+                new Comparator<Map.Entry<Lista, Integer>>() {
+
+                    @Override
+                    public int compare(Map.Entry<Lista,Integer> es1,
+                                       Map.Entry<Lista, Integer> es2) {
+                        return es2.getValue().compareTo(es1.getValue());
+                    }
+                });
+
+        // 4. clear original LinkedHashMap
+        votacaoLista.clear();
+
+        // 5. iterating list and storing in LinkedHahsMap
+        for(Map.Entry<Lista, Integer> map : companyFounderListEntry){
+            votacaoLista.put(map.getKey(), map.getValue());
+        }
+
+
+
         int count = 1;
         if(totalVotos==0){
             totalVotos+=1;
@@ -512,7 +565,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             String nome = entry.getKey().nome;
             int numVoto = entry.getValue();
             info.append(count).append("-").append(nome).append(" Votos-").append(numVoto).append(" Percentagem-")
-                    .append(numVoto/totalVotos).append("\n");
+                    .append((float) numVoto/totalVotos).append("\n");
             count+=1;
         }
         for (User user: users) {

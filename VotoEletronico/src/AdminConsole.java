@@ -266,7 +266,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     votoObj.addListaEleicao(eleicao1, lista);
                                 }
                                 else{
-                                    System.out.println("Não ha eleicoes registadas!");
+                                    System.out.println("Nao ha eleicoes registadas!");
                                 }
                                 break;
                             case 2:
@@ -276,39 +276,58 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     System.out.println(input);
                                     n3 = Integer.parseInt(readInput.nextLine());
                                     eleicao = votoObj.getEleicao(n3 - 1);
-                                    input = votoObj.listarListas();
-                                    System.out.println(input);
-                                    n4 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n4 - 1);
-                                    votoObj.removeListaEleicao(eleicao, lista);
+                                    input = votoObj.listarListasEleicao(n3);
+                                    if(!input.equals("")) {
+                                        System.out.println(input);
+                                        n4 = Integer.parseInt(readInput.nextLine());
+                                        lista = votoObj.getLista(n4 - 1);
+                                        votoObj.removeListaEleicao(eleicao, lista);
+                                    }
+                                    else{
+                                        System.out.println("Eleicao nao tem listas inscritas");
+                                    }
                                 }
                                 else{
-                                    System.out.println("Não ha eleicoes registadas!");
+                                    System.out.println("Nao ha eleicoes registadas!");
                                 }
                                 break;
 
                             case 3:
                                 System.out.println("Indique nome da Lista");
-                                input=votoObj.listarEleicoes();
-                                if(!input.equals("")) {
-                                    System.out.println(input);
-                                    input = readInput.nextLine();
-                                    lista = new Lista(input);
-                                    votoObj.addLista(lista);
-                                    System.out.println("Adicione elementos á lista - Clique 0 quando quiser terminar");
-                                    input = votoObj.printUsers();
-                                    System.out.println(input);
-                                    do {
-                                        n3 = Integer.parseInt(readInput.nextLine());
-                                        if (n3 != 0) {
-                                            user = votoObj.getUser(n3 - 1);
-                                            votoObj.addUserList(user, lista);
-                                        }
-                                    } while (n3 != 0);
+                                input = readInput.nextLine();
+                                System.out.println("Insira Tipo de Eleicoes: ");
+                                System.out.println("1- Estudante");
+                                System.out.println("2- Docente");
+                                System.out.println("3- Funcionario");
+                                n3 = Integer.parseInt(readInput.nextLine());
+                                switch (n3) {
+                                    case 1:
+                                        funcao = "Estudante";
+                                        break;
+                                    case 2:
+                                        funcao = "Docente";
+                                        break;
+                                    case 3:
+                                        funcao = "Funcionario";
+                                        break;
+                                    default:
+                                        System.out.println("Por Default é Estudante");
+                                        funcao = "Estudante";
                                 }
-                                else{
-                                    System.out.println("Não ha listas registadas!");
-                                }
+                                lista = new Lista(input,funcao);
+                                votoObj.addLista(lista);
+                                System.out.println("Adicione elementos a lista - Clique 0 quando quiser terminar");
+                                input = votoObj.printUsers();
+                                System.out.println(input);
+                                do {
+                                    n3 = Integer.parseInt(readInput.nextLine());
+                                    if (n3 != 0) {
+                                        user = votoObj.getUser(n3 - 1);
+                                        input=votoObj.addUserList(user, lista);
+                                        System.out.println(input);
+                                    }
+                                } while (n3 != 0);
+
                                 break;
 
                             case 4:
@@ -393,7 +412,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     input = votoObj.addMesaEleicao(mesa,eleicao);
                                     System.out.println(input);
                                 } else {
-                                    System.out.println("Não há maquinas no sistema");
+                                    System.out.println("Nao há maquinas no sistema");
                                 }
                             }
                             else{
@@ -413,7 +432,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             }
                         }
                         else {
-                            System.out.println("Não há eleições a decorrer");
+                            System.out.println("Nao há eleições a decorrer");
                         }
                         break;
 
@@ -502,7 +521,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             }
                         }
                         else{
-                            System.out.println("Não ha eleicoes registadas!");
+                            System.out.println("Nao ha eleicoes registadas!");
                         }
                         break;
 
@@ -517,21 +536,22 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             System.out.println(input);
                         }
                         else{
-                            System.out.println("Não ha eleicoes registadas!");
+                            System.out.println("Nao ha eleicoes registadas!");
                         }
                         break;
 
                     case 7:
                         accao = true;
                         System.out.println("Escolha uma Eleicao");
-                        input = votoObj.getEleicoesVelhas();
+                        input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);
                             n3 = Integer.parseInt(readInput.nextLine());
-
+                            n3 = votoObj.numVotantes(n3-1);
+                            System.out.println(n3);
                         }
                         else{
-                            System.out.println("Não ha eleicoes registadas!");
+                            System.out.println("Nao ha eleicoes registadas!");
                         }
                         break;
 
