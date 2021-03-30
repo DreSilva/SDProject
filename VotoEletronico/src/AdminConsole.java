@@ -55,10 +55,10 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
         } catch (FileNotFoundException e) {
 
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (IOException e) {
 
-            e.printStackTrace();
+           // e.printStackTrace();
         } finally {
             fis.close();
         }
@@ -276,12 +276,11 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     System.out.println(input);
                                     n3 = Integer.parseInt(readInput.nextLine());
                                     eleicao = votoObj.getEleicao(n3 - 1);
-                                    input = votoObj.listarListasEleicao(n3);
+                                    input = votoObj.listarListasEleicao(n3-1);
                                     if(!input.equals("")) {
                                         System.out.println(input);
                                         n4 = Integer.parseInt(readInput.nextLine());
-                                        lista = votoObj.getLista(n4 - 1);
-                                        votoObj.removeListaEleicao(eleicao, lista);
+                                        votoObj.removeListaEleicao(eleicao, n4-1);
                                     }
                                     else{
                                         System.out.println("Eleicao nao tem listas inscritas");
@@ -399,7 +398,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             n3 = Integer.parseInt(readInput.nextLine());
                             eleicao = votoObj.getEleicao(n3 - 1);
                             do {
-                                System.out.println("1- Adicionar Mesa \n 2- Remover mesa");
+                                System.out.println("1- Adicionar Mesa \n2- Remover mesa");
                                 n3 = Integer.parseInt(readInput.nextLine());
                             }while (n3!=1 && n3!=2);
                             if(n3==1) {
@@ -412,7 +411,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     input = votoObj.addMesaEleicao(mesa,eleicao);
                                     System.out.println(input);
                                 } else {
-                                    System.out.println("Nao há maquinas no sistema");
+                                    System.out.println("Nao ha maquinas no sistema");
                                 }
                             }
                             else{
@@ -432,7 +431,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             }
                         }
                         else {
-                            System.out.println("Nao há eleições a decorrer");
+                            System.out.println("Nao ha eleicoes a decorrer");
                         }
                         break;
 
@@ -576,7 +575,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                 while (now.before(after)) {
                     now = new Date();
                     try {
-                        votoObj = (Voto) LocateRegistry.getRegistry(admin.porto).lookup("votacao");
+                        votoObj = (Voto) LocateRegistry.getRegistry(admin.serverAddress,admin.porto).lookup("votacao");
                         flag = true;
                         break;
                     }catch (ConnectException e1){
@@ -594,6 +593,9 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                 }
             } catch (NumberFormatException e){
                 System.out.println("Insira um numero e repita o procedimento");
+            }
+            catch (NoSuchElementException e){
+
             }
 
         }

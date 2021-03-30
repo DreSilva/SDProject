@@ -96,17 +96,18 @@ public interface Voto extends Remote {
      * Adiciona uma lista a uma eleição para ser possivel votar nela
      * @param eleicao eleicao onde se quer adicionar lista
      * @param lista lista a adicionar a eleicao
+     * @return  informarcao sobre o sucesso da função
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException;
+    public String addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException;
 
     /**
      * Remove uma lista a uma eleição
      * @param eleicao eleição onde se quer remover lista
-     * @param lista lista a remover
+     * @param opcao opcao selecionada
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException;
+    public void removeListaEleicao(Eleicao eleicao,int opcao)throws java.rmi.RemoteException;
 
     /**
      * Funcao de debug
@@ -222,7 +223,7 @@ public interface Voto extends Remote {
      * @param mesa Mesa a adicionar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void addMesa(DepMesa mesa) throws java.rmi.RemoteException;
+    public String addMesa(DepMesa mesa) throws java.rmi.RemoteException;
 
     /**
      * Obtem a mesa de voto correta

@@ -22,7 +22,7 @@ class Global{
         try {
             rmiServer = new RMIServer();
         } catch (RemoteException e) {
-            e.printStackTrace();
+           //StackTrace();
         }
     }
 }
@@ -69,7 +69,7 @@ class UDPPrim extends Thread{
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
         }catch (IOException e) {System.out.println("IO: " + e.getMessage());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         } finally {if(aSocket != null) aSocket.close();}
     }
 }
@@ -115,7 +115,7 @@ class UDPSec extends Thread{
             System.out.println("Server primario morreu");
             Global.prim=true;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 }
@@ -138,7 +138,7 @@ class RealTimeUpdate extends Thread{
             try {
                 Global.rmiServer.realTimeEleicao();
             } catch (RemoteException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
         }
     }
@@ -218,7 +218,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         } catch (IOException e) {
             System.out.println("Error initializing stream");
         }  catch (ClassNotFoundException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 
@@ -374,7 +374,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+    public String addListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
         Eleicao eleicao1=null;
 
         for (Eleicao eleicaoS: eleicoes) {
@@ -382,13 +382,19 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 eleicao1 = eleicaoS;
             }
         }
-        eleicao1.addLista(lista);
+        if(lista.tipo.equals(eleicao1.tipo)) {
+            eleicao1.addLista(lista);
+            return "Lista adicionada com sucesso";
+        }
+        else{
+            return "Lista e de tipo diferente da eleicao";
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public void removeListaEleicao(Eleicao eleicao,Lista lista)throws java.rmi.RemoteException {
+    public void removeListaEleicao(Eleicao eleicao,int opcao)throws java.rmi.RemoteException {
         Eleicao eleicao1=null;
 
         for (Eleicao eleicaoS: eleicoes) {
@@ -397,6 +403,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             }
         }
 
+        Lista lista = eleicao1.listas.get(opcao);
         eleicao1.removeLista(lista);
     }
 
@@ -660,7 +667,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
         for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
             if (entry.getKey().equals(eleicao)){
-                return "Utilizador ja votou nesta eleição!";
+                return "Utilizador ja votou nesta eleicao!";
             }
         }
 
@@ -676,18 +683,24 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             }
         }
         else{
-            return "O utilizador não pode votar nesta mesa";
+            return "O utilizador nao pode votar nesta mesa";
         }
     }
 
     /**
      * @inheritDoc
      */
-    public void addMesa(DepMesa mesa) throws java.rmi.RemoteException{
+    public String addMesa(DepMesa mesa) throws java.rmi.RemoteException{
+        for (DepMesa mesa1: mesasVoto) {
+            if(mesa1.departamento.equals(mesa.departamento)){
+                return "Ja se encontra uma mesa neste departamento";
+            }
+        }
         for (Notifications notifications: Global.admin) {
             notifications.estadoMesa("On",mesa.departamento,mesa.id);
         }
         mesasVoto.add(mesa);
+        return "";
     }
 
     /**
@@ -710,7 +723,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public int numVotantes(int opcao) throws java.rmi.RemoteException{
-        Eleicao eleicao = eleicoes.get(opcao-1);
+        Eleicao eleicao = eleicoes.get(opcao);
         int soma = 0;
         for (User user: users) {
             for (Map.Entry<Eleicao,String> entry : user.localVoto.entrySet()) {
@@ -741,7 +754,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         for (DepMesa mesa: eleicao1.maquinasVotacao){
             if(mesa1.departamento.equals(mesa.departamento)){
-                return "Já existe uma mesa de voto para essa eleicao";
+                return "Ja existe uma mesa de voto para essa eleicao";
             }
         }
         eleicao1.maquinasVotacao.add(mesa1);
@@ -806,7 +819,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             prop.load(fis);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } finally {
             assert fis != null;
             fis.close();
