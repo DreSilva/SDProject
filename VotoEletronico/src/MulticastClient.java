@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.NoSuchElementException;
 import java.util.Properties;
-import java.util.Scanner;
 
 
 /**
@@ -53,10 +52,10 @@ public class MulticastClient extends Thread {
 
         } catch (FileNotFoundException e) {
 
-           // e.printStackTrace();
+            e.printStackTrace();
         } catch (IOException e) {
 
-            //e.printStackTrace();
+            e.printStackTrace();
         } finally {
             fis.close();
         }
@@ -116,7 +115,7 @@ public class MulticastClient extends Thread {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                     socket.send(packet);
                 } catch (IOException ex) {
-                    //ex.printStackTrace();
+                    ex.printStackTrace();
                 }
             }
         });
@@ -146,7 +145,6 @@ public class MulticastClient extends Thread {
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength());
                 String[] arrOfStr = message.split("[|;]");
-                Scanner scanner = new Scanner(System.in);
 
                 //interpreta o comando do servidor e escreve a mensagem deste na consola
                 if (arrOfStr[0].equals("server") && arrOfStr[1].equals(Globals.clientID)) {
@@ -155,58 +153,20 @@ public class MulticastClient extends Thread {
                         Globals.login = "off";
                         System.out.println(arrOfStr[5]);
                     } else if (arrOfStr[3].equals("logged on & select election")) {
-                        if(!arrOfStr[5].equals("Welcome to eVoting. Nao ha eleicoes disponiveis\n")){
-                            Globals.command = "election";
-                            Globals.login = "on";
-                            System.out.println(arrOfStr[5]);
-                        }
-                        else{
-                            System.out.println(arrOfStr[5]);
-                            Globals.CC=null;
-                            Globals.locked=true;
-                            Globals.login="empty";
-                            Globals.command="no cmd";
-                        }
+                        Globals.command = "election";
+                        Globals.login = "on";
+                        System.out.println(arrOfStr[5]);
                     } else if (arrOfStr[3].equals("locked")) {
                         Globals.locked = false;
                         System.out.println("Terminal Desbloqueado");
                         System.out.println(arrOfStr[5]);
                         Globals.command = "login";
                     } else if (arrOfStr[3].equals("select election")) {
-                        System.out.println("Quer continuar a votar?");
-                        int choice = 0;
-                        do{
-                            System.out.println("1-Sim");
-                            System.out.println("2-Nao");
-                            try {
-                                choice = Integer.parseInt(scanner.nextLine());
-                            }
-                            catch (NumberFormatException  e){
-                                System.out.println("Insira uma das opcoes");
-                            }
-
-                        }while(choice!=1 && choice!=2);
-                        if(choice==1) {
-                            Globals.command = "election";
-                            System.out.println(arrOfStr[5]);
-                        }
-                        else{
-                            Globals.CC=null;
-                            Globals.locked=true;
-                            Globals.login="empty";
-                            Globals.command="no cmd";
-                        }
+                        Globals.command = "election";
+                        System.out.println(arrOfStr[5]);
                     } else if (arrOfStr[3].equals("select candidate")) {
-                        if(!arrOfStr[5].equals("Nao ha eleicoes para votar\n")){
-                            Globals.CC=null;
-                            Globals.locked=true;
-                            Globals.login="empty";
-                            Globals.command="no cmd";
-                        }
-                        else {
-                            System.out.println(arrOfStr[5]);
-                            Globals.command = "candidate";
-                        }
+                        System.out.println(arrOfStr[5]);
+                        Globals.command = "candidate";
                     } else if (arrOfStr[3].equals("fail")) {
                         Globals.locked = false;
                         arrOfStr = arrOfStr[5].split(" ");
@@ -233,7 +193,7 @@ public class MulticastClient extends Thread {
 
             }
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         } finally {
             socket.close();
         }
@@ -261,6 +221,8 @@ class MulticastUser extends Thread {
      * @param keyboardScanner Scanner do teclado
      * @param time tempo em segundos para o timer
      * @return strin lida do teclado
+     * @throws NoSuchElementException
+     * @throws IOException
      */
     public String readTimedConsole(NonBlockingInputStream keyboardScanner, int time) throws NoSuchElementException, IOException {
         int i;
@@ -329,11 +291,11 @@ class MulticastUser extends Thread {
                                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, PORT);
                                 socket.send(packet);
                             } else {
-                                System.out.println("O terminal encontra-se bloqueado. Dirija-se a mesa de voto.");
+                                System.out.println("O terminal encontra-se bloqueado. Dirija-se à mesa de voto.");
                             }
                         } else {
                             //bloqueio do terminal em caso de time out
-                            System.out.println("O terminal bloqueou por inatividade. Dirija-se a mesa de voto");
+                            System.out.println("O terminal bloqueou por inatividade. Dirija-se à mesa de voto");
                             Globals.CC=null;
                             Globals.locked=true;
                             Globals.login="empty";
@@ -345,9 +307,9 @@ class MulticastUser extends Thread {
                         Globals.command = "no cmd";
                 }
             } catch (InterruptedException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             } catch (IOException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             } finally {
                 socket.close();
             }

@@ -55,7 +55,7 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user1 = (User) o;
-        return user.equals(user1.user) && password.equals(user1.password) && departamento.equals(user1.departamento) && contacto.equals(user1.contacto) && tipo.equals(user1.tipo) && morada.equals(user1.morada) && CC.equals(user1.CC) && validade.equals(user1.validade);
+        return user.equals(user1.user) && password.equals(user1.password)  && CC.equals(user1.CC);
     }
 
 }

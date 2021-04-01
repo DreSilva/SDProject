@@ -10,7 +10,7 @@ public interface Voto extends Remote {
      * @param user utilizador a registar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void registo(User user) throws java.rmi.RemoteException;
+    public String registo(User user) throws java.rmi.RemoteException;
 
     /**
      * Verifica se o user existe registado ou não, através da password e CC
@@ -28,15 +28,6 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException;
-
-    /**
-     * Vai gerir as mesas de voto, permite eliminar ou adicionar
-     * @param cliente Mesa a editar
-     * @param opcao Se é para eliminar ou adicionar a mesa
-     * @param eleicao Eleição à qual é para adicionar a mesa de voto
-     * @throws RemoteException excepção que pode ocorrer na execução de uma remote call
-     */
-    public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException;
 
 
     /**
@@ -255,11 +246,11 @@ public interface Voto extends Remote {
 
     /**
      * Remove uma mesa de voto a uma eleicao
-     * @param Mesa Mesa a adicionar
+     * @param opcao Mesa a adicionar
      * @param eleicao Eleicao a ser adicionada mesa
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void removeMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException;
+    public void removeMesaEleicao(int opcao, Eleicao eleicao) throws  java.rmi.RemoteException;
 
     /**
      * Lista as mesas nos departamentos

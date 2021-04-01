@@ -93,7 +93,7 @@ class UDPSec extends Thread{
         try (DatagramSocket aSocket = new DatagramSocket()) {
 
             String texto = "";
-            aSocket.setSoTimeout(3000);
+            aSocket.setSoTimeout(5000);
 
             while (true) {
                 texto = "ping";
@@ -242,7 +242,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         Date now = new Date();
         for (Eleicao eleicao : eleicoes) {
             if(eleicao.fim.before(now)){
-                System.out.println("sim");
                 eleicoes.remove(eleicao);
                 eleicoesVelhas.add(eleicao);
                 if(Global.admin!=null) {
@@ -257,8 +256,14 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void registo(User user) throws java.rmi.RemoteException{
+    public String registo(User user) throws java.rmi.RemoteException{
+        for (User user1: users) {
+            if(user1.equals(user)){
+                return "User ja se encontra registado";
+            }
+        }
         users.add(user);
+        return "Registado com sucesso";
     }
 
     /**
@@ -282,26 +287,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao.addLista(lista);
         lista = new Lista("Nulo",eleicao.tipo);
         eleicao.addLista(lista);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public void gerirMesas(DepMesa cliente, String opcao, Eleicao eleicao) throws RemoteException{
-        Eleicao eleicao1=null;
-
-        for (Eleicao eleicaoS: eleicoes) {
-            if(eleicaoS.equals(eleicao)){
-                eleicao1 = eleicaoS;
-            }
-        }
-
-        if(opcao.equals("Remover")){
-                eleicao1.removeMaquina(cliente);
-        }
-        else{
-            eleicao1.addMaquina(cliente);
-        }
     }
 
     /**
@@ -732,7 +717,16 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 break;
             }
         }
-
+        for (Eleicao eleicao: eleicoes) {
+            int counter = 0;
+            for (DepMesa mesa1: eleicao.maquinasVotacao) {
+                if(mesa1.equals(mesa)){
+                    eleicao.removeMaquina(counter);
+                    break;
+                }
+                counter+=1;
+            }
+        }
     }
 
     /**
@@ -780,22 +774,15 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void removeMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException{
-        DepMesa mesa1=null;
+    public void removeMesaEleicao(int opcao, Eleicao eleicao) throws  java.rmi.RemoteException{
         Eleicao eleicao1=null;
-        for (DepMesa mesa: mesasVoto) {
-            if(mesa.equals(Mesa)){
-                mesa1=mesa;
-                break;
-            }
-        }
         for (Eleicao eleicao2: eleicoes) {
             if(eleicao.equals(eleicao2)){
                 eleicao1=eleicao2;
             }
         }
 
-        eleicao1.removeMaquina(mesa1);
+        eleicao1.removeMaquina(opcao);
     }
 
     /**

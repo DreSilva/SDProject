@@ -99,10 +99,10 @@ public class Eleicao implements Serializable {
 
     /**
      * Remover mesa de eleição
-     * @param maq Mesa a Remover
+     * @param opcao Mesa a Remover
      */
-    public void removeMaquina(DepMesa maq){
-        maquinasVotacao.remove(maq);
+    public void removeMaquina(int opcao){
+        maquinasVotacao.remove(opcao);
     }
 
     /**

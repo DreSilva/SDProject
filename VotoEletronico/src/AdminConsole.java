@@ -5,6 +5,7 @@ import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class AdminConsole extends UnicastRemoteObject implements Notifications {
     int porto;
-    String serverAddress;
+    String serverAddress,clientAddress;
     ArrayList<String> Departamentos = new ArrayList<>();
 
     /**
@@ -78,6 +79,8 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         String[] depsSplit = deps.split(",");
         Departamentos.addAll(Arrays.asList(depsSplit));
         serverAddress =  prop.getProperty("RMIAddress");
+        clientAddress = prop.getProperty("RMIAdminClient");
+
 
     }
 
@@ -91,9 +94,18 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         Scanner readInput = new Scanner(System.in);
         AdminConsole admin = new AdminConsole();
 
+
         admin.readDeps();
-        Voto votoObj = (Voto) LocateRegistry.getRegistry(admin.serverAddress,admin.porto).lookup("votacao");
+
+        System.setProperty("java.rmi.server.hostname", admin.clientAddress);
+
+
+        Registry reg = LocateRegistry.getRegistry(admin.serverAddress,admin.porto);
+
+        Voto votoObj = (Voto) reg.lookup("votacao");
+
         ArrayList<String> opcoes =  new ArrayList<>();
+
 
         votoObj.subscribeAdmin((Notifications) admin);
 
@@ -108,6 +120,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
         opcoes.add("7-Ver Eleitores em Votacao");
+        opcoes.add("Para voltar atras nos seguinte submenus selecione qualquer letra");
 
         while(true){
             try {
@@ -171,7 +184,8 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 Date dataF = new SimpleDateFormat("dd/MM/yyyy").parse(dataV);
                                 check = true;
                                 user = new User(username, password, departamento, contacto, funcao, morada, CC, dataF);
-                                votoObj.registo(user);
+                                input= votoObj.registo(user);
+                                System.out.println(input);
                             } catch (ParseException e) {
                                 System.out.println("Insira uma data valida no formato dd/MM/yyyy");
                             }
@@ -434,10 +448,10 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                     counter = 1;
                                     for (DepMesa mesa : eleicao.maquinasVotacao) {
                                         System.out.println(counter + "- " + mesa.departamento + " " + mesa.id);
+                                        counter +=1;
                                     }
                                     n3 = Integer.parseInt(readInput.nextLine());
-                                    DepMesa mesa = votoObj.getMesa(n3-1);
-                                    votoObj.removeMesaEleicao(mesa,eleicao);
+                                    votoObj.removeMesaEleicao(n3-1, eleicao);
                                 }
                                 else{
                                     System.out.println("Nao ha maquinas para remover");
