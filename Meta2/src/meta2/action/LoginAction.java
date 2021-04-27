@@ -13,22 +13,21 @@ import meta2.model.HeyBean;
 public class LoginAction extends ActionSupport implements SessionAware {
 	private static final long serialVersionUID = 4L;
 	private Map<String, Object> session;
-	private String username = null, password = null;
+	private String username = null, password = null, CC = null;
 
 	@Override
 	public String execute() throws RemoteException {
 		if(this.username != null && !username.equals("")) {
 			this.getHeyBean().setUsername(this.username);
 			this.getHeyBean().setPassword(this.password);
-			if (this.getHeyBean().getUserMatchesPassword()) {
-				session.put("username", username);
-				session.put("loggedin", true); // this marks the user as logged in
+			this.getHeyBean().setCC(this.CC);
+			if (this.getHeyBean().checkUserExists()) { // fazer funcao de login
 				return SUCCESS;
-			}
-			else{
+			} else {
 				this.getHeyBean().setUsername("");
 				this.getHeyBean().setPassword("");
 				return LOGIN;
+
 			}
 		}
 		else
@@ -42,8 +41,12 @@ public class LoginAction extends ActionSupport implements SessionAware {
 	public void setPassword(String password) {
 		this.password = password; // what about this input? 
 	}
-	
-	public HeyBean getHeyBean() {
+
+	public void setCC(String CC) {
+		this.CC = CC;
+	}
+
+	public HeyBean getHeyBean(){
 		if(!session.containsKey("heyBean"))
 			this.setHeyBean(new HeyBean());
 		return (HeyBean) session.get("heyBean");

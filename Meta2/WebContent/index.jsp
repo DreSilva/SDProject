@@ -13,6 +13,8 @@
 		<s:textfield name="username" /><br>
 		<s:text name="Password:" />
 		<s:textfield name="password" /><br>
+		<s:text name="CC:" />
+		<s:textfield name="CC" /><br>
 		<s:submit />
 	</s:form>
 </body>

@@ -33,15 +33,9 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 
 	<!-- 'login' action calls 'execute' in 'LoginAction' -->
     <action name="login" class="meta2.action.LoginAction" method="execute">
-      <result name="success">/meta2.jsp</result>
+      <result name="success">/logged.jsp</result>
       <result name="login">/index.jsp</result>
     </action>
-
-      <!-- 'sayHey' action calls 'execute' in 'LoginAction' -->
-      <action name="sayHey" class="meta2.action.SayHeyAction" method="execute">
-          <result name="success">/meta2.jsp</result>
-          <result name="login">/index.jsp</result>
-      </action>
 
   </package>
 
