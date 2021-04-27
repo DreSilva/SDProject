@@ -166,7 +166,12 @@ public class MulticastClient extends Thread {
                         System.out.println(arrOfStr[5]);
                     } else if (arrOfStr[3].equals("select candidate")) {
                         System.out.println(arrOfStr[5]);
-                        Globals.command = "candidate";
+                        if(arrOfStr[5].startsWith("Selecione o candidato:\nSelecione uma opcao listada!")){
+                            Globals.command="election";
+                        }
+                        else{
+                            Globals.command = "candidate";
+                        }
                     } else if (arrOfStr[3].equals("fail")) {
                         Globals.locked = false;
                         arrOfStr = arrOfStr[5].split(" ");
@@ -238,7 +243,14 @@ class MulticastUser extends Thread {
         }while(i!=-2 && i!=10);
 
         if(i==-2) return null;
-        else return sb.toString().substring(0,sb.toString().length()-1);
+        else{
+            if(sb.toString().charAt(sb.toString().length()-1)>=48 &&  sb.toString().charAt(sb.toString().length()-1)<=122){
+                return sb.toString();
+            }
+            else {
+                return sb.substring(0, sb.toString().length() - 1);
+            }
+        }
     }
 
     /**

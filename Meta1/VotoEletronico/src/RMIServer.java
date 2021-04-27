@@ -63,7 +63,7 @@ class UDPPrim extends Thread{
                         request.getLength(), request.getAddress(), request.getPort());
                 aSocket.send(reply);
                 Global.rmiServer.writeFile();
-                Thread.sleep(4000);
+                Thread.sleep(2500);
 
             }
         }catch (SocketException e){System.out.println("Socket: " + e.getMessage());
@@ -275,7 +275,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 return userL.CC.equals(CC);
             }
         }
-        return  false;
+        return false;
     }
 
     /**
@@ -293,6 +293,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public String listaCandidatos(int n) throws java.rmi.RemoteException{
+        if(n>=eleicoes.size()){
+            return "Selecione uma opcao listada!\n" + listarEleicoes();
+        }
         Eleicao eleicao = eleicoes.get(n);
         StringBuilder s = new StringBuilder();
         int count = 1;
@@ -342,14 +345,24 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public Eleicao getEleicao(int n) throws java.rmi.RemoteException {
-        return eleicoes.get(n);
+        if(n<eleicoes.size()) {
+            return eleicoes.get(n);
+        }
+        else{
+            return null;
+        }
     }
 
     /**
      * @inheritDoc
      */
     public Lista getLista(int n) throws java.rmi.RemoteException {
-        return listas.get(n);
+        if(n<listas.size()) {
+            return listas.get(n);
+        }
+        else {
+            return null;
+        }
     }
 
 
@@ -527,6 +540,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      */
     public String getInfoEleicaoVelha(int pos)throws java.rmi.RemoteException{
         StringBuilder info = new StringBuilder();
+        if(pos>eleicoesVelhas.size()){
+            return "Escolha uma opcao listada!";
+        }
         Eleicao eleicao = eleicoesVelhas.get(pos);
         ArrayList<Lista> listas = eleicao.listas;
         ArrayList<Integer> votos = eleicao.votosDone;
@@ -620,7 +636,12 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public User getUser(int pos) throws java.rmi.RemoteException {
-        return users.get(pos);
+        if(pos<users.size()) {
+            return users.get(pos);
+        }
+        else{
+            return  null;
+        }
     }
 
     /**
@@ -733,6 +754,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public int numVotantes(int opcao) throws java.rmi.RemoteException{
+        if(opcao>eleicoes.size()){
+            return -1;
+        }
         Eleicao eleicao = eleicoes.get(opcao);
         int soma = 0;
         for (User user: users) {
@@ -802,7 +826,12 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public DepMesa getMesa(int opcao) throws java.rmi.RemoteException{
-        return mesasVoto.get(opcao);
+        if(opcao<mesasVoto.size()) {
+            return mesasVoto.get(opcao);
+        }
+        else {
+            return null;
+        }
     }
     // ========================================================= Ler config
     /**

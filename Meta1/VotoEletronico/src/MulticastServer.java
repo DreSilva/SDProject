@@ -13,6 +13,9 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Scanner;
 
+class GlobalMulticast {
+    static volatile boolean exit = false;
+}
 
 public class MulticastServer extends Thread {
     private String MULTICAST_ADDRESS,serverAddress;
@@ -95,6 +98,7 @@ public class MulticastServer extends Thread {
         //listener para ctrl C
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
+                GlobalMulticast.exit = true;
                 try {
                     Voto voto = (Voto) LocateRegistry.getRegistry(server.serverAddress,server.RMIPORT).lookup("votacao");
                     voto.removeMesa(depMesa);
@@ -142,7 +146,7 @@ public class MulticastServer extends Thread {
             int n=0;
 
             //ciclo de requests e answers
-            while (true) {
+            while (!GlobalMulticast.exit) {
                 try {
                     voting = false;
                     //recebe mensagem
@@ -258,7 +262,7 @@ class Console extends Thread {
             //part to connect to the rmi server
             Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 
-            while (true) {
+            while (!GlobalMulticast.exit) {
                 try {
                     //pedir nr do CC do eleitor
                     System.out.println("Insira o número do CC do eleitor: ");
@@ -348,8 +352,6 @@ class Login extends Thread {
                 socketR.joinGroup(groupR);
                 socketR.setSoTimeout(2500);
 
-                Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
-
                 //mensagem geral para todos os clientes para saber quais se encontram disponiveis
                 message = "server|all;cmd|locked;msg|" + this.CC;
                 byte[] buffer = message.getBytes();
@@ -377,6 +379,7 @@ class Login extends Thread {
             }
 
             socketR.setSoTimeout(0);
+
 
             Voto voto = (Voto) LocateRegistry.getRegistry(this.serverAddress,this.RMIPORT).lookup("votacao");
 

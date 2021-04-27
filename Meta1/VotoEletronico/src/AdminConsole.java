@@ -148,8 +148,18 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             System.out.println(counter+"- "+depName);
                             counter+=1;
                         }
-                        n3 = Integer.parseInt(readInput.nextLine());
-                        String departamento = admin.Departamentos.get(n3-1);
+                        boolean flagCorrect = false;
+                        String departamento = "";
+                        do {
+                            n3 = Integer.parseInt(readInput.nextLine());
+                            if(n3-1< admin.Departamentos.size()) {
+                                departamento = admin.Departamentos.get(n3 - 1);
+                                flagCorrect = true;
+                            }
+                            else{
+                                System.out.println("Escolha um departamento listado!");
+                            }
+                        }while (!flagCorrect);
                         System.out.println("Insira Contacto: ");
                         String contacto = readInput.nextLine();
                         System.out.println("Insira Funcao: ");
@@ -270,15 +280,33 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             case 1:
                                 System.out.println("Selecione Eleicao");
                                 input = votoObj.listarEleicoes();
+                                boolean flagRightInput = false;
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    Eleicao eleicao1 = votoObj.getEleicao(n3 - 1);
-                                    input = votoObj.listarListas();
-                                    System.out.println(input);
-                                    n4 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n4 - 1);
-                                    votoObj.addListaEleicao(eleicao1, lista);
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        Eleicao eleicao1 = votoObj.getEleicao(n3 - 1);
+                                        if (eleicao1 != null) {
+                                            input = votoObj.listarListas();
+                                            System.out.println(input);
+                                            boolean flagRightInput2=false;
+                                            do {
+                                                n4 = Integer.parseInt(readInput.nextLine());
+                                                lista = votoObj.getLista(n4 - 1);
+                                                if(lista!=null) {
+                                                    votoObj.addListaEleicao(eleicao1, lista);
+                                                    flagRightInput2=true;
+                                                }
+                                                else{
+                                                    System.out.println("Selecione uma ocapListada");
+                                                }
+                                            }while (!flagRightInput2);
+                                            flagRightInput = true;
+                                        }
+                                        else{
+                                            System.out.println("Escolha uma opcao Listada!");
+                                        }
+                                    } while (!flagRightInput);
                                 }
                                 else{
                                     System.out.println("Nao ha eleicoes registadas!");
@@ -289,17 +317,25 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listarEleicoes();
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    eleicao = votoObj.getEleicao(n3 - 1);
-                                    input = votoObj.listarListasEleicao(n3-1);
-                                    if(!input.equals("")) {
-                                        System.out.println(input);
-                                        n4 = Integer.parseInt(readInput.nextLine());
-                                        votoObj.removeListaEleicao(eleicao, n4-1);
-                                    }
-                                    else{
-                                        System.out.println("Eleicao nao tem listas inscritas");
-                                    }
+                                    flagRightInput = false;
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        eleicao = votoObj.getEleicao(n3 - 1);
+                                        if(eleicao!=null) {
+                                            input = votoObj.listarListasEleicao(n3 - 1);
+                                            if (!input.equals("")) {
+                                                System.out.println(input);
+                                                n4 = Integer.parseInt(readInput.nextLine());
+                                                votoObj.removeListaEleicao(eleicao, n4 - 1);
+                                            } else {
+                                                System.out.println("Eleicao nao tem listas inscritas");
+                                            }
+                                            flagRightInput=true;
+                                        }
+                                        else{
+                                            System.out.println("Escolha uma opcao listada");
+                                        }
+                                    }while (!flagRightInput);
                                 }
                                 else{
                                     System.out.println("Nao ha eleicoes registadas!");
@@ -334,11 +370,16 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.printUsers();
                                 System.out.println(input);
                                 do {
-                                    n3 = Integer.parseInt(readInput.nextLine());
                                     if (n3 != 0) {
+                                        n3 = Integer.parseInt(readInput.nextLine());
                                         user = votoObj.getUser(n3 - 1);
-                                        input=votoObj.addUserList(user, lista);
-                                        System.out.println(input);
+                                        if(user!=null) {
+                                            input = votoObj.addUserList(user, lista);
+                                            System.out.println(input);
+                                        }
+                                        else{
+                                            System.out.println("Selecione um utilizador listado!");
+                                        }
                                     }
                                 } while (n3 != 0);
 
@@ -349,9 +390,18 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n3 - 1);
-                                    votoObj.removeLista(lista);
+                                    flagRightInput=false;
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        lista = votoObj.getLista(n3 - 1);
+                                        if(lista!=null) {
+                                            votoObj.removeLista(lista);
+                                            flagRightInput=true;
+                                        }
+                                        else{
+                                            System.out.println("Escolha uma opcao listada");
+                                        }
+                                    }while (!flagRightInput);
                                 }
                                 else{
                                     System.out.println("Nao ha listas registadas!");
@@ -362,17 +412,30 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n3 - 1);
-                                    input = votoObj.printUsers();
-                                    System.out.println(input);
+                                    flagRightInput=false;
                                     do {
                                         n3 = Integer.parseInt(readInput.nextLine());
-                                        if (n3 != 0) {
-                                            user = votoObj.getUser(n3 - 1);
-                                            votoObj.addUserList(user, lista);
+                                        lista = votoObj.getLista(n3 - 1);
+                                        if(lista!=null) {
+                                            input = votoObj.printUsers();
+                                            System.out.println(input);
+                                            flagRightInput=true;
+                                            do {
+                                                n3 = Integer.parseInt(readInput.nextLine());
+                                                if (n3 != 0) {
+                                                    user = votoObj.getUser(n3 - 1);
+                                                    if (user != null) {
+                                                        votoObj.addUserList(user, lista);
+                                                    } else {
+                                                        System.out.println("Selecione um utilizador listado!");
+                                                    }
+                                                }
+                                            } while (n3 != 0);
                                         }
-                                    } while (n3 != 0);
+                                        else{
+                                            System.out.println("Seleciona uma opcao listada");
+                                        }
+                                    }while (!flagRightInput);
                                 }
                                 else{
                                     System.out.println("Nao ha listas registadas!");
@@ -384,17 +447,23 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n3 - 1);
-                                    input = votoObj.printUsers();
-                                    System.out.println(input);
+                                    flagRightInput = false;
                                     do {
                                         n3 = Integer.parseInt(readInput.nextLine());
-                                        if (n3 != 0) {
-                                            user = votoObj.getUser(n3 - 1);
-                                            votoObj.removeUserList(lista, user);
+                                        lista = votoObj.getLista(n3 - 1);
+                                        if(lista!=null) {
+                                            input = votoObj.printUsers();
+                                            System.out.println(input);
+                                            flagRightInput=true;
+                                            do {
+                                                n3 = Integer.parseInt(readInput.nextLine());
+                                                if (n3 != 0) {
+                                                    user = votoObj.getUser(n3 - 1);
+                                                    votoObj.removeUserList(lista, user);
+                                                }
+                                            } while (n3 != 0);
                                         }
-                                    } while (n3 != 0);
+                                    }while (!flagRightInput);
                                 }
                                 else {
                                     System.out.println("Nao ha listas registadas!");
@@ -406,10 +475,19 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    lista = votoObj.getLista(n3 - 1);
-                                    input = votoObj.listarLista(lista);
-                                    System.out.println(input);
+                                    flagRightInput=false;
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        lista = votoObj.getLista(n3 - 1);
+                                        if(lista!=null) {
+                                            input = votoObj.listarLista(lista);
+                                            System.out.println(input);
+                                            flagRightInput=true;
+                                        }
+                                        else{
+                                            System.out.println("Selecione uma opcao Listada!");
+                                        }
+                                    }while (!flagRightInput);
                                 }
                                 else {
                                     System.out.println("Nao ha listas registadas!");
@@ -424,8 +502,17 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);
-                            n3 = Integer.parseInt(readInput.nextLine());
-                            eleicao = votoObj.getEleicao(n3 - 1);
+                            flagCorrect=false;
+                            do {
+                                n3 = Integer.parseInt(readInput.nextLine());
+                                eleicao = votoObj.getEleicao(n3 - 1);
+                                if(eleicao!=null){
+                                    flagCorrect=true;
+                                }
+                                else{
+                                    System.out.println("Insira uma opcao listada!");
+                                }
+                            }while (!flagCorrect);
                             do {
                                 System.out.println("1- Adicionar Mesa \n2- Remover mesa");
                                 n3 = Integer.parseInt(readInput.nextLine());
@@ -435,10 +522,19 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 input = votoObj.listaMaquina();
                                 if (!input.equals("")) {
                                     System.out.println(input);
-                                    n3 = Integer.parseInt(readInput.nextLine());
-                                    DepMesa mesa = votoObj.getMesa(n3 - 1);
-                                    input = votoObj.addMesaEleicao(mesa,eleicao);
-                                    System.out.println(input);
+                                    boolean flagCorrectInput = false;
+                                    do {
+                                        n3 = Integer.parseInt(readInput.nextLine());
+                                        DepMesa mesa = votoObj.getMesa(n3 - 1);
+                                        if(mesa!=null) {
+                                            input = votoObj.addMesaEleicao(mesa, eleicao);
+                                            System.out.println(input);
+                                            flagCorrectInput = true;
+                                        }
+                                        else{
+                                            System.out.println("Selecione uma mesa correta!");
+                                        }
+                                    }while (!flagCorrectInput);
                                 } else {
                                     System.out.println("Nao ha maquinas no sistema");
                                 }
@@ -470,8 +566,17 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);
-                            n3 = Integer.parseInt(readInput.nextLine());
-                            eleicao = votoObj.getEleicao(n3 - 1);
+                            boolean flagCorrectOption = false;
+                            do {
+                                n3 = Integer.parseInt(readInput.nextLine());
+                                eleicao = votoObj.getEleicao(n3 - 1);
+                                if(eleicao!=null){
+                                    flagCorrectOption=true;
+                                }
+                                else{
+                                    System.out.println("Selecione uma eleicao listada!");
+                                }
+                            }while (!flagCorrectOption);
                             do {
                                 System.out.println("1-Editar Titulo da Eleicao");
                                 System.out.println("2-Editar Descricao da Eleicao");
@@ -576,7 +681,12 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                             System.out.println(input);
                             n3 = Integer.parseInt(readInput.nextLine());
                             n3 = votoObj.numVotantes(n3-1);
-                            System.out.println(n3);
+                            if(n3==-1){
+                                System.out.println("Selecione uma eleicao listada");
+                            }
+                            else {
+                                System.out.println(n3);
+                            }
                         }
                         else{
                             System.out.println("Nao ha eleicoes registadas!");
