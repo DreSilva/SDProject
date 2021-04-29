@@ -13,6 +13,7 @@ import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.Properties;
 
 import rmiserver.Voto;
@@ -24,6 +25,9 @@ public class HeyBean {
 	private String CC;
 	private int porto;
 	private String serverAddress,clientAddress;
+	private String titulo,descricao,tipo;
+	private Date dataInicial,dataFinal;
+
 
 	public static Properties readPropertiesFile(String fileName) throws IOException {
 		FileInputStream fis = null;
@@ -93,6 +97,26 @@ public class HeyBean {
 
 	public void setCC(String CC) {
 		this.CC = CC;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public void setDataFinal(Date dataFinal) {
+		this.dataFinal = dataFinal;
+	}
+
+	public void setDataInicial(Date dataInicial) {
+		this.dataInicial = dataInicial;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
 	}
 
 	public boolean checkUserExists() throws RemoteException{

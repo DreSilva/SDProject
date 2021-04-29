@@ -43,7 +43,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
      * @inheritDoc
      */
     public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
-        System.out.println("models.Eleicao "+nome+" acabou.\nResultados");
+        System.out.println("Eleicao "+nome+" acabou.\nResultados");
         System.out.println(votos);
     }
 
@@ -123,10 +123,10 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
         opcoes.add("Escolher Opcao");
         opcoes.add("1-Registar Pessoa");
-        opcoes.add("2-Criar models.Eleicao");
-        opcoes.add("3-Gerir models.Lista de Candidatos");
+        opcoes.add("2-Criar Eleicao");
+        opcoes.add("3-Gerir Lista de Candidatos");
         opcoes.add("4-Gerir Mesas de rmiserver.Voto");
-        opcoes.add("5-Alterar models.Eleicao");
+        opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
         opcoes.add("7-Ver Eleitores em Votacao");
         opcoes.add("Para voltar atras nos seguinte submenus selecione qualquer letra");
@@ -275,19 +275,19 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                         accao = true;
                         int n2;
                         do {
-                            System.out.println("1-Adicionar models.Lista a models.Eleicao");
-                            System.out.println("2-Remover models.Lista a models.Eleicao");
-                            System.out.println("3-Criar models.Lista");
-                            System.out.println("4-Remover models.Lista");
-                            System.out.println("5-Adicionar Utilizador a models.Lista");
-                            System.out.println("6-Remover Utilizador a models.Lista");
-                            System.out.println("7-Ver Elementos da models.Lista");
+                            System.out.println("1-Adicionar Lista a Eleicao");
+                            System.out.println("2-Remover Lista a Eleicao");
+                            System.out.println("3-Criar Lista");
+                            System.out.println("4-Remover Lista");
+                            System.out.println("5-Adicionar Utilizador a Lista");
+                            System.out.println("6-Remover Utilizador a Lista");
+                            System.out.println("7-Ver Elementos da Lista");
                             n2 = Integer.parseInt(readInput.nextLine());
                         } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4 && n2!=5 && n2!=6 && n2!=7);
 
                         switch (n2) {
                             case 1:
-                                System.out.println("Selecione models.Eleicao");
+                                System.out.println("Selecione Eleicao");
                                 input = votoObj.listarEleicoes();
                                 boolean flagRightInput = false;
                                 if(!input.equals("")) {
@@ -322,7 +322,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 }
                                 break;
                             case 2:
-                                System.out.println("Selecione models.Eleicao");
+                                System.out.println("Selecione Eleicao");
                                 input = votoObj.listarEleicoes();
                                 if(!input.equals("")) {
                                     System.out.println(input);
@@ -337,7 +337,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                                 n4 = Integer.parseInt(readInput.nextLine());
                                                 votoObj.removeListaEleicao(eleicao, n4 - 1);
                                             } else {
-                                                System.out.println("models.Eleicao nao tem listas inscritas");
+                                                System.out.println("Eleicao nao tem listas inscritas");
                                             }
                                             flagRightInput=true;
                                         }
@@ -352,7 +352,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 break;
 
                             case 3:
-                                System.out.println("Indique nome da models.Lista");
+                                System.out.println("Indique nome da Lista");
                                 input = readInput.nextLine();
                                 System.out.println("Insira Tipo de Eleicoes: ");
                                 System.out.println("1- Estudante");
@@ -395,7 +395,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 break;
 
                             case 4:
-                                System.out.println("Selecione models.Lista");
+                                System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
@@ -417,7 +417,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 }
                                 break;
                             case 5:
-                                System.out.println("Selecione models.Lista");
+                                System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
@@ -452,7 +452,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 break;
 
                             case 6:
-                                System.out.println("Selecione models.Lista");
+                                System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
@@ -480,7 +480,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 break;
 
                             case 7:
-                                System.out.println("Selecione models.Lista");
+                                System.out.println("Selecione Lista");
                                 input = votoObj.listarListas();
                                 if(!input.equals("")) {
                                     System.out.println(input);
@@ -507,7 +507,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
                     case 4:
                         accao = true;
-                        System.out.println("Selecione models.Eleicao");
+                        System.out.println("Selecione Eleicao");
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);
@@ -571,7 +571,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
                     case 5:
                         accao = true;
-                        System.out.println("Selecione models.Eleicao");
+                        System.out.println("Selecione Eleicao");
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);
@@ -587,10 +587,10 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                 }
                             }while (!flagCorrectOption);
                             do {
-                                System.out.println("1-Editar Titulo da models.Eleicao");
-                                System.out.println("2-Editar Descricao da models.Eleicao");
+                                System.out.println("1-Editar Titulo da Eleicao");
+                                System.out.println("2-Editar Descricao da Eleicao");
                                 System.out.println("3-Editar Datas");
-                                System.out.println("4-Editar Tipo de models.Eleicao");
+                                System.out.println("4-Editar Tipo de Eleicao");
                                 n2 = Integer.parseInt(readInput.nextLine());
                             } while (n2 != 1 && n2 != 2 && n2 != 3 && n2 != 4);
 
@@ -669,7 +669,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
                     case 6:
                         accao = true;
-                        System.out.println("Escolha uma models.Eleicao");
+                        System.out.println("Escolha uma Eleicao");
                         input = votoObj.getEleicoesVelhas();
                         if(!input.equals("")) {
                             System.out.println(input);
@@ -684,7 +684,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
 
                     case 7:
                         accao = true;
-                        System.out.println("Escolha uma models.Eleicao");
+                        System.out.println("Escolha uma Eleicao");
                         input = votoObj.listarEleicoes();
                         if(!input.equals("")) {
                             System.out.println(input);

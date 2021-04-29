@@ -13,6 +13,8 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
   <constant name="struts.devMode" value="true" />
   <constant name="struts.ui.theme" value="simple" />
 
+
+
   <package name="meta2" extends="struts-default">
 	
 	<default-action-ref name="index" />
@@ -26,16 +28,41 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 		<exception-mapping exception="java.lang.Exception" result="error" />
 	</global-exception-mappings>
 
-	<!-- 'index' action leads to the view provided by index.jsp -->
+	<!-- 'index' action leads to the view provided by login.jsp -->
     <action name="index">
       <result>/index.jsp</result>
     </action>
 
 	<!-- 'login' action calls 'execute' in 'LoginAction' -->
     <action name="login" class="meta2.action.LoginAction" method="execute">
-      <result name="success">/logged.jsp</result>
-      <result name="login">/index.jsp</result>
+      <result name="success">/votar.jsp</result>
+      <result name="login">/login.jsp</result>
     </action>
+
+    <action name="admin">
+      <result>/adminLogin.jsp</result>
+    </action>
+
+    <action name="vote">
+      <result>/login.jsp</result>
+    </action>
+
+      <action name="criarEleicao" class="meta2.action.CriarEleicaoAction" method="execute">
+          <result name="success">/optionsAdmin.jsp</result>
+          <result name="input">/criarEleicao.jsp</result>
+      </action>
+
+
+      <action name="goCriarEleicao" class="meta2.action.GoCriarEleicaoAction" method="execute">
+          <result name="success">/criarEleicao.jsp</result>
+      </action>
+
+
+      <action name="adminLogin" class="meta2.action.AdminLoginAction" method="execute">
+          <result name="success">/optionsAdmin.jsp</result>
+          <result name="login">/adminLogin.jsp</result>
+      </action>
+
 
   </package>
 
