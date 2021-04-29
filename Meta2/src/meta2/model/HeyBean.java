@@ -25,8 +25,8 @@ public class HeyBean {
 	private String CC;
 	private int porto;
 	private String serverAddress,clientAddress;
-	private String titulo,descricao,tipo;
-	private Date dataInicial,dataFinal;
+	private String titulo,descricao,tipo,departamento,contacto,morada;
+	private Date dataInicial,dataFinal,dataValidade;
 
 
 	public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -87,6 +87,10 @@ public class HeyBean {
 		return username;
 	}
 
+	public void setDataValidade(Date dataValidade) {
+		this.dataValidade = dataValidade;
+	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -117,6 +121,18 @@ public class HeyBean {
 
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
+	}
+
+	public void setMorada(String morada) {
+		this.morada = morada;
+	}
+
+	public void setContacto(String contacto) {
+		this.contacto = contacto;
+	}
+
+	public void setDepartamento(String departamento) {
+		this.departamento = departamento;
 	}
 
 	public boolean checkUserExists() throws RemoteException{

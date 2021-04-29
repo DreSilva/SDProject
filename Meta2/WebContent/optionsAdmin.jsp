@@ -13,6 +13,10 @@
 </head>
 <body>
 
+<s:form action="goRegistarPessoa" method="post">
+    <button value="registarPessoa" type="submit" name="registarPesssoa">Registar Pessoa</button>
+</s:form>
+
 <s:form action="goCriarEleicao" method="post">
     <button value="criarEleicao" type="submit" name="criarEleicao">Criar Eleicao</button>
 </s:form>
