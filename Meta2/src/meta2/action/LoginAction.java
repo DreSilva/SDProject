@@ -8,7 +8,7 @@ import org.apache.struts2.interceptor.SessionAware;
 
 import java.rmi.RemoteException;
 import java.util.Map;
-import meta2.model.HeyBean;
+import meta2.models.HeyBean;
 
 public class LoginAction extends ActionSupport implements SessionAware {
 	private static final long serialVersionUID = 4L;

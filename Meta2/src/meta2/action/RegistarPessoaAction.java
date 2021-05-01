@@ -1,10 +1,11 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
-import meta2.model.HeyBean;
-import meta2.model.radioOptions;
+import meta2.models.HeyBean;
+import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +67,7 @@ public class RegistarPessoaAction extends ActionSupport implements SessionAware 
     }
 
     @Override
-    public String execute(){
+    public String execute() throws RemoteException {
         this.getHeyBean().setCC(CC);
         this.getHeyBean().setContacto(contacto);
         this.getHeyBean().setMorada(morada);
@@ -75,6 +76,7 @@ public class RegistarPessoaAction extends ActionSupport implements SessionAware 
         this.getHeyBean().setDataValidade(dataValidade);
         this.getHeyBean().setUsername(user);
         this.getHeyBean().setPassword(password);
+        this.getHeyBean().registarPessoa();
         return SUCCESS;
     }
 

@@ -1,6 +1,7 @@
 package rmiserver;
 
 import java.rmi.*;
+import java.util.ArrayList;
 import java.util.Date;
 import models.*;
 
@@ -14,6 +15,9 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public String registo(User user) throws java.rmi.RemoteException;
+
+    public String registoUser(String user, String password, String departamento,
+                              String contacto, String tipo, String morada, String CC, Date validade) throws java.rmi.RemoteException;
 
     /**
      * Verifica se o user existe registado ou não, através da password e CC
@@ -68,7 +72,7 @@ public interface Voto extends Remote {
     public Eleicao getEleicao(int n) throws java.rmi.RemoteException;
 
     /**
-     * models.Lista todas as listas guardadas na BD
+     * Lista todas as listas guardadas na BD
      * @return String com todas as listas guardads
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
@@ -284,4 +288,20 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public String listarListasEleicao(int n) throws java.rmi.RemoteException;
+
+
+    /**
+     * Obtem as eleicoes para a web
+     * @return ArrayLista com Strings
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listarEleicoesWEB() throws java.rmi.RemoteException;
+
+
+    /**
+     * Lista todas as listas guardadas na BD para a web
+     * @return ArrayLista com todas as listas guardadas
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listarListasWEB() throws java.rmi.RemoteException;
 }

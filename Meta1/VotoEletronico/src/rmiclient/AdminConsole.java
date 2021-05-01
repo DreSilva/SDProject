@@ -125,7 +125,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         opcoes.add("1-Registar Pessoa");
         opcoes.add("2-Criar Eleicao");
         opcoes.add("3-Gerir Lista de Candidatos");
-        opcoes.add("4-Gerir Mesas de rmiserver.Voto");
+        opcoes.add("4-Gerir Mesas de Voto");
         opcoes.add("5-Alterar Eleicao");
         opcoes.add("6-Consultar Eleicoes Passadas");
         opcoes.add("7-Ver Eleitores em Votacao");

@@ -264,6 +264,22 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
+    public String registoUser(String username, String password, String departamento,
+                                     String contacto, String tipo, String morada, String CC, Date validade) throws java.rmi.RemoteException{
+        User user = new User(username,password,departamento,contacto,tipo,morada,CC,validade);
+        for (User user1: users) {
+            if(user1.equals(user)){
+                return "models.User ja se encontra registado";
+            }
+        }
+        users.add(user);
+        return "Registado com sucesso";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public String registo(User user) throws java.rmi.RemoteException{
         for (User user1: users) {
             if(user1.equals(user)){
@@ -347,6 +363,30 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             count+=1;
         }
         return votacoes.toString();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public ArrayList<String> listarEleicoesWEB() throws java.rmi.RemoteException {
+        ArrayList<String> s = new ArrayList<>();
+        for (Eleicao eleicao : eleicoes) {
+            String votacoes = eleicao.titulo + "\n";
+            s.add(votacoes);
+        }
+        return s;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public ArrayList<String> listarListasWEB() throws java.rmi.RemoteException{
+        ArrayList<String> s = new ArrayList<>();
+        for (Lista listaV : listas) {
+            String listasS = listaV.nome + "\n";
+            s.add(listasS);
+        }
+        return s;
     }
 
     /**

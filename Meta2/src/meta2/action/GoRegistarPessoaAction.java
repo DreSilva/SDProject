@@ -1,7 +1,7 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
-import meta2.model.radioOptions;
+import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
 import java.util.ArrayList;

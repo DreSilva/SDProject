@@ -12,9 +12,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
   <!-- devMode equals debug information and reload everything for every request -->
   <constant name="struts.devMode" value="true" />
   <constant name="struts.ui.theme" value="simple" />
-
-
-
+  <constant name="struts.action.excludePattern" value="/ws"/>
   <package name="meta2" extends="struts-default">
 	
 	<default-action-ref name="index" />
@@ -28,17 +26,13 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 		<exception-mapping exception="java.lang.Exception" result="error" />
 	</global-exception-mappings>
 
-	<!-- 'index' action leads to the view provided by login.jsp -->
+    <!-- 'index' action leads to the view provided by login.jsp -->
     <action name="index">
       <result>/index.jsp</result>
     </action>
 
-	<!-- 'login' action calls 'execute' in 'LoginAction' -->
-    <action name="login" class="meta2.action.LoginAction" method="execute">
-      <result name="success">/votar.jsp</result>
-      <result name="login">/login.jsp</result>
-    </action>
 
+    <!-- MAIN PAGES -->
     <action name="admin">
       <result>/adminLogin.jsp</result>
     </action>
@@ -47,31 +41,49 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result>/login.jsp</result>
     </action>
 
-      <action name="criarEleicao" class="meta2.action.CriarEleicaoAction" method="execute">
-          <result name="success">/optionsAdmin.jsp</result>
-          <result name="input">/criarEleicao.jsp</result>
-      </action>
+    <!-- 'login' action calls 'execute' in 'LoginAction' -->
+    <action name="login" class="meta2.action.LoginAction" method="execute">
+      <result name="success">/votar.jsp</result>
+      <result name="login">/login.jsp</result>
+    </action>
 
 
-      <action name="goCriarEleicao" class="meta2.action.GoCriarEleicaoAction" method="execute">
-          <result name="success">/criarEleicao.jsp</result>
-      </action>
+    <action name="adminLogin" class="meta2.action.AdminLoginAction" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="login">/adminLogin.jsp</result>
+    </action>
 
+
+    <!-- ADMIN ACTIONS -->
+
+    <!-- CRIAR ELEICAO -->
+    <action name="goCriarEleicao" class="meta2.action.GoCriarEleicaoAction" method="execute">
+      <result name="success">/criarEleicao.jsp</result>
+    </action>
+
+    <action name="criarEleicao" class="meta2.action.CriarEleicaoAction" method="execute">
+        <result name="success">/optionsAdmin.jsp</result>
+        <result name="input">/criarEleicao.jsp</result>
+    </action>
+
+    <!-- REGISTAR PESSOA -->
+    <action name="goRegistarPessoa" class="meta2.action.GoRegistarPessoaAction" method="execute">
+      <result name="success">/registarPessoa.jsp</result>
+    </action>
 
     <action name="registarPessoa" class="meta2.action.RegistarPessoaAction" method="execute">
       <result name="success">/optionsAdmin.jsp</result>
       <result name="input">/registarPessoa.jsp</result>
     </action>
 
-    <action name="goRegistarPessoa" class="meta2.action.GoRegistarPessoaAction" method="execute">
-      <result name="success">/registarPessoa.jsp</result>
+    <!-- GERIR LISTAS -->
+    <action name="goGerirLista" class="meta2.action.GoCriarEleicaoAction" method="execute">
+      <result>/gerirListaCandidatos.jsp</result>
     </action>
 
-
-      <action name="adminLogin" class="meta2.action.AdminLoginAction" method="execute">
-          <result name="success">/optionsAdmin.jsp</result>
-          <result name="login">/adminLogin.jsp</result>
-      </action>
+    <action name="goAdicionarListaEleicao" class="meta2.action.GoAdicionarListaEleicao" method="execute">
+      <result name="success">/adicionarListaEleicao.jsp</result>
+    </action>
 
 
   </package>
