@@ -32,5 +32,6 @@
 <s:form action="goElemLista" method="post">
     <button value="elemLista" type="submit" name="elemLista">Ver elementos de uma Lista</button>
 </s:form>
+
 </body>
 </html>

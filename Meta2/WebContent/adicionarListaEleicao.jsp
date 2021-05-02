@@ -6,13 +6,11 @@
     <title>Adicionar Lista a Eleicao</title>
 </head>
 <body>
-<s:form action="criarEleicao" method="post">
+<s:form action="adicionarListaEleicao" method="post">
     <s:fielderror name="tError"/>
-    <s:radio label="Tipo Eleicao" name="tipo" list="tipos"
-             listKey="key" listValue="value" value="Estudante" /><br>
     <s:radio label="Lista" name="lista" list="listas"
              listKey="key" listValue="value"/><br>
-    <s:radio label="Eleição" name="eleiao" list="eleicoes"
+    <s:radio label="Eleição" name="eleicao" list="eleicoes"
              listKey="key" listValue="value" value="Estudante" /><br>
 
     <s:submit onclick=""/>

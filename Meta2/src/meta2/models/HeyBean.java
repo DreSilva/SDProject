@@ -28,6 +28,7 @@ public class HeyBean {
 	private String serverAddress,clientAddress;
 	private String titulo,descricao,tipo,departamento,contacto,morada;
 	private Date dataInicial,dataFinal,dataValidade;
+	private String lista,eleicao;
 
 
 	public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -136,6 +137,14 @@ public class HeyBean {
 		this.departamento = departamento;
 	}
 
+	public void setLista(String lista) {
+		this.lista = lista;
+	}
+
+	public void setEleicao(String eleicao) {
+		this.eleicao = eleicao;
+	}
+
 	public boolean checkUserExists() throws RemoteException{
 		return this.server.login(this.username,this.password,this.CC);
 	}
@@ -146,6 +155,10 @@ public class HeyBean {
 
 	public ArrayList<String> getEleicao() throws RemoteException{
 		return this.server.listarListasWEB();
+	}
+
+	public ArrayList<String> getListasEleicao() throws RemoteException{
+		return this.server.listarListasEleicaoWEB(Integer.parseInt(this.eleicao));
 	}
 
 	public void criarEleicao() throws RemoteException{

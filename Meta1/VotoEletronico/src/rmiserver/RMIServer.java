@@ -269,7 +269,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         User user = new User(username,password,departamento,contacto,tipo,morada,CC,validade);
         for (User user1: users) {
             if(user1.equals(user)){
-                return "models.User ja se encontra registado";
+                return "User ja se encontra registado";
             }
         }
         users.add(user);
@@ -283,7 +283,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public String registo(User user) throws java.rmi.RemoteException{
         for (User user1: users) {
             if(user1.equals(user)){
-                return "models.User ja se encontra registado";
+                return "User ja se encontra registado";
             }
         }
         users.add(user);
@@ -431,6 +431,18 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
+    public ArrayList<String> listarListasEleicaoWEB(int n) throws java.rmi.RemoteException {
+        Eleicao eleicao =  eleicoes.get(n);
+        ArrayList<String> s = new ArrayList<>();
+        for (Lista lista: eleicao.listas) {
+            s.add(lista.nome);
+        }
+        return s;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public String addListaEleicao(Eleicao eleicao, Lista lista)throws java.rmi.RemoteException {
         Eleicao eleicao1=null;
 
@@ -441,10 +453,10 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         if(lista.tipo.equals(eleicao1.tipo)) {
             eleicao1.addLista(lista);
-            return "models.Lista adicionada com sucesso";
+            return "Lista adicionada com sucesso";
         }
         else{
-            return "models.Lista e de tipo diferente da eleicao";
+            return "Lista e de tipo diferente da eleicao";
         }
     }
 
@@ -553,7 +565,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         else {
             for (User user1: lista1.lista) {
                 if(user.equals(user1)){
-                    return "models.User ja se encontra na lista";
+                    return "User ja se encontra na lista";
                 }
             }
             lista1.addUser(user);
@@ -749,7 +761,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 return "rmiserver.Voto com sucesso";
             }
             else{
-                return "models.User nao pode votar nesta eleicao, e para uma funcao diferente!";
+                return "User nao pode votar nesta eleicao, e para uma funcao diferente!";
             }
         }
         else{

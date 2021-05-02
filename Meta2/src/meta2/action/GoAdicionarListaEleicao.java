@@ -15,7 +15,6 @@ public class GoAdicionarListaEleicao  extends ActionSupport implements SessionAw
     private Map<String, Object> session;
     private List<radioOptions> listas;
     private List<radioOptions> eleicoes;
-    private List<radioOptions> tipos;
 
     @Override
     public String execute() throws RemoteException {
@@ -31,15 +30,7 @@ public class GoAdicionarListaEleicao  extends ActionSupport implements SessionAw
         for (String a: s2) {
             eleicoes.add(new radioOptions(String.valueOf(counter),a));
         }
-        tipos = new ArrayList<radioOptions>();
-        tipos.add( new radioOptions("Estudante", "Estudante") );
-        tipos.add( new radioOptions("Docente", "Docente") );
-        tipos.add( new radioOptions("Funcionario", "Funcionario") );
         return SUCCESS;
-    }
-
-    public List<radioOptions> getTipos() {
-        return tipos;
     }
 
     public List<radioOptions> getEleicoes() {

@@ -81,8 +81,26 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result>/gerirListaCandidatos.jsp</result>
     </action>
 
+    <!-- ADICIONAR LISTA-->
     <action name="goAdicionarListaEleicao" class="meta2.action.GoAdicionarListaEleicao" method="execute">
       <result name="success">/adicionarListaEleicao.jsp</result>
+    </action>
+
+    <action name="adicionarListaEleicao" class="meta2.action.AdicionarListaEleicao" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+    </action>
+
+  <!-- REMOVER LISTA -->
+    <action name="goRemoverListaEleicao" class="meta2.action.GoEscolherEleicaoParaRemover" method="execute">
+      <result name="success">/escolherEleicaoParaRemover.jsp</result>
+    </action>
+
+    <action name="escolherEleicaoParaRemover" class="meta2.action.EscolherEleicaoParaRemover" method="execute">
+      <result name="success">/escolherListaParaRemover.jsp</result>
+    </action>
+
+    <action name="escolherListaParaRemover" class="meta2.action.EscolherListaParaRemover" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
     </action>
 
 
