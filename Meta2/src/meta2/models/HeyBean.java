@@ -29,6 +29,7 @@ public class HeyBean {
 	private String titulo,descricao,tipo,departamento,contacto,morada;
 	private Date dataInicial,dataFinal,dataValidade;
 	private String lista,eleicao;
+	private String nome;
 
 
 	public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -67,8 +68,8 @@ public class HeyBean {
 	public HeyBean() {
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "192.168.1.71";
-			serverAddress = "192.168.1.71";
+			clientAddress = "192.168.1.75";
+			serverAddress = "192.168.1.75";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -87,6 +88,10 @@ public class HeyBean {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public void setDataValidade(Date dataValidade) {
@@ -150,11 +155,11 @@ public class HeyBean {
 	}
 
 	public ArrayList<String> getListas() throws RemoteException{
-		return this.server.listarEleicoesWEB();
+		return this.server.listarListasWEB();
 	}
 
 	public ArrayList<String> getEleicao() throws RemoteException{
-		return this.server.listarListasWEB();
+		return this.server.listarEleicoesWEB();
 	}
 
 	public ArrayList<String> getListasEleicao() throws RemoteException{
@@ -168,5 +173,13 @@ public class HeyBean {
 
 	public void registarPessoa() throws RemoteException{
 		this.server.registoUser(this.username,this.password,this.departamento,this.contacto,this.tipo,this.morada,this.CC,this.dataValidade);
+	}
+
+	public ArrayList<String> getUsers() throws RemoteException{
+		return this.server.printUsersWEB();
+	}
+
+	public ArrayList<String> getUsersList() throws RemoteException{
+		return this.server.getUserLista(Integer.parseInt(lista));
 	}
 }

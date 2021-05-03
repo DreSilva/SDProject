@@ -20,9 +20,9 @@ public class GoEscolherEleicaoParaRemover extends ActionSupport implements Sessi
         eleicoes = new ArrayList<radioOptions>();
         int counter = 0;
         ArrayList<String> s = this.getHeyBean().getEleicao();
-        ArrayList<String> s2 = this.getHeyBean().getListas();
-        for (String a: s2) {
+        for (String a: s) {
             eleicoes.add(new radioOptions(String.valueOf(counter),a));
+            counter+=1;
         }
         return SUCCESS;
     }

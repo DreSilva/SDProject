@@ -32,6 +32,7 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
             }
             for (String a: s) {
                 listas.add(new radioOptions(String.valueOf(counter),a));
+                counter+=1;
             }
         }
         if(eleicoes==null){
@@ -45,8 +46,22 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
             }
             for (String a: s2) {
                 eleicoes.add(new radioOptions(String.valueOf(counter),a));
+                counter+=1;
             }
         }
+
+        if(eleicao==null){
+            addFieldError("tError", "Eleição é obrigatorio.");
+        }
+        if(lista==null){
+            addFieldError("tError", "Lista é obrigatorio.");
+        }
+        /*
+        if(lista already in eleicao){
+            addFieldError("tError", "Lista ja se encontra na eleição.");
+        }
+
+         */
 
 
     }

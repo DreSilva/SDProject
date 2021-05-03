@@ -695,6 +695,18 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
+    public ArrayList<String > printUsersWEB() throws java.rmi.RemoteException {
+        ArrayList<String> s = new ArrayList<>();
+        for (User user: users) {
+            s.add(user.user);
+        }
+        return s;
+
+    }
+
+    /**
+     * @inheritDoc
+     */
     public User getUser(int pos) throws java.rmi.RemoteException {
         if(pos<users.size()) {
             return users.get(pos);
@@ -892,6 +904,18 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         else {
             return null;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public ArrayList<String> getUserLista(int n) throws java.rmi.RemoteException{
+        Lista lista = getLista(n);
+        ArrayList<String> s = new ArrayList<>();
+        for (User user: lista.lista) {
+            s.add(user.user);
+        }
+        return s;
     }
     // ========================================================= Ler config
     /**

@@ -88,21 +88,70 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 
     <action name="adicionarListaEleicao" class="meta2.action.AdicionarListaEleicao" method="execute">
       <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/adicionarListaEleicao.jsp</result>
     </action>
 
-  <!-- REMOVER LISTA -->
+  <!-- REMOVER LISTA DE ELEICAO -->
     <action name="goRemoverListaEleicao" class="meta2.action.GoEscolherEleicaoParaRemover" method="execute">
       <result name="success">/escolherEleicaoParaRemover.jsp</result>
     </action>
 
     <action name="escolherEleicaoParaRemover" class="meta2.action.EscolherEleicaoParaRemover" method="execute">
       <result name="success">/escolherListaParaRemover.jsp</result>
+      <result name="input">/escolherEleicaoParaRemover.jsp</result>
     </action>
 
     <action name="escolherListaParaRemover" class="meta2.action.EscolherListaParaRemover" method="execute">
       <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/escolherListaParaRemover.jsp</result>
     </action>
 
+    <!-- CRIAR LISTA -->
+    <action name="goCriarLista" class="meta2.action.GoCriarEleicaoAction" method="execute"> <!-- Vamos a este pq queremos so as options -->
+      <result name="success">/criarLista.jsp</result>
+    </action>
+
+    <action name="criarLista" class="meta2.action.CriarLista" method="execute"> <!-- Vamos a este pq queremos so as options -->
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/criarLista.jsp</result>
+    </action>
+
+
+    <!-- REMOVER LISTA -->
+
+    <action name="goRemoverLista" class="meta2.action.GoAdicionarListaEleicao" method="execute"> <!-- Vamos a este buscar as listas atuais -->
+      <result name="success">/removerLista.jsp</result>
+    </action>
+
+    <action name="removerLista" class="meta2.action.RemoverLista" method="execute"> <!-- Vamos a este buscar as listas atuais -->
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/removerLista.jsp</result>
+    </action>
+
+    <!-- ADICIONAR USER A LISTA -->
+    <action name="goAddUserLista" class="meta2.action.GoAdicionarUserLista" method="execute"> <!-- Vamos a este buscar as listas atuais -->
+      <result name="success">/adicionarUserLista.jsp</result>
+    </action>
+
+    <action name="adicionarUser" class="meta2.action.AdicionarUserLista" method="execute"> <!-- Vamos a este buscar as listas atuais -->
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/adicionarUserLista.jsp</result>
+    </action>
+
+    <!-- REMOVER USER LISTA -->
+    <action name="goRemoverUserLista" class="meta2.action.GoAdicionarUserLista" method="execute">
+      <result name="success">/escolherListaParaRemoverUser.jsp</result>
+    </action>
+
+    <action name="escolherLista" class="meta2.action.EscolherListaParaRemoverUser" method="execute">
+      <result name="success">/removerUserLista.jsp</result>
+      <result name="input">/escolherListaParaRemoverUser.jsp</result>
+    </action>
+
+    <action name="removerUser" class="meta2.action.RemoverUserLista" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/removerUserLista.jsp</result>
+    </action>
 
   </package>
 

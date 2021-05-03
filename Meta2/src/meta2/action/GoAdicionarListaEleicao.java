@@ -23,12 +23,14 @@ public class GoAdicionarListaEleicao  extends ActionSupport implements SessionAw
         int counter = 0;
         ArrayList<String> s = this.getHeyBean().getEleicao();
         for (String a: s) {
-            listas.add(new radioOptions(String.valueOf(counter),a));
+            eleicoes.add(new radioOptions(String.valueOf(counter),a));
+            counter+=1;
         }
         counter = 0;
         ArrayList<String> s2 = this.getHeyBean().getListas();
         for (String a: s2) {
-            eleicoes.add(new radioOptions(String.valueOf(counter),a));
+            listas.add(new radioOptions(String.valueOf(counter),a));
+            counter+=1;
         }
         return SUCCESS;
     }

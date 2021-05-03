@@ -310,4 +310,18 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public ArrayList<String> listarListasEleicaoWEB(int n) throws java.rmi.RemoteException;
+
+    /**
+     * Funcao para dar print aos users
+     * @return String com informação dos utilizadores
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> printUsersWEB() throws java.rmi.RemoteException;
+
+    /**
+     * Lista users de uma lista
+     * @return ArrayLista com todas as listas guardadas
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getUserLista(int n) throws java.rmi.RemoteException;
 }

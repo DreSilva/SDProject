@@ -31,6 +31,9 @@ public class EscolherListaParaRemover extends ActionSupport implements SessionAw
                 listas.add(new radioOptions(String.valueOf(counter),a));
             }
         }
+        if(lista==null){
+            addFieldError("tError", "Lista é obrigatoria.");
+        }
     }
 
     @Override

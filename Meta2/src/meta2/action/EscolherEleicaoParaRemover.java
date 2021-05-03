@@ -37,6 +37,9 @@ public class EscolherEleicaoParaRemover extends ActionSupport implements Session
                 eleicoes.add(new radioOptions(String.valueOf(counter),a));
             }
         }
+        if(eleicao==null){
+            addFieldError("tError", "Eleição é obrigatorio.");
+        }
     }
 
     @Override
