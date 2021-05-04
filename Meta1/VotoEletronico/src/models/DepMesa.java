@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class DepMesa implements Serializable {
     public String departamento;
+    private static final long serialVersionUID = 4L;
     public long id;
 
     /**

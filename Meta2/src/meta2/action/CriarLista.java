@@ -5,6 +5,7 @@ import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,10 @@ public class CriarLista extends ActionSupport implements SessionAware {
     }
 
     @Override
-    public String execute(){
+    public String execute() throws RemoteException {
         this.getHeyBean().setTipo(tipo);
         this.getHeyBean().setNome(nome);
-        //TODO CRIAR LISTA;
+        this.getHeyBean().criarLista();
         return SUCCESS;
     }
 

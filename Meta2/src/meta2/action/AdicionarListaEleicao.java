@@ -56,12 +56,17 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
         if(lista==null){
             addFieldError("tError", "Lista é obrigatorio.");
         }
-        /*
-        if(lista already in eleicao){
-            addFieldError("tError", "Lista ja se encontra na eleição.");
+
+        if(lista!=null && eleicao!=null){
+            try {
+                if(this.getHeyBean().checkEleicaoLista(eleicao,lista)) {
+                    addFieldError("tError", "Lista ja se encontra na eleição.");
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
-         */
 
 
     }
@@ -70,6 +75,7 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
     public String execute() throws RemoteException {
         this.getHeyBean().setLista(lista);
         this.getHeyBean().setEleicao(eleicao);
+        this.getHeyBean().addListaEleicao();
         return SUCCESS;
     }
 
@@ -79,6 +85,14 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
 
     public void setLista(String lista) {
         this.lista = lista;
+    }
+
+    public List<radioOptions> getListas() {
+        return listas;
+    }
+
+    public List<radioOptions> getEleicoes() {
+        return eleicoes;
     }
 
     public HeyBean getHeyBean(){

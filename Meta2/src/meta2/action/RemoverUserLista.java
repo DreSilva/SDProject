@@ -35,7 +35,7 @@ public class RemoverUserLista extends ActionSupport implements SessionAware {
     @Override
     public String execute() throws RemoteException {
         for (String user: this.user) {
-            //CODIGO PARA REMOVER AQUI
+            this.getHeyBean().removerUserLista(Integer.parseInt(user));
         }
         return SUCCESS;
     }

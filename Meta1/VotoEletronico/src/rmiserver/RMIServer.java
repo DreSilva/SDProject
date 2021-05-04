@@ -6,6 +6,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import java.net.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Comparator;
@@ -27,7 +28,7 @@ class Global{
             rmiServer = new RMIServer();
             voto = new RMIServer();
         } catch (RemoteException e) {
-           //StackTrace();
+           e.printStackTrace();
         }
     }
 }
@@ -576,7 +577,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void removeUserList(Lista lista, User user) throws java.rmi.RemoteException{
+    public void removeUserList(Lista lista,int count) throws java.rmi.RemoteException{
         Lista lista1=null;
 
         for (Lista lista2: listas) {
@@ -585,12 +586,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             }
         }
 
-        User user1 = null;
-        for (User user2: lista1.lista) {
-            if(user2.equals(user)){
-                user1 = user2;
-            }
-        }
+        User user1 = lista1.lista.get(count);
 
         lista1.removeUser(user1);
     }
@@ -917,6 +913,35 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         return s;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public ArrayList<String> getEleicaoInfo(int n) throws java.rmi.RemoteException{
+        Eleicao eleicao = getEleicao(n);
+        ArrayList<String> s = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        s.add(eleicao.titulo);
+        s.add(eleicao.descricao);
+        s.add(eleicao.tipo);
+        s.add(formatter.format(eleicao.inicio));
+        s.add(formatter.format(eleicao.fim));
+        return s;
+
+    }
+    /**
+     * @inheritDoc
+     */
+    public boolean checkListaEleicao(int nEleicao,int nLista) throws RemoteException{
+        Eleicao eleicao = eleicoes.get(nEleicao);
+        Lista lista = listas.get(nLista);
+        for (Lista l: eleicao.listas) {
+            if(l.equals(lista)){
+                return true;
+            }
+        }
+        return false;
+    }
     // ========================================================= Ler config
     /**
      * Abre o ficheiro de config para leitura
@@ -957,6 +982,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         serverAddress =  prop.getProperty("RMIAddress");
 
     }
+
+
 
     // ======================================================== Main
 
@@ -1018,4 +1045,5 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             System.out.println("Exception in HelloServer.main: " + re);
         }
     }
+
 }

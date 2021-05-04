@@ -39,9 +39,9 @@ public class RemoverLista extends ActionSupport implements SessionAware {
     }
 
     @Override
-    public String execute(){
-        this.getHeyBean().setTipo(lista);
-        //TODO CRIAR LISTA;
+    public String execute() throws RemoteException {
+        this.getHeyBean().setLista(lista);
+        this.getHeyBean().removeLista();
         return SUCCESS;
     }
 
@@ -52,7 +52,6 @@ public class RemoverLista extends ActionSupport implements SessionAware {
     public void setLista(String lista) {
         this.lista = lista;
     }
-
 
     public HeyBean getHeyBean(){
         if(!session.containsKey("heyBean"))

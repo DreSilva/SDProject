@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import models.Eleicao;
+import models.Lista;
 import models.User;
 import rmiserver.Voto;
 
@@ -175,11 +176,60 @@ public class HeyBean {
 		this.server.registoUser(this.username,this.password,this.departamento,this.contacto,this.tipo,this.morada,this.CC,this.dataValidade);
 	}
 
+	public ArrayList<String> getEleicaoInfo() throws RemoteException{
+		return this.server.getEleicaoInfo(Integer.parseInt(this.eleicao));
+	}
+
 	public ArrayList<String> getUsers() throws RemoteException{
 		return this.server.printUsersWEB();
 	}
 
 	public ArrayList<String> getUsersList() throws RemoteException{
 		return this.server.getUserLista(Integer.parseInt(lista));
+	}
+
+	public boolean checkEleicaoLista(String eleicao,String lista) throws RemoteException{
+		return this.server.checkListaEleicao(Integer.parseInt(eleicao),Integer.parseInt(lista));
+	}
+
+	public void addListaEleicao() throws RemoteException{
+		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
+		Lista lista = this.server.getLista(Integer.parseInt(this.lista));
+		this.server.addListaEleicao(eleicao,lista);
+	}
+
+	public void removerListaEleicao() throws RemoteException{
+		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
+		this.server.removeListaEleicao(eleicao,Integer.parseInt(this.lista));
+	}
+
+	public void criarLista() throws RemoteException{
+		Lista lista = new Lista(this.nome,this.tipo);
+		this.server.addLista(lista);
+	}
+
+	public void removeLista() throws RemoteException{
+		Lista l = this.server.getLista(Integer.parseInt(this.lista));
+		this.server.removeLista(l);
+	}
+
+	public void addUserLista(int nUser) throws RemoteException{
+		User user= this.server.getUser(nUser);
+		Lista lista = this.server.getLista(Integer.parseInt(this.lista));
+		this.server.addUserList(user,lista);
+	}
+
+	public void removerUserLista(int nUser) throws RemoteException{
+		Lista lista = this.server.getLista(Integer.parseInt(this.lista));
+		this.server.removeUserList(lista,nUser);
+	}
+
+	public void editarEleicao() throws RemoteException{
+		//TODO VER PQ EQ SO DA PARA ALTERAR 1 DE CADA VEZ E SOMAR MAIS 12H NA HORA CASO >12
+		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
+		this.server.setDescricao(this.descricao,eleicao);
+		this.server.setTipo(this.tipo,eleicao);
+		this.server.setTitulo(this.titulo,eleicao);
+		this.server.setDatas(this.dataInicial,this.dataFinal,eleicao);
 	}
 }

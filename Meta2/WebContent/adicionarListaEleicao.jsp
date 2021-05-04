@@ -8,8 +8,10 @@
 <body>
 <s:form action="adicionarListaEleicao" method="post">
     <s:fielderror name="tError"/>
+    <s:text name="Lista a Adicionar"/>
     <s:radio label="Lista" name="lista" list="listas"
              listKey="key" listValue="value"/><br>
+    <s:text name="Eleição a Adicionar Lista"/>
     <s:radio label="Eleição" name="eleicao" list="eleicoes"
              listKey="key" listValue="value" value="Estudante" /><br>
 

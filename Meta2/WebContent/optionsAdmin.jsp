@@ -18,5 +18,9 @@
     <button value="gerirLista" type="submit" name="gerirLista">Gerir Lista</button>
 </s:form>
 
+<s:form action="goEditarEleicao" method="post">
+    <button value="editarEleicao" type="submit" name="editarEleicao">Editar Eleição</button>
+</s:form>
+
 </body>
 </html>

@@ -11,6 +11,7 @@ import java.util.Map;
 public class User implements Serializable {
     public String user,password,departamento,contacto,tipo,morada,CC;
     public Date validade;
+    private static final long serialVersionUID = 4L;
     public Map<Eleicao,String> localVoto = new HashMap<>();
 
 

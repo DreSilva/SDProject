@@ -29,6 +29,7 @@ public class EscolherListaParaRemover extends ActionSupport implements SessionAw
             }
             for (String a: s2) {
                 listas.add(new radioOptions(String.valueOf(counter),a));
+                counter+=1;
             }
         }
         if(lista==null){
@@ -39,11 +40,13 @@ public class EscolherListaParaRemover extends ActionSupport implements SessionAw
     @Override
     public String execute() throws RemoteException {
         this.getHeyBean().setLista(lista);
-        //TODO REMOVER LISTA
+        this.getHeyBean().removerListaEleicao();
         return SUCCESS;
     }
 
-
+    public void setLista(String lista) {
+        this.lista = lista;
+    }
 
     public List<radioOptions> getListas() {
         return listas;

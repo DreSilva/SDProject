@@ -8,6 +8,7 @@ import java.util.Date;
  * Classe para cada Lista de eleição
  */
 public class Lista implements Serializable {
+    private static final long serialVersionUID = 4L;
     ArrayList<User> lista = new ArrayList<>();
     String nome;
     String tipo;

@@ -11,6 +11,7 @@ public class Lista implements Serializable {
     public ArrayList<User> lista = new ArrayList<>();
     public String nome;
     public String tipo;
+    private static final long serialVersionUID = 4L;
     public long idofList;
 
     /**

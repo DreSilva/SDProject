@@ -467,8 +467,7 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
                                             do {
                                                 n3 = Integer.parseInt(readInput.nextLine());
                                                 if (n3 != 0) {
-                                                    user = votoObj.getUser(n3 - 1);
-                                                    votoObj.removeUserList(lista, user);
+                                                    votoObj.removeUserList(lista, n3 - 1);
                                                 }
                                             } while (n3 != 0);
                                         }

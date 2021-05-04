@@ -43,6 +43,7 @@ public class AdicionarUserLista extends ActionSupport implements SessionAware {
             }
             for (String a: s2) {
                 users.add(new radioOptions(String.valueOf(counter),a));
+                counter+=1;
             }
         }
         if(lista==null){
@@ -56,9 +57,9 @@ public class AdicionarUserLista extends ActionSupport implements SessionAware {
 
     @Override
     public String execute() throws RemoteException {
-        //TODO FALTA ADICIONAR OS USERS
+        this.getHeyBean().setLista(lista);
         for (String s: user) {
-            //fazer aqui o codigo para adicionar
+            this.getHeyBean().addUserLista(Integer.parseInt(s));
         }
 
         return SUCCESS;

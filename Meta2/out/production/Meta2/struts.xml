@@ -153,6 +153,21 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result name="input">/removerUserLista.jsp</result>
     </action>
 
+
+    <!-- EDITAR ELEICAO -->
+    <action name="goEditarEleicao" class="meta2.action.GoAdicionarListaEleicao" method="execute"> <!-- Vamos a este buscar as eleicoes -->
+      <result name="success">/selecionarEleicaoEditar.jsp</result>
+    </action>
+
+    <action name="selecionarEleicaoEditar" class="meta2.action.GoEditarEleicao" method="execute">
+      <result name="success">/editarEleicao.jsp</result>
+    </action>
+
+    <action name="editarEleicao" class="meta2.action.EditarEleicao" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/editarEleicao.jsp</result>
+    </action>
+
   </package>
 
 </struts>

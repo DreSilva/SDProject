@@ -149,10 +149,10 @@ public interface Voto extends Remote {
     /**
      * Remover um utilizador de uma lista
      * @param lista Lista selecionada para remover
-     * @param user user para remover da lista
+     * @param nUser user para remover da lista
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void removeUserList(Lista lista,User user) throws java.rmi.RemoteException;
+    public void removeUserList(Lista lista,int nUser) throws java.rmi.RemoteException;
 
     /**
      * Lista todas as eleições que ja pasaram
@@ -324,4 +324,19 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public ArrayList<String> getUserLista(int n) throws java.rmi.RemoteException;
+
+    /**
+     * Retorna informacao sobre eleição selecionada
+     * @return ArrayLista com as informações da eleição
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getEleicaoInfo(int n) throws java.rmi.RemoteException;
+
+    /**
+     * Checa se a lista esta na eleição ou nao
+     * @param nEleicao indice da eleicao a checar
+     * @param nLista indice da lista a verificar
+     * @return Se existe ou nao
+     */
+    public boolean checkListaEleicao(int nEleicao,int nLista) throws RemoteException;
 }

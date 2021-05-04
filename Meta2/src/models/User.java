@@ -9,6 +9,7 @@ import java.util.Map;
  * Class que corresponde a cada utilizador assim como os seus atributos necessários
  */
 public class User implements Serializable {
+    private static final long serialVersionUID = 4L;
     String user,password,departamento,contacto,tipo,morada,CC;
     Date validade;
     Map<Eleicao,String> localVoto = new HashMap<>();

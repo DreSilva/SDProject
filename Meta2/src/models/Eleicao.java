@@ -8,6 +8,7 @@ import java.util.Date;
  * Classe com todos os atributos necessários para uma eleição
  */
 public class Eleicao implements Serializable {
+    private static final long serialVersionUID = 4L;
     Date inicio,fim;
     String titulo,descricao,tipo;
     int votos;

@@ -35,6 +35,7 @@ public class EscolherEleicaoParaRemover extends ActionSupport implements Session
             }
             for (String a: s2) {
                 eleicoes.add(new radioOptions(String.valueOf(counter),a));
+                counter+=1;
             }
         }
         if(eleicao==null){
@@ -51,6 +52,7 @@ public class EscolherEleicaoParaRemover extends ActionSupport implements Session
         ArrayList<String> s2 = this.getHeyBean().getListasEleicao();
         for (String a: s2) {
             listas.add(new radioOptions(String.valueOf(counter),a));
+            counter+=1;
         }
         return SUCCESS;
     }
