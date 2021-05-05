@@ -511,7 +511,6 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             if(eleicao.equals(eleicao1)){
                 eleicao1.setDescicao(Descricao);
             }
-
         }
     }
 
@@ -519,6 +518,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      * @inheritDoc
      */
     public void setDatas(Date dataI, Date dataf, Eleicao eleicao) throws java.rmi.RemoteException{
+
         for (Eleicao eleicao1: eleicoes) {
             if(eleicao.equals(eleicao1)){
                 eleicao1.setInicio(dataI);
@@ -537,6 +537,21 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                 eleicao1.setTipo(Tipo);
             }
 
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void changeEleicao(String Tipo,Date dataI, Date dataf,String Descricao,String titulo,Eleicao eleicao) throws java.rmi.RemoteException {
+        for (Eleicao eleicao1 : eleicoes) {
+            if (eleicao.equals(eleicao1)) {
+                eleicao1.setInicio(dataI);
+                eleicao1.setFim(dataf);
+                eleicao1.setTipo(Tipo);
+                eleicao1.setDescicao(Descricao);
+                eleicao1.setTitulo(titulo);
+            }
         }
     }
 
@@ -920,7 +935,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public ArrayList<String> getEleicaoInfo(int n) throws java.rmi.RemoteException{
         Eleicao eleicao = getEleicao(n);
         ArrayList<String> s = new ArrayList<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         s.add(eleicao.titulo);
         s.add(eleicao.descricao);
         s.add(eleicao.tipo);

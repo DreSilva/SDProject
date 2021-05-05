@@ -225,11 +225,7 @@ public class HeyBean {
 	}
 
 	public void editarEleicao() throws RemoteException{
-		//TODO VER PQ EQ SO DA PARA ALTERAR 1 DE CADA VEZ E SOMAR MAIS 12H NA HORA CASO >12
 		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
-		this.server.setDescricao(this.descricao,eleicao);
-		this.server.setTipo(this.tipo,eleicao);
-		this.server.setTitulo(this.titulo,eleicao);
-		this.server.setDatas(this.dataInicial,this.dataFinal,eleicao);
+		this.server.changeEleicao(tipo,dataInicial,dataFinal,descricao,titulo,eleicao);
 	}
 }

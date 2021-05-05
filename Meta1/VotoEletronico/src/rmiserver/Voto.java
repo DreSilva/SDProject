@@ -343,4 +343,17 @@ public interface Voto extends Remote {
      * @return Se existe ou nao
      */
     public boolean checkListaEleicao(int nEleicao,int nLista) throws RemoteException;
+
+
+    /**
+     * Alterar Eleicao
+     * @param Tipo novo tipo da eleicao
+     * @param dataI nova data inicial
+     * @param dataf nova data final
+     * @param Descricao nova descricao
+     * @param titulo novo titulo
+     * @param eleicao eleicao a mudar
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public void changeEleicao(String Tipo,Date dataI, Date dataf,String Descricao,String titulo,Eleicao eleicao) throws java.rmi.RemoteException;
 }
