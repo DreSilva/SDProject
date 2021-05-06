@@ -41,12 +41,24 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result>/login.jsp</result>
     </action>
 
-    <!-- 'login' action calls 'execute' in 'LoginAction' -->
+    <!-- VOTAR ACTIONS -->
     <action name="login" class="meta2.action.LoginAction" method="execute">
       <result name="success">/votar.jsp</result>
       <result name="login">/login.jsp</result>
     </action>
 
+    <action name="escolherListaVotar" class="meta2.action.EscolherListaVotar" method="execute">
+      <result name="success">/escolherListaVotar.jsp</result>
+      <result name="input">/votar.jsp</result>
+    </action>
+
+    <action name="doVoto" class="meta2.action.Votar" method="execute">
+      <result name="success">/index.jsp</result>
+      <result name="input">/escolherListaVotar.jsp</result>
+    </action>
+
+
+    <!-- ADMIN ACTIONS -->
 
     <action name="adminLogin" class="meta2.action.AdminLoginAction" method="execute">
       <result name="success">/optionsAdmin.jsp</result>
@@ -54,7 +66,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     </action>
 
 
-    <!-- ADMIN ACTIONS -->
+
 
     <!-- CRIAR ELEICAO -->
     <action name="goCriarEleicao" class="meta2.action.GoCriarEleicaoAction" method="execute">

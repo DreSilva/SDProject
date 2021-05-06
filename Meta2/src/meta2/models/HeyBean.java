@@ -92,6 +92,7 @@ public class HeyBean {
 		return username;
 	}
 
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
@@ -259,5 +260,13 @@ public class HeyBean {
 
 	public String getInfoEleicaoVelhas() throws RemoteException{
 		return this.server.getInfoEleicaoVelha(Integer.parseInt(this.eleicao));
+	}
+
+	public void votar() throws RemoteException{
+		this.server.votarOnline(Integer.parseInt(this.lista),this.CC,Integer.parseInt(this.eleicao));
+	}
+
+	public int checkVotar() throws RemoteException{
+		return this.server.checkVotoWeb(this.CC, Integer.parseInt(eleicao));
 	}
 }

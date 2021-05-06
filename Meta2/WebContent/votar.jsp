@@ -10,7 +10,13 @@
 </head>
 <body>
 
-<h1>ENTREI AQUI SUAS PUTAS</h1>
+<s:form action="escolherListaVotar" method="post">
+    <s:fielderror name="tError"/>
+    <s:text name="Eleição Para Votar"/>
+    <s:radio label="Eleição" name="eleicao" list="eleicoes"
+             listKey="key" listValue="value" value="Estudante" /><br>
+    <s:submit onclick=""/>
+</s:form>
 
 </body>
 </html>

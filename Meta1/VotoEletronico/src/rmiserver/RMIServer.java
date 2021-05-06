@@ -795,7 +795,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             if(user.tipo.equals(eleicao.tipo)){
                 user.addVoto(eleicao,mesa.departamento+" "+date.toString());
                 eleicao.addVoto(opcao);
-                return "rmiserver.Voto com sucesso";
+                return "Voto com sucesso";
             }
             else{
                 return "User nao pode votar nesta eleicao, e para uma funcao diferente!";
@@ -804,6 +804,77 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         else{
             return "O utilizador nao pode votar nesta mesa";
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException {
+        User user = null;
+        DepMesa mesa = mesasVoto.get(0);
+        Date date = new Date();
+        for (User userS:users) {
+            if(userS.CC.equals(CC)){
+                user = userS;
+                break;
+            }
+        }
+        Eleicao eleicao = eleicoes.get(nEleicao);
+        user.addVoto(eleicao,mesa.departamento+" "+date.toString());
+        eleicao.addVoto(opcao);
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public int checkVotoWeb(String CC, int nEleicao) throws java.rmi.RemoteException{
+        DepMesa mesa = mesasVoto.get(0);
+        User user = null;
+        for (User userS:users) {
+            if(userS.CC.equals(CC)){
+                user = userS;
+                break;
+            }
+        }
+        Eleicao eleicao = eleicoes.get(nEleicao);
+
+        Date date = new Date();
+
+        if(eleicao.inicio.after(date)){
+            return 0;
+            //return "A votacao nesta eleicao ainda nao comecou";
+        }
+
+        int flag=0;
+        for (DepMesa mesaEleicao: eleicao.maquinasVotacao) {
+            if(mesaEleicao.equals(mesa)){
+                flag=1;
+                break;
+            }
+        }
+
+        if(flag==0){
+            return 1;
+           // return "Esta mesa nao se encontra registada para esta eleicao";
+        }
+
+        for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
+            if (entry.getKey().equals(eleicao)){
+                return 2;
+                //return "Utilizador ja votou nesta eleicao!";
+            }
+        }
+
+
+        if(user.departamento.equals(mesa.departamento)){
+            if(!user.tipo.equals(eleicao.tipo)){
+                //return "User nao pode votar nesta eleicao, e para uma funcao diferente!";
+                return 3;
+            }
+        }
+        return -1;
     }
 
     /**
