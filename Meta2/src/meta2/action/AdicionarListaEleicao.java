@@ -17,8 +17,6 @@ public class AdicionarListaEleicao extends ActionSupport implements SessionAware
     private List<radioOptions> eleicoes;
     private String eleicao,lista;
 
-    //TODO POR A LISTA NA ELEICAO E VERIFICAR SE ELA NAO ESTA JA LA
-
     @Override
     public void validate() {
         if(listas==null){

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
+import models.DepMesa;
 import models.Eleicao;
 import models.Lista;
 import models.User;
@@ -148,7 +149,7 @@ public class HeyBean {
 	}
 
 	public void setEleicao(String eleicao) {
-		this.eleicao = eleicao;
+		this.eleicao = eleicao; //TODO PERGUNTAR AO STOR SE TENHO DE MUDAR ISTO DO SETELEICAO
 	}
 
 	public boolean checkUserExists() throws RemoteException{
@@ -227,5 +228,36 @@ public class HeyBean {
 	public void editarEleicao() throws RemoteException{
 		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
 		this.server.changeEleicao(tipo,dataInicial,dataFinal,descricao,titulo,eleicao);
+	}
+
+	public ArrayList<String> listarMesas() throws RemoteException{
+		return this.server.listaMaquinaWEB();
+	}
+
+	public void addMesaEleicao(int nMesa) throws RemoteException{
+		DepMesa mesa = this.server.getMesa(nMesa);
+		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
+		this.server.addMesaEleicao(mesa,eleicao);
+	}
+
+	public ArrayList<String> getMesasEleicao() throws RemoteException{
+		return this.server.listaMaquinaEleicao(Integer.parseInt(this.eleicao));
+	}
+
+	public void removeMesaEleicao(int nMesa) throws RemoteException{
+		Eleicao eleicao = this.server.getEleicao(Integer.parseInt(this.eleicao));
+		this.server.removeMesaEleicao(nMesa,eleicao);
+	}
+
+	public ArrayList<String> getDepartamentos() throws RemoteException{
+		return this.server.getDepartamentos();
+	}
+
+	public ArrayList<String> getEleicoesVelhas() throws RemoteException{
+		return this.server.getEleicoesVelhasWeb();
+	}
+
+	public String getInfoEleicaoVelhas() throws RemoteException{
+		return this.server.getInfoEleicaoVelha(Integer.parseInt(this.eleicao));
 	}
 }

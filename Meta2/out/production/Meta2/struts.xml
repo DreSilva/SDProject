@@ -168,6 +168,47 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result name="input">/editarEleicao.jsp</result>
     </action>
 
+    <!-- GERIR MESAS VOTO -->
+    <action name="goGerirMesasVoto" class="meta2.action.GoAdicionarListaEleicao" method="execute"> <!-- Vamos a este buscar as eleicoes -->
+      <result name="success">/escolherEleicaoGerirMessas.jsp</result>
+    </action>
+
+    <action name="escolherListaGerir" class="meta2.action.EscolherEleicaoGerir" method="execute">
+      <result name="success">/escolherOpcaoMesa.jsp</result>
+    </action>
+
+
+    <!-- ADICIONAR MESA DE VOTO A ELEICAO -->
+    <action name="goAdicionarMesa" class="meta2.action.ListarMesas" method="execute">
+      <result name="success">/adicionarMesaEleicao.jsp</result>
+    </action>
+
+    <action name="addMesaEleicao" class="meta2.action.AddMesaEleicao" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/adicionarMesaEleicao.jsp</result>
+    </action>
+
+
+    <!-- REMOVER MESA DE VOTO A ELEICAO -->
+    <action name="goRemoverMesa" class="meta2.action.ListaMesasEleicao" method="execute">
+      <result name="success">/removerMesaEleicao.jsp</result>
+    </action>
+
+    <action name="removeMesaEleicao" class="meta2.action.RemoveMesasEleicao" method="execute">
+      <result name="success">/optionsAdmin.jsp</result>
+      <result name="input">/removerMesaEleicao.jsp</result>
+    </action>
+
+    <!-- OBTER INFORMACAO ELEICAO PASSADA-->
+    <action name="goObterInformacaoPassada" class="meta2.action.EscolherEleicaoPassada" method="execute"> <!-- Vamos a este buscar as eleicoes -->
+      <result name="success">/escolherEleicaoPassada.jsp</result>
+    </action>
+
+    <action name="escolherEleicaoPassada" class="meta2.action.InfoEleicaoVelha" method="execute">
+      <result name="success">/infoEleicaoVelha.jsp</result>
+      <result name="input">/escolherEleicaoPassada.jsp</result>
+    </action>
+
   </package>
 
 </struts>

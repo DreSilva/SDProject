@@ -352,4 +352,34 @@ public interface Voto extends Remote {
      */
     public void changeEleicao(String Tipo,Date dataI, Date dataf,String Descricao,String titulo,Eleicao eleicao) throws java.rmi.RemoteException;
 
+
+    /**
+     * Listar Maquinas existentes para a WEB
+     * @return array de listas para a web
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listaMaquinaWEB() throws java.rmi.RemoteException;
+
+    /**
+     * Listar Maquinas existentes a uma eleicao
+     * @return array de maquias pertencentes a eleicao
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listaMaquinaEleicao(int n) throws java.rmi.RemoteException;
+
+
+    /**
+     *  Obter os departamentos
+     * @return Retorna os departamentos
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getDepartamentos() throws java.rmi.RemoteException;
+
+
+    /**
+     * Lista todas as eleições que ja pasaram
+     * @return String com informação sobre as eleições passadas
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getEleicoesVelhasWeb() throws  java.rmi.RemoteException;
 }

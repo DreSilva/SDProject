@@ -22,5 +22,13 @@
     <button value="editarEleicao" type="submit" name="editarEleicao">Editar Eleição</button>
 </s:form>
 
+<s:form action="goGerirMesasVoto" method="post">
+    <button value="gerirMesas" type="submit" name="gerirMesas">Gerir Mesas de Voto</button>
+</s:form>
+
+<s:form action="goObterInformacaoPassada" method="post">
+    <button value="gerirMesas" type="submit" name="gerirMesas">Informação Eleição Passada</button>
+</s:form>
+
 </body>
 </html>

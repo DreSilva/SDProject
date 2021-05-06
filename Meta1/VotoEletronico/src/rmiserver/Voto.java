@@ -47,7 +47,7 @@ public interface Voto extends Remote {
 
     /**
      * Função que vai efetuar o voto do utilizador
-     * @param opcao models.Lista a votar
+     * @param opcao Lista a votar
      * @param CC Cartao de Cidadao do utilizador
      * @param nEleicao Eleição a selecionar
      * @param mesa Mesa de voto onde se votou
@@ -57,14 +57,14 @@ public interface Voto extends Remote {
     public String votar(int opcao,String CC,int nEleicao, DepMesa mesa) throws java.rmi.RemoteException;
 
     /**
-     * models.Lista todas as eleições diponiveis para votar
+     * Lista todas as eleições diponiveis para votar
      * @return String com as eleições
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public String listarEleicoes() throws java.rmi.RemoteException;
 
     /**
-     * Retorna models.Eleicao selecionada
+     * Retorna Eleicao selecionada
      * @param n numero da opção a retornar
      * @return eleicao selecionada
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
@@ -79,7 +79,7 @@ public interface Voto extends Remote {
     public String listarListas() throws java.rmi.RemoteException;
 
     /**
-     * Retorna models.Lista selecionada
+     * Retorna Lista selecionada
      * @param n numero da opção a retornar
      * @return lista selecionada
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
@@ -87,7 +87,7 @@ public interface Voto extends Remote {
     public Lista getLista(int n) throws java.rmi.RemoteException;
 
     /**
-     * Adiciona models.Lista a BD
+     * Adiciona Lista a BD
      * @param lista lista a adicionar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
@@ -134,7 +134,7 @@ public interface Voto extends Remote {
 
     /**
      * Adiciona um utilizador a uma lista de eleições
-     * @param user models.User a adicionar
+     * @param user User a adicionar
      * @param lista lista a adicionar utilizador
      * @return Mensagem sobre sucesso ou falha de adicionar o user
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
@@ -150,14 +150,14 @@ public interface Voto extends Remote {
 
     /**
      * Remover um utilizador de uma lista
-     * @param lista models.Lista selecionada para remover
+     * @param lista Lista selecionada para remover
      * @param nUser user para remover da lista
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void removeUserList(Lista lista, int nUser) throws java.rmi.RemoteException;
 
     /**
-     * models.Lista todas as eleições que ja pasaram
+     * Lista todas as eleições que ja pasaram
      * @return String com informação sobre as eleições passadas
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
@@ -197,7 +197,7 @@ public interface Voto extends Remote {
      * Mudar as datas de uma eleição
      * @param dataI Data inicio
      * @param dataf Data fim
-     * @param eleicao models.Eleicao a mudar
+     * @param eleicao Eleicao a mudar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void setDatas(Date dataI, Date dataf, Eleicao eleicao) throws java.rmi.RemoteException;
@@ -214,7 +214,7 @@ public interface Voto extends Remote {
     /**
      * Listar elementos de uma lista
      * @param lista lista a listar elementos
-     * @return models.Lista dos elemtnos
+     * @return Lista dos elemtnos
      * @throws java.rmi.RemoteException
      */
     public String listarLista(Lista lista) throws  java.rmi.RemoteException;
@@ -253,7 +253,7 @@ public interface Voto extends Remote {
     /**
      * Adiciona uma mesa de voto a uma eleicao
      * @param Mesa Mesa a adicionar
-     * @param eleicao models.Eleicao a ser adicionada mesa
+     * @param eleicao Eleicao a ser adicionada mesa
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public String addMesaEleicao(DepMesa Mesa, Eleicao eleicao) throws  java.rmi.RemoteException;
@@ -261,15 +261,15 @@ public interface Voto extends Remote {
     /**
      * Remove uma mesa de voto a uma eleicao
      * @param opcao Mesa a adicionar
-     * @param eleicao models.Eleicao a ser adicionada mesa
+     * @param eleicao Eleicao a ser adicionada mesa
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void removeMesaEleicao(int opcao, Eleicao eleicao) throws  java.rmi.RemoteException;
 
     /**
-     * models.Lista as mesas nos departamentos
+     * Lista as mesas nos departamentos
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
-     * @return models.Lista das mesas
+     * @return Lista das mesas
      */
     public String listaMaquina() throws java.rmi.RemoteException;
 
@@ -356,4 +356,33 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void changeEleicao(String Tipo,Date dataI, Date dataf,String Descricao,String titulo,Eleicao eleicao) throws java.rmi.RemoteException;
+
+
+    /**
+     * Listar Maquinas existentes para a WEB
+     * @return array de listas para a web
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listaMaquinaWEB() throws java.rmi.RemoteException;
+
+    /**
+     * Listar Maquinas existentes a uma eleicao
+     * @return array de maquias pertencentes a eleicao
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> listaMaquinaEleicao(int n) throws java.rmi.RemoteException;
+
+    /**
+     *  Obter os departamentos
+     * @return Retorna os departamentos
+     * @throws java.rmi.RemoteException java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getDepartamentos() throws java.rmi.RemoteException;
+
+    /**
+     * Lista todas as eleições que ja pasaram
+     * @return String com informação sobre as eleições passadas
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getEleicoesVelhasWeb() throws  java.rmi.RemoteException;
 }

@@ -30,9 +30,15 @@ public class RegistarPessoaAction extends ActionSupport implements SessionAware 
 
         if(departamentos==null){
             departamentos = new ArrayList<radioOptions>();
-            departamentos.add(new radioOptions("DEI", "DEI") );
-            departamentos.add(new radioOptions("DEEC", "DEEC") );
-            departamentos.add(new radioOptions("DEM", "DEM") );
+            ArrayList<String> s = null;
+            try {
+                s = this.getHeyBean().getDepartamentos();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            for (String dep: s) {
+                departamentos.add(new radioOptions(dep,dep));
+            }
         }
 
         if(user.equals("") ){

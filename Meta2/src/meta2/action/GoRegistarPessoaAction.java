@@ -1,9 +1,11 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
+import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,20 +17,29 @@ public class GoRegistarPessoaAction extends ActionSupport implements SessionAwar
     private List<radioOptions> departamentos;
 
     @Override
-    public String execute(){
+    public String execute() throws RemoteException {
         tipos = new ArrayList<radioOptions>();
         tipos.add( new radioOptions("Estudante", "Estudante") );
         tipos.add( new radioOptions("Docente", "Docente") );
         tipos.add( new radioOptions("Funcionario", "Funcionario") );
-        //MUDAR ISTO PARA LER DO FICHEIRO
-        departamentos = new ArrayList<radioOptions>();
-        departamentos.add(new radioOptions("DEI", "DEI") );
-        departamentos.add(new radioOptions("DEEC", "DEEC") );
-        departamentos.add(new radioOptions("DEM", "DEM") );
+        departamentos=new ArrayList<>();
+        ArrayList<String> s = this.getHeyBean().getDepartamentos();
+        for (String dep: s) {
+            departamentos.add(new radioOptions(dep,dep));
+        }
         return SUCCESS;
     }
 
 
+    public HeyBean getHeyBean(){
+        if(!session.containsKey("heyBean"))
+            this.setHeyBean(new HeyBean());
+        return (HeyBean) session.get("heyBean");
+    }
+
+    public void setHeyBean(HeyBean heyBean) {
+        this.session.put("heyBean", heyBean);
+    }
     public List<radioOptions> getTipos() {
         return tipos;
     }

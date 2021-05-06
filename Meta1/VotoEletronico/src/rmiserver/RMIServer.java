@@ -161,6 +161,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<DepMesa> mesasVoto = new CopyOnWriteArrayList<>();
+    public static ArrayList<String> departamentos = new ArrayList<>();
     private static int portoRMI;
     private static String serverAddress;
 
@@ -673,6 +674,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return info.toString();
     }
 
+
     /**
      * @inheritDoc
      */
@@ -684,6 +686,18 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             counter+=1;
         }
         return  votacoes.toString();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public ArrayList<String> getEleicoesVelhasWeb() throws  java.rmi.RemoteException{
+        ArrayList<String> votacoes = new ArrayList<>();
+
+        for (Eleicao eleicao:eleicoesVelhas) {
+            votacoes.add(eleicao.titulo);
+        }
+        return  votacoes;
     }
 
     /**
@@ -806,6 +820,10 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         mesasVoto.add(mesa);
         return "";
+    }
+
+    public ArrayList<String> getDepartamentos() throws java.rmi.RemoteException{
+        return departamentos;
     }
 
     /**
@@ -957,6 +975,23 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         return false;
     }
+
+    public ArrayList<String> listaMaquinaWEB() throws java.rmi.RemoteException{
+        ArrayList<String> s = new ArrayList<>();
+        for (DepMesa mesa: mesasVoto) {
+            s.add("Id: "+mesa.id+" Dep:"+mesa.departamento);
+        }
+        return s;
+    }
+
+    public ArrayList<String> listaMaquinaEleicao(int n) throws java.rmi.RemoteException{
+        Eleicao eleicao = eleicoes.get(n);
+        ArrayList<String> s = new ArrayList<>();
+        for (DepMesa mesa:eleicao.maquinasVotacao) {
+            s.add("Id: "+mesa.id+" Dep:"+mesa.departamento);
+        }
+        return s;
+    }
     // ========================================================= Ler config
     /**
      * Abre o ficheiro de config para leitura
@@ -995,6 +1030,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         String portoUDPSring = prop.getProperty("portoUDP");
         Global.portoUDP = Integer.parseInt(portoUDPSring);
         serverAddress =  prop.getProperty("RMIAddress");
+        String deps = prop.getProperty("departamento");
+        String[] depsSplit = deps.split(",");
+        departamentos.addAll(Arrays.asList(depsSplit));
 
     }
 
@@ -1017,6 +1055,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
         DatagramSocket aSocket = null;
         boolean primario = false;
+        DepMesa mesa = new DepMesa("web",-30506049);
+        mesasVoto.add(mesa);
 
 
         try{
