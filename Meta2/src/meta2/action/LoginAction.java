@@ -4,6 +4,7 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
+import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
@@ -11,7 +12,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import meta2.models.HeyBean;
 
 public class LoginAction extends ActionSupport implements SessionAware {
 	private static final long serialVersionUID = 4L;
@@ -61,7 +61,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
 		this.CC = CC;
 	}
 
-	public HeyBean getHeyBean(){
+	public HeyBean getHeyBean() throws RemoteException {
 		if(!session.containsKey("heyBean"))
 			this.setHeyBean(new HeyBean());
 		return (HeyBean) session.get("heyBean");

@@ -39,6 +39,10 @@ public class AdminConsole extends UnicastRemoteObject implements Notifications {
         System.out.println("Mesa: "+num+" Dep: "+dep+" Estado: "+estado);
     }
 
+    public void estadoUser(String user,String estado) throws java.rmi.RemoteException{
+        System.out.println("User: "+user+" Estado:"+estado);
+    }
+
     /**
      * @inheritDoc
      */

@@ -228,6 +228,14 @@ public interface Voto extends Remote {
 
 
     /**
+     * Adiciona a class do Admin Console para ser possivel enviar notificações
+     * @param nAdmin admin console para a qual se quer enviar notificações
+     * @throws RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public void subscribeAdmin(Notifications nAdmin) throws java.rmi.RemoteException;
+
+
+    /**
      * Adicionar mesa de voto
      * @param mesa Mesa a adicionar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
@@ -402,4 +410,12 @@ public interface Voto extends Remote {
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
     public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException;
+
+
+    /**
+     * Obter utilizadores online
+     * @return ArrayLista com Nome dos utilziadores loggedin
+     * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
+     */
+    public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException;
 }

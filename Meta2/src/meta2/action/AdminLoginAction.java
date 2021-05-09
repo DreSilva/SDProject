@@ -1,6 +1,7 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
+import meta2.models.HeyBean;
 import org.apache.struts2.interceptor.SessionAware;
 
 import java.rmi.RemoteException;
@@ -12,7 +13,8 @@ public class AdminLoginAction extends ActionSupport implements SessionAware {
     private String password;
 
     @Override
-    public String execute() {
+    public String execute() throws RemoteException {
+        this.getHeyBean();
         if(password.equals("1234")){
             return SUCCESS;
         }
@@ -27,6 +29,16 @@ public class AdminLoginAction extends ActionSupport implements SessionAware {
 
     public String getPassword() {
         return password;
+    }
+
+    public HeyBean getHeyBean() throws RemoteException {
+        if(!session.containsKey("heyBean"))
+            this.setHeyBean(new HeyBean());
+        return (HeyBean) session.get("heyBean");
+    }
+
+    public void setHeyBean(HeyBean heyBean) {
+        this.session.put("heyBean", heyBean);
     }
 
     @Override

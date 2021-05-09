@@ -5,6 +5,7 @@ import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class ListaMesasEleicao extends ActionSupport implements SessionAware {
     }
 
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

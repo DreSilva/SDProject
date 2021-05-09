@@ -1,6 +1,7 @@
 package meta2.action;
 
 import com.opensymphony.xwork2.ActionSupport;
+import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
 
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import meta2.models.HeyBean;
 
 
 public class CriarEleicaoAction extends ActionSupport implements SessionAware {
@@ -90,7 +90,7 @@ public class CriarEleicaoAction extends ActionSupport implements SessionAware {
         return tipos;
     }
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

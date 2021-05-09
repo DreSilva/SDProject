@@ -52,7 +52,7 @@ public class CriarLista extends ActionSupport implements SessionAware {
         this.nome = nome;
     }
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

@@ -70,7 +70,7 @@ public class EscolherEleicaoParaRemover extends ActionSupport implements Session
         this.eleicao = eleicao;
     }
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

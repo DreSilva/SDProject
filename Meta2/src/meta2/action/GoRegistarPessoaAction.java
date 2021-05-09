@@ -31,7 +31,7 @@ public class GoRegistarPessoaAction extends ActionSupport implements SessionAwar
     }
 
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

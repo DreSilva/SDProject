@@ -18,4 +18,11 @@ public interface Notifications extends Remote {
      */
     public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException;
 
+    /**
+     * Indica estado de utilizador
+     * @param user User
+     * @param estado ON ou OFF
+     */
+    public void estadoUser(String user,String estado) throws java.rmi.RemoteException;
+
 }

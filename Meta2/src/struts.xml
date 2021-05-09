@@ -14,6 +14,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
   <constant name="struts.ui.theme" value="simple" />
   <constant name="struts.action.excludePattern" value="/ws"/>
   <package name="meta2" extends="struts-default">
+
 	
 	<default-action-ref name="index" />
 	
@@ -219,6 +220,11 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     <action name="escolherEleicaoPassada" class="meta2.action.InfoEleicaoVelha" method="execute">
       <result name="success">/infoEleicaoVelha.jsp</result>
       <result name="input">/escolherEleicaoPassada.jsp</result>
+    </action>
+
+    <!-- NOTIFICACOES -->
+    <action name="notifications" class="ws.WebSocketAnnotation" method="execute">
+      <result name="success">/notifications.html</result>
     </action>
 
   </package>

@@ -1,27 +1,27 @@
-/**
- * Raul Barbosa 2014-11-07
- */
 package meta2.models;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
 
 import models.DepMesa;
 import models.Eleicao;
 import models.Lista;
 import models.User;
+import rmiserver.Notifications;
 import rmiserver.Voto;
+import ws.WebSocketAnnotation;
 
-public class HeyBean {
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
+
+public class HeyBean extends UnicastRemoteObject implements Notifications {
 	private Voto server;
 	private String username; // username and password supplied by the user
 	private String password;
@@ -32,6 +32,8 @@ public class HeyBean {
 	private Date dataInicial,dataFinal,dataValidade;
 	private String lista,eleicao;
 	private String nome;
+	private String roomnumber;
+	WebSocketAnnotation webSocketAnnotation;
 
 
 	public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -67,7 +69,8 @@ public class HeyBean {
 		clientAddress = prop.getProperty("RMIAdminClient");
 	}
 
-	public HeyBean() {
+	public HeyBean() throws RemoteException {
+		super();
 		try {
 			//readDeps();  mudar isto
 			clientAddress = "192.168.1.75";
@@ -76,6 +79,8 @@ public class HeyBean {
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
 			server = (Voto) reg.lookup("votacao");
+			this.webSocketAnnotation = new WebSocketAnnotation();
+			this.addNotifications();
 		}
 		catch(NotBoundException| RemoteException e) {
 			e.printStackTrace(); // what happens *after* we reach this line?
@@ -92,6 +97,10 @@ public class HeyBean {
 		return username;
 	}
 
+
+	public void setRoomnumber(String roomnumber) {
+		this.roomnumber = roomnumber;
+	}
 
 	public void setNome(String nome) {
 		this.nome = nome;
@@ -150,7 +159,7 @@ public class HeyBean {
 	}
 
 	public void setEleicao(String eleicao) {
-		this.eleicao = eleicao; //TODO PERGUNTAR AO STOR SE TENHO DE MUDAR ISTO DO SETELEICAO
+		this.eleicao = eleicao;
 	}
 
 	public boolean checkUserExists() throws RemoteException{
@@ -269,4 +278,31 @@ public class HeyBean {
 	public int checkVotar() throws RemoteException{
 		return this.server.checkVotoWeb(this.CC, Integer.parseInt(eleicao));
 	}
+
+	public void addNotifications() throws RemoteException{
+		this.server.subscribeAdmin(this);
+	}
+
+	public void estadoMesa(String estado,String dep,long num) throws  java.rmi.RemoteException{
+		webSocketAnnotation.sendMessage("Mesa: "+num+" Dep: "+dep+" Estado: "+estado);
+	}
+
+	public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
+		webSocketAnnotation.sendMessage("Eleicao "+nome+" acabou");
+		webSocketAnnotation.sendMessage("Resultados");
+		String[] s = votos.split("\n");
+		for (String s1: s) {
+			webSocketAnnotation.sendMessage(s1);
+		}
+	}
+
+	public void estadoUser(String user, String estado) throws RemoteException {
+		webSocketAnnotation.sendMessage("User: "+user+" Estado: "+estado);
+	}
+
+	public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException{
+		return this.server.getUsersOnline();
+	}
+
+
 }

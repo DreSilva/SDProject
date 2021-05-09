@@ -43,7 +43,7 @@ public class GoAdicionarListaEleicao  extends ActionSupport implements SessionAw
         return listas;
     }
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");

@@ -49,7 +49,7 @@ public class RemoverUserLista extends ActionSupport implements SessionAware {
         this.user = user;
     }
 
-    public HeyBean getHeyBean(){
+    public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");
