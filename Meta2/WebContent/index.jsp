@@ -10,7 +10,7 @@
 </head>
 <body>
     <p><a href="<s:url action="admin" />">Admin Console</a></p>
-    <p><a href="<s:url action="vote" />">Votar</a></p>
-
+    <p><a href="<s:url action="loginnormal" />">Login</a></p>
+    <p><a href="<s:url action="loginfb" />">Login With Facebook</a></p>
 </body>
 </html>
