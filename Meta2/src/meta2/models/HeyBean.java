@@ -304,5 +304,12 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		return this.server.getUsersOnline();
 	}
 
+	public void AssociarFB(String token,User user){
+		this.server.AssociarFB(token,user);
+	}
+
+	public boolean LoginFB(String token,User user){
+		return this.server.LoginFB(token,user);
+	}
 
 }
