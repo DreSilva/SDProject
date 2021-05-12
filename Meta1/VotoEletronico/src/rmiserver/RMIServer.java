@@ -1161,10 +1161,22 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     //======================================================= FB API
 
+    /**
+     * associa token do fb ao user em questão
+     * @param token token da api do fb
+     * @param user utilizador
+     */
     public void associarFBtoken(String token,User user){
         user.token=token;
     }
 
+
+    /**
+     * login do utilizador
+     * @param token token do login
+     * @param user
+     * @return
+     */
     public boolean loginFB(String token, User user){
         if(user.token==token){
             return true;
