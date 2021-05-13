@@ -60,8 +60,8 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     </action>
 
     <!-- VOTAR ACTIONS -->
-    <action name="vote">
-      <result>/votar.jsp</result>
+    <action name="vote" class="meta2.action.GoEscolherEleicoes" method="execute">
+      <result name="success">/votar.jsp</result>
     </action>
 
     <action name="login" class="meta2.action.LoginAction" method="execute">

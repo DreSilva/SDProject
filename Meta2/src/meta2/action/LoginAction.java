@@ -3,6 +3,9 @@
  */
 package meta2.action;
 
+import com.github.scribejava.apis.FacebookApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import com.opensymphony.xwork2.ActionSupport;
 import meta2.models.HeyBean;
 import meta2.models.radioOptions;
@@ -12,15 +15,27 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class LoginAction extends ActionSupport implements SessionAware {
 	private static final long serialVersionUID = 4L;
 	private Map<String, Object> session;
 	private String username = null, password = null, CC = null;
 	private List<radioOptions> eleicoes;
+	private String authorizationUrl;
+	private OAuth20Service service;
+	private static final String apiKey = "1002478766825526";
+	private static final String apiSecret = "c4fcf2bd00fa673e8c8c6c6e4cd35707";
+	private String secretState;
 
 	@Override
 	public String execute() throws RemoteException {
+		this.service = new ServiceBuilder(apiKey)
+				.apiSecret(apiSecret)
+				.callback("https://localhost:8443/facebooklogin.action")
+				.build(FacebookApi.instance());
+		this.secretState = "secret"+ new Random().nextInt(999999);
+		String authorizationUrl = this.service.getAuthorizationUrl(secretState);
 		if(this.username != null && !username.equals("")) {
 			this.getHeyBean().setUsername(this.username);
 			this.getHeyBean().setPassword(this.password);
@@ -51,6 +66,10 @@ public class LoginAction extends ActionSupport implements SessionAware {
 
 	public void setPassword(String password) {
 		this.password = password; // what about this input? 
+	}
+
+	public String getAuthorizationURL(){
+		return this.authorizationUrl;
 	}
 
 	public List<radioOptions> getEleicoes() {
