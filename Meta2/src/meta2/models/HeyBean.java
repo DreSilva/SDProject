@@ -73,8 +73,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		super();
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "194.210.32.148";
-			serverAddress = "194.210.32.148";
+			clientAddress = "192.168.1.222";
+			serverAddress = "192.168.1.222";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -284,33 +284,32 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	}
 
 	public void estadoMesa(String estado,String dep,long num) throws  java.rmi.RemoteException{
-		webSocketAnnotation.sendMessage("Mesa: "+num+" Dep: "+dep+" Estado: "+estado,"0");
+		webSocketAnnotation.sendMessage("Mesa: "+num+" Dep: "+dep+" Estado: "+estado);
 	}
 
-	public void fimEleicao(String nome,String votos) throws java.rmi.RemoteException, InterruptedException {
-		webSocketAnnotation.sendMessage("Eleicao "+nome+" acabou","0");
-		webSocketAnnotation.sendMessage("Resultados","0");
+	public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
+		webSocketAnnotation.sendMessage("Eleicao "+nome+" acabou");
+		webSocketAnnotation.sendMessage("Resultados");
 		String[] s = votos.split("\n");
 		for (String s1: s) {
-			webSocketAnnotation.sendMessage(s1,"0");
-			Thread.sleep(50);
+			webSocketAnnotation.sendMessage(s1);
 		}
 	}
 
 	public void estadoUser(String user, String estado) throws RemoteException {
-		webSocketAnnotation.sendMessage("User: "+user+" Estado: "+estado,"0");
+		webSocketAnnotation.sendMessage("User: "+user+" Estado: "+estado);
 	}
 
 	public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException{
 		return this.server.getUsersOnline();
 	}
 
-	public ArrayList<String> infoEleicao(int n) throws java.rmi.RemoteException{
-		return this.server.getFullEleicaoInfo(n-1);
+	public void AssociarFB(String token,User user){
+		this.server.AssociarFB(token,user);
 	}
 
-	public void notVoto(String user,int eleicao,String mesa){
-		webSocketAnnotation.sendMessage("Voto user: "+user+" na mesa: "+mesa,String.valueOf(eleicao));
+	public boolean LoginFB(String token,User user){
+		return this.server.LoginFB(token,user);
 	}
 
 }
