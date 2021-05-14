@@ -25,4 +25,12 @@ public interface Notifications extends Remote {
      */
     public void estadoUser(String user,String estado) throws java.rmi.RemoteException;
 
+    /**
+     * Notificação de voto
+     * @param user User que votou
+     * @param eleicao Eleicao onde votou
+     * @param mesa Mesa onde votou
+     */
+    public void notVoto(String user,int eleicao,String mesa) throws java.rmi.RemoteException;
+
 }
