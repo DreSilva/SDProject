@@ -13,9 +13,10 @@ what, if any, additional configuration files are loaded and how the framework sh
 
     <filter>
         <filter-name>struts2</filter-name>
-        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+        <filter-class>
+            org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
+        </filter-class>
     </filter>
-
 
     <filter-mapping>
         <filter-name>struts2</filter-name>

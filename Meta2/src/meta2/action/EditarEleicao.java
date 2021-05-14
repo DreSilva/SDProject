@@ -103,6 +103,39 @@ public class EditarEleicao extends ActionSupport implements SessionAware {
         this.horaI = horaI;
     }
 
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public String getHoraI() {
+        return horaI;
+    }
+
+    public List<radioOptions> getTipos() {
+        return tipos;
+    }
+
+    public String getHoraF() {
+        return horaF;
+    }
+
+    public Date getDataInicial() {
+        return dataInicial;
+    }
+
+    public Date getDataFinal() {
+        return dataFinal;
+    }
+
     public HeyBean getHeyBean() throws RemoteException {
         if(!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());

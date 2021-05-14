@@ -12,7 +12,11 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
   <!-- devMode equals debug information and reload everything for every request -->
   <constant name="struts.devMode" value="true" />
   <constant name="struts.ui.theme" value="simple" />
-  <constant name="struts.action.excludePattern" value="/ws"/>
+  <constant name="struts.action.excludePattern" value="/ws/.*,ws://.*"/>
+  <constant name="struts.action.extension" value="" />
+  <constant name="struts.enable.SlashesInActionNames" value="true"/>
+  <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
+  <constant name="struts.patternMatcher" value="regex" />
   <package name="meta2" extends="struts-default">
 
 	
@@ -86,8 +90,6 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result name="success">/optionsAdmin.jsp</result>
       <result name="login">/adminLogin.jsp</result>
     </action>
-
-
 
 
     <!-- CRIAR ELEICAO -->
@@ -244,7 +246,15 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     </action>
 
     <!-- NOTIFICACOES -->
-    <action name="notifications" class="ws.WebSocketAnnotation" method="execute">
+    <!--<action name="notifications" class="ws.WebSocketAnnotation" method="execute">
+      <result name="success">/notifications.html</result>
+    </action>-->
+
+    <action name="notificationsEleicao" class="meta2.action.GoEscolherEleicaoParaRemover" method="execute">
+      <result name="success">/notificacoesEleicao.jsp</result>
+    </action>
+
+    <action name="/notifications/{room}" class="ws.WebSocketAnnotation">
       <result name="success">/notifications.html</result>
     </action>
 

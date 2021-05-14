@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <title>WebSocket Chat</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript">
 
         var websocket = null;
-
-        window.onload = function() { // URI = ws://10.16.0.165:8080/WebSocket/ws
-            connect('ws://' + window.location.host + '/meta2/ws');
-            document.getElementById("chat").focus();
+        var url = window.location.href;
+        var room = url.split("/")[5];
+        window.onload = function() {
+            connect('ws://' + window.location.host + '/meta2/ws/'+room);
         }
 
         function connect(host) { // connect to the host websocket
@@ -30,15 +29,10 @@
 
         function onOpen(event) {
             writeToHistory('Connected to ' + window.location.host + '.');
-            document.getElementById('chat').onkeydown = function(key) {
-                if (key.keyCode == 13)
-                    doSend(); // call doSend() on enter key press
-            };
         }
 
         function onClose(event) {
             writeToHistory('WebSocket closed (code ' + event.code + ').');
-            document.getElementById('chat').onkeydown = null;
         }
 
         function onMessage(message) { // print the received message
@@ -47,7 +41,6 @@
 
         function onError(event) {
             writeToHistory('WebSocket error.');
-            document.getElementById('chat').onkeydown = null;
         }
 
 

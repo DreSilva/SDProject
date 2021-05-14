@@ -10,13 +10,6 @@
 </head>
 <body>
 
-<struts>  <!-- POR ISTO SEMPRE QUE SE QUER USAR DATEPICKER -->
-    <constant name="struts.ui.templateDir" value="templates" />
-    <constant name="struts.ui.theme" value="simple" />
-    <constant name="struts.xwork.chaining.copyErrors" value="true"/>
-    <constant name="struts.xwork.chaining.copyFieldErrors" value="true"/>
-    <constant name="struts.xwork.chaining.copyErrors" value="true"/>
-</struts>
 
 <s:form action="registarPessoa" method="post">
     <s:fielderror name="tError"/>
@@ -35,7 +28,7 @@
     <s:text name="CC:" />
     <s:textfield name="CC" /><br>
     <s:text name="Data Validade: "/>
-    <sx:datetimepicker name="dataValidade" displayFormat="dd-MM-yyyy"/><br>
+    <input type="date" name="dataValidade">
     <s:submit/>
 </s:form>
 

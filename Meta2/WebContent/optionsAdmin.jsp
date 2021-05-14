@@ -29,14 +29,13 @@
 <s:form action="goObterInformacaoPassada" method="post">
     <button value="gerirMesas" type="submit" name="gerirMesas">Informação Eleição Passada</button>
 </s:form>
-<!--
-<form>
-    <button formaction="/meta2/notifications.html">Notificações</button>
-</form> -->
 
-
-<s:form action="notifications" method="post">
+<s:form action="notifications/0" method="post">
     <button value="notficications" type="submit" >Notificações</button>
+</s:form>
+
+<s:form action="notificationsEleicao" method="post">
+    <button value="notficicationsEleicao" type="submit" >Notificações Eleição</button>
 </s:form>
 
 

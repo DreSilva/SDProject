@@ -814,6 +814,11 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
                         usersOn.remove(user1);
                     }
                 }
+                if (Global.admin != null) {
+                    for (Notifications notifications : Global.admin) {
+                        notifications.notVoto(user.user,nEleicao+1,mesa.departamento);
+                    }
+                }
                 return "Voto com sucesso";
             } else {
                 return "User nao pode votar nesta eleicao, e para uma funcao diferente!";
@@ -848,6 +853,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         eleicao.addVoto(opcao);
         for (Notifications not: Global.admin) {
             not.estadoUser(user.user,"OFF");
+            not.notVoto(user.user,nEleicao+1,mesa.departamento);
         }
     }
 
