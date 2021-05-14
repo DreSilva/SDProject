@@ -33,6 +33,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	private String lista,eleicao;
 	private String nome;
 	private String roomnumber;
+	private String authorizationUrl;
 	WebSocketAnnotation webSocketAnnotation;
 
 
@@ -73,8 +74,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		super();
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "192.168.1.222";
-			serverAddress = "192.168.1.222";
+			clientAddress = "194.210.32.148";
+			serverAddress = "194.210.32.148";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -97,6 +98,13 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		return username;
 	}
 
+	public void setAuthorizationUrl(String authorizationUrl) {
+		this.authorizationUrl = authorizationUrl;
+	}
+
+	public String getAuthorizationUrl() {
+		return authorizationUrl;
+	}
 
 	public void setRoomnumber(String roomnumber) {
 		this.roomnumber = roomnumber;
@@ -284,20 +292,25 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	}
 
 	public void estadoMesa(String estado,String dep,long num) throws  java.rmi.RemoteException{
-		webSocketAnnotation.sendMessage("Mesa: "+num+" Dep: "+dep+" Estado: "+estado);
+		webSocketAnnotation.sendMessage("Mesa: "+num+" Dep: "+dep+" Estado: "+estado,"0");
 	}
 
 	public void fimEleicao(String nome,String votos) throws  java.rmi.RemoteException{
-		webSocketAnnotation.sendMessage("Eleicao "+nome+" acabou");
-		webSocketAnnotation.sendMessage("Resultados");
+		webSocketAnnotation.sendMessage("Eleicao "+nome+" acabou","0");
+		webSocketAnnotation.sendMessage("Resultados","0");
 		String[] s = votos.split("\n");
 		for (String s1: s) {
-			webSocketAnnotation.sendMessage(s1);
+			webSocketAnnotation.sendMessage(s1,"0");
 		}
 	}
 
 	public void estadoUser(String user, String estado) throws RemoteException {
-		webSocketAnnotation.sendMessage("User: "+user+" Estado: "+estado);
+		webSocketAnnotation.sendMessage("User: "+user+" Estado: "+estado,"0");
+	}
+
+	@Override
+	public void notVoto(String user, int eleicao, String mesa) throws RemoteException {
+		webSocketAnnotation.sendMessage("User: "+user+" Mesa: "+mesa,String.valueOf(eleicao));
 	}
 
 	public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException{
@@ -310,6 +323,10 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
 	public boolean LoginFB(String token,User user){
 		return this.server.LoginFB(token,user);
+	}
+
+	public ArrayList<String> infoEleicao(int elec) throws RemoteException {
+		return this.server.getFullEleicaoInfo(elec-1);
 	}
 
 }

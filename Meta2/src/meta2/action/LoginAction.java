@@ -32,11 +32,11 @@ public class LoginAction extends ActionSupport implements SessionAware {
 	public String execute() throws RemoteException {
 		this.service = new ServiceBuilder(apiKey)
 				.apiSecret(apiSecret)
-				.callback("")
+				.callback("https://localhost:8443/facebooklogin.action")
 				.build(FacebookApi.instance());
 		this.secretState = "secret"+ new Random().nextInt(999999);
 		this.authorizationUrl = this.service.getAuthorizationUrl(secretState);
-		this.getHeyBean().setTeste(authorizationUrl);
+		this.getHeyBean().setAuthorizationUrl(authorizationUrl);
 		if(this.username != null && !username.equals("")) {
 			this.getHeyBean().setUsername(this.username);
 			this.getHeyBean().setPassword(this.password);

@@ -9,7 +9,7 @@
 </head>
 <body>
 <p><a href="<s:url action="vote"/>">Votar</a></p>
-<p><a href="${HeyBean.teste}">Associar conta do Facebook</a></p>
+<p><a href="${HeyBean.authorizationUrl}">Associar conta do Facebook</a></p>
 <p><a href="<s:url action="share" />">Share an election on Facebook</a></p>
 </body>
 </html>
