@@ -54,7 +54,7 @@ public interface Voto extends Remote {
      * @return String com informação sobre o estado do voto, se foi efetuado ou se houve algum problema
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public String votar(int opcao,String CC,int nEleicao, DepMesa mesa) throws java.rmi.RemoteException;
+    public String votar(int opcao,String CC,int nEleicao, DepMesa mesa) throws java.rmi.RemoteException, InterruptedException;
 
     /**
      * Lista todas as eleições diponiveis para votar
@@ -403,7 +403,7 @@ public interface Voto extends Remote {
      * @param nEleicao Numero da Eleicao a votar
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call
      */
-    public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException;
+    public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException, InterruptedException;
 
     /**
      * Obter utilizadores online

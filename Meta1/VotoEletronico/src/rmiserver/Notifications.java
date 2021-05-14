@@ -31,6 +31,6 @@ public interface Notifications extends Remote {
      * @param eleicao Eleicao onde votou
      * @param mesa Mesa onde votou
      */
-    public void notVoto(String user,int eleicao,String mesa) throws java.rmi.RemoteException;
+    public void notVoto(String user,int eleicao,String mesa) throws java.rmi.RemoteException,InterruptedException;
 
 }

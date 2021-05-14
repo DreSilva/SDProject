@@ -767,7 +767,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public String votar(int opcao, String CC, int nEleicao, DepMesa mesa) throws java.rmi.RemoteException {
+    public String votar(int opcao, String CC, int nEleicao, DepMesa mesa) throws java.rmi.RemoteException, InterruptedException {
         User user = null;
         for (User userS : users) {
             if (userS.CC.equals(CC)) {
@@ -838,7 +838,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     /**
      * @inheritDoc
      */
-    public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException {
+    public void votarOnline(int opcao, String CC, int nEleicao) throws java.rmi.RemoteException, InterruptedException {
         User user = null;
         DepMesa mesa = mesasVoto.get(0);
         Date date = new Date();
