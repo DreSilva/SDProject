@@ -30,7 +30,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
 	private static final Token EMPTY_TOKEN = null;
 	@Override
 	public String execute() throws RemoteException {
-		this.service = this.getHeyBean().getService();
+		this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb.action");
 		this.authorizationUrl = this.service.getAuthorizationUrl(EMPTY_TOKEN);
 		this.getHeyBean().setAuthorizationUrl(authorizationUrl);
 		if(this.username != null && !username.equals("")) {
