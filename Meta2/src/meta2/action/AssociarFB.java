@@ -1,18 +1,12 @@
 package meta2.action;
 
-import com.github.scribejava.apis.FacebookApi;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.oauth.OAuth20Service;
 import com.github.scribejava.core.oauth.OAuthService;
 import com.opensymphony.xwork2.ActionSupport;
 import meta2.models.HeyBean;
 import org.apache.struts2.interceptor.SessionAware;
-import uc.sd.apis.FacebookApi2;
-
 
 import java.rmi.RemoteException;
 import java.util.Map;
-import java.util.Random;
 
 
 public class AssociarFB extends ActionSupport implements SessionAware {
@@ -23,14 +17,13 @@ public class AssociarFB extends ActionSupport implements SessionAware {
     private Map<String, Object> session;
     private String code;
 
-    public String getCode() {
-        return code;
-    }
-
     public void setCode(String code) {
         this.code = code;
     }
 
+    public String getCode() {
+        return code;
+    }
 
     @Override
     public String execute() throws RemoteException {

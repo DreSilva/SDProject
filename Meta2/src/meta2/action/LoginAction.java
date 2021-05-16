@@ -3,22 +3,17 @@
  */
 package meta2.action;
 
-import com.github.scribejava.apis.FacebookApi;
-import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.Token;
-import com.github.scribejava.core.oauth.OAuth20Service;
 import com.github.scribejava.core.oauth.OAuthService;
 import com.opensymphony.xwork2.ActionSupport;
 import meta2.models.HeyBean;
 import meta2.models.radioOptions;
 import org.apache.struts2.interceptor.SessionAware;
-import uc.sd.apis.FacebookApi2;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class LoginAction extends ActionSupport implements SessionAware {
 	private static final long serialVersionUID = 4L;
@@ -30,7 +25,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
 	private static final Token EMPTY_TOKEN = null;
 	@Override
 	public String execute() throws RemoteException {
-		this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb.action");
+		this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb");
 		this.authorizationUrl = this.service.getAuthorizationUrl(EMPTY_TOKEN);
 		this.getHeyBean().setAuthorizationUrl(authorizationUrl);
 		if(this.username != null && !username.equals("")) {
@@ -66,8 +61,8 @@ public class LoginAction extends ActionSupport implements SessionAware {
 		this.password = password; // what about this input? 
 	}
 
-	public String getAuthorizationURL(){
-		return this.authorizationUrl;
+	public String getAuthorizationUrl() {
+		return authorizationUrl;
 	}
 
 	public List<radioOptions> getEleicoes() {
