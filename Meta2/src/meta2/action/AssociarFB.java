@@ -4,9 +4,11 @@ import com.github.scribejava.apis.FacebookApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import com.opensymphony.xwork2.ActionSupport;
+import meta2.models.HeyBean;
 import org.apache.struts2.interceptor.SessionAware;
 
 
+import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Random;
 
@@ -18,21 +20,50 @@ public class AssociarFB extends ActionSupport implements SessionAware {
     private OAuth20Service service;
     private String secretState;
     private Map<String, Object> session;
+    private String code;
+    private String state;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
 
     @Override
-    public String execute(){
+    public String execute() throws RemoteException {
+        //this.code= this.getHeyBean().getCode();
         this.service = new ServiceBuilder(apiKey)
                 .apiSecret(apiSecret)
                 .callback("https://localhost:8443/facebooklogin.action")
                 .build(FacebookApi.instance());
         this.secretState = "secret"+ new Random().nextInt(999999);
 
-        return null;
+        return SUCCESS;
     }
 
     @Override
     public void setSession(Map<String, Object> session) {
         this.session=session;
+    }
+
+    public HeyBean getHeyBean() throws RemoteException {
+        if(!session.containsKey("heyBean"))
+            this.setHeyBean(new HeyBean());
+        return (HeyBean) session.get("heyBean");
+    }
+
+    public void setHeyBean(HeyBean heyBean) {
+        this.session.put("heyBean", heyBean);
     }
 }

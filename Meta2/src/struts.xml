@@ -10,16 +10,17 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 <struts>
 
   <!-- devMode equals debug information and reload everything for every request -->
-  <constant name="struts.devMode" value="true" />
+  <constant name="struts.devMode" value="true"/>
   <constant name="struts.ui.theme" value="simple" />
   <constant name="struts.action.excludePattern" value="/ws/.*,ws://.*"/>
   <constant name="struts.action.extension" value="" />
   <constant name="struts.enable.SlashesInActionNames" value="true"/>
   <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
   <constant name="struts.patternMatcher" value="regex" />
+
+
   <package name="meta2" extends="struts-default">
 
-	
 	<default-action-ref name="index" />
 	
 	<global-results>
@@ -30,6 +31,8 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 	<global-exception-mappings>
 		<exception-mapping exception="java.lang.Exception" result="error" />
 	</global-exception-mappings>
+
+
 
     <!-- 'index' action leads to the view provided by login.jsp -->
     <action name="index">
@@ -60,8 +63,9 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     </action>
 
     <action name="associarfb" class="meta2.action.AssociarFB" method="execute">
-      <result>/loggedin.jsp</result>
+      <result name="success">/loggedin.jsp</result>
     </action>
+
 
     <!-- VOTAR ACTIONS -->
     <action name="vote" class="meta2.action.GoEscolherEleicoes" method="execute">

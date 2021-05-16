@@ -34,6 +34,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	private String nome;
 	private String roomnumber;
 	private String authorizationUrl;
+	private String code;
 	WebSocketAnnotation webSocketAnnotation;
 
 
@@ -74,8 +75,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		super();
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "194.210.32.148";
-			serverAddress = "194.210.32.148";
+			clientAddress = "192.168.1.43";
+			serverAddress = "192.168.1.43";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -96,6 +97,14 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public void setAuthorizationUrl(String authorizationUrl) {
