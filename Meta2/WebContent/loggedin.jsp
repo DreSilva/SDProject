@@ -15,7 +15,7 @@
     </c:when>
     <c:otherwise>
         <p><a href="<s:url action="vote"/>">Votar</a></p>
-        <p><a href="${HeyBean.authorizationUrl}">Associar conta do Facebook</a></p>
+        <p><a href="<s:property value="HeyBean.authorizationUrl"/>">Associar conta do Facebook</a></p>
         <p><a href="<s:url action="share" />">Share an election on Facebook</a></p>
     </c:otherwise>
 </c:choose>

@@ -36,7 +36,7 @@ public class AssociarFB extends ActionSupport implements SessionAware {
     public String execute() throws RemoteException {
         //this.code= this.getHeyBean().getCode();
         System.out.println("helllllllllllllllllooooooooooooooooooo");
-        this.service = this.getHeyBean().getService();
+        this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb.action");
 
         return SUCCESS;
     }
