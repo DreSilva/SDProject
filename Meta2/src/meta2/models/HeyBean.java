@@ -35,6 +35,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	private String roomnumber;
 	private String authorizationUrl;
 	private String code;
+	private int adminLogIn=0;
+	private int userLogIn=0;
 	WebSocketAnnotation webSocketAnnotation;
 
 
@@ -75,8 +77,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		super();
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "192.168.1.43";
-			serverAddress = "192.168.1.43";
+			clientAddress = "192.168.1.75";
+			serverAddress = "192.168.1.75";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -89,6 +91,22 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setUserLogIn(int userLogIn) {
+		this.userLogIn = userLogIn;
+	}
+
+	public void setAdminLogIn(int adminLogIn) {
+		this.adminLogIn = adminLogIn;
+	}
+
+	public int getAdminLogIn() {
+		return adminLogIn;
+	}
+
+	public int getUserLogIn() {
+		return userLogIn;
 	}
 
 	public String getPassword() {
@@ -326,12 +344,12 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		return this.server.getUsersOnline();
 	}
 
-	public void AssociarFB(String token,User user){
-		this.server.AssociarFB(token,user);
+	public void AssociarFB(String token){
+		this.server.AssociarFB(token,this.CC);
 	}
 
-	public boolean LoginFB(String token,User user){
-		return this.server.LoginFB(token,user);
+	public boolean LoginFB(String token){
+		return this.server.LoginFB(token,this.CC);
 	}
 
 	public ArrayList<String> infoEleicao(int elec) throws RemoteException {

@@ -36,6 +36,22 @@ public interface Voto extends Remote {
      */
     public void criarEleicao(Eleicao eleicao) throws java.rmi.RemoteException;
 
+    /**
+     * associar token do fb ao user
+     * @param token token fornecido pelo fb
+     * @param CC user que vai ser associado o token
+     */
+    public void AssociarFB(String token,String CC);
+
+    /**
+     * login com FB
+     * @param token token do fb
+     * @param CC user que deseja fazer login
+     * @return se existe user com o token ou nao
+     */
+
+    public boolean LoginFB(String token,String CC);
+
 
     /**
      * Verifica se o user com o CC dado existe
@@ -413,7 +429,7 @@ public interface Voto extends Remote {
     public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException;
 
     /**
-     * Obter Informação sobre uma lista
+     * Obter Iormação sobre uma lista
      * @param n Eleicao a obter info
      * @return Array List com toda a Informação de uma lista
      * @throws java.rmi.RemoteException excepção que pode ocorrer na execução de uma remote call

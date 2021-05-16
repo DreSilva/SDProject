@@ -16,6 +16,7 @@ public class AdminLoginAction extends ActionSupport implements SessionAware {
     public String execute() throws RemoteException {
         this.getHeyBean();
         if(password.equals("1234")){
+            this.getHeyBean().setAdminLogIn(1);
             return SUCCESS;
         }
         else{

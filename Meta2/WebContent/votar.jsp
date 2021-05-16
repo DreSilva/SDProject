@@ -9,14 +9,22 @@
 <title>Vote</title>
 </head>
 <body>
+<c:choose>
+    <c:when test="${HeyBean.userLogIn==0}">
+        <p>Precisa de fazer login para poder aceder!</p>
+    </c:when>
+    <c:otherwise>
+        <s:form action="escolherListaVotar" method="post">
+            <s:fielderror name="tError"/>
+            <s:text name="Eleição Para Votar"/>
+            <s:radio label="Eleição" name="eleicao" list="eleicoes"
+                     listKey="key" listValue="value" value="Estudante" /><br>
+            <s:submit onclick=""/>
+        </s:form>
+    </c:otherwise>
+</c:choose>
 
-<s:form action="escolherListaVotar" method="post">
-    <s:fielderror name="tError"/>
-    <s:text name="Eleição Para Votar"/>
-    <s:radio label="Eleição" name="eleicao" list="eleicoes"
-             listKey="key" listValue="value" value="Estudante" /><br>
-    <s:submit onclick=""/>
-</s:form>
+
 
 </body>
 </html>

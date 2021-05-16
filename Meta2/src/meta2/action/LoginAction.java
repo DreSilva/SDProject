@@ -49,6 +49,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
 					eleicoes.add(new radioOptions(String.valueOf(counter),a));
 					counter+=1;
 				}
+				this.getHeyBean().setUserLogIn(1);
 				return SUCCESS;
 			} else {
 				this.getHeyBean().setUsername("");
