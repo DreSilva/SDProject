@@ -24,6 +24,7 @@
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-annotations-2.12.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-core-2.12.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-databind-2.12.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/async-http-client-1.9.31.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/scribejava-core-8.1.0-javadoc.jar!/" />
@@ -32,6 +33,8 @@
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-core-2.12.0-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-databind-2.12.0-javadoc.jar!/" />
     </JAVADOC>
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ideaLibSources/xwork-core-2.3.16.3-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

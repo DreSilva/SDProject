@@ -1,11 +1,14 @@
 package meta2.models;
 
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuthService;
 import models.DepMesa;
 import models.Eleicao;
 import models.Lista;
 import models.User;
 import rmiserver.Notifications;
 import rmiserver.Voto;
+import uc.sd.apis.FacebookApi2;
 import ws.WebSocketAnnotation;
 
 import java.io.File;
@@ -37,6 +40,9 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 	private String code;
 	private int adminLogIn=0;
 	private int userLogIn=0;
+	private static final String apiKey = "1002478766825526";
+	private static final String apiSecret = "c4fcf2bd00fa673e8c8c6c6e4cd35707";
+	private OAuthService service=null;
 	WebSocketAnnotation webSocketAnnotation;
 
 
@@ -77,8 +83,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 		super();
 		try {
 			//readDeps();  mudar isto
-			clientAddress = "192.168.1.75";
-			serverAddress = "192.168.1.75";
+			clientAddress = "192.168.1.222";
+			serverAddress = "192.168.1.222";
 			porto = 7001;
 			System.setProperty("java.rmi.server.hostname", clientAddress);
 			Registry reg = LocateRegistry.getRegistry(serverAddress,porto);
@@ -115,6 +121,23 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public OAuthService getService() {
+		if (service==null) {
+			this.service = new ServiceBuilder()
+					.apiKey(apiKey)
+					.provider(FacebookApi2.class)
+					.apiSecret(apiSecret)
+					.callback("http://localhost:8080/meta2/associarfb.action")
+					.scope("public_profile")
+					.build();
+		}
+		return service;
+	}
+
+	public void setService(OAuthService service) {
+		this.service = service;
 	}
 
 	public String getCode() {
