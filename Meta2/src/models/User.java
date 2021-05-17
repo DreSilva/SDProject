@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class User implements Serializable {
     private static final long serialVersionUID = 4L;
-    String user,password,departamento,contacto,tipo,morada,CC;
+    String user,password,departamento,contacto,tipo,morada,CC,token;
     Date validade;
     Map<Eleicao,String> localVoto = new HashMap<>();
 
@@ -36,6 +36,7 @@ public class User implements Serializable {
         this.tipo=tipo;
         this.morada=morada;
         this.validade=validade;
+        this.token="";
     }
 
     /**
@@ -45,6 +46,10 @@ public class User implements Serializable {
      */
     public void addVoto(Eleicao eleicao, String departamento){
         localVoto.put(eleicao,departamento);
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
 

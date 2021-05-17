@@ -36,7 +36,7 @@ public class User implements Serializable {
         this.tipo=tipo;
         this.morada=morada;
         this.validade=validade;
-        this.token=null;
+        this.token="";
     }
 
     /**
@@ -48,6 +48,9 @@ public class User implements Serializable {
         localVoto.put(eleicao,departamento);
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     /**
      * Comparação entre users
@@ -60,6 +63,18 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         User user1 = (User) o;
         return user.equals(user1.user) && password.equals(user1.password)  && CC.equals(user1.CC);
+    }
+
+    public String getCC() {
+        return CC;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUser() {
+        return user;
     }
 
 }

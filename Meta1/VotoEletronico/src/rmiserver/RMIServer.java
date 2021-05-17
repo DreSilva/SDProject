@@ -1174,16 +1174,19 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public boolean AssociarFB(String token, String CC) throws java.rmi.RemoteException {
         User final_user = null;
         for (User user : users) {
+            System.out.println(user.user+" "+user.token);
             if (user.CC.equals(CC)) {
+                System.out.println("eNCONTREI");
                 final_user = user;
             }
             if (user.token.equals(token)) {
+                System.out.println("Aqui for somereason");
                 return false;
             }
         }
-        if (final_user == null) {
-            final_user.token = token;
-        }
+        System.out.println("Vou fazer isto");
+        final_user.setToken(token);
+        System.out.println("Adicionei");
         return true;
     }
 
