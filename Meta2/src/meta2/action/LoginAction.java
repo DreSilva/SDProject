@@ -46,7 +46,6 @@ public class LoginAction extends ActionSupport implements SessionAware {
 				this.getHeyBean().setUsername("");
 				this.getHeyBean().setPassword("");
 				return LOGIN;
-
 			}
 		}
 		else

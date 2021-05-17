@@ -166,7 +166,7 @@ class RealTimeUpdate extends Thread {
  * Classe para o RMI server
  */
 public class RMIServer extends UnicastRemoteObject implements Voto {
-    static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>(),usersOn = new CopyOnWriteArrayList<>();
+    static CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>(), usersOn = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoes = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Eleicao> eleicoesVelhas = new CopyOnWriteArrayList<>();
     public static CopyOnWriteArrayList<Lista> listas = new CopyOnWriteArrayList<>();
@@ -311,8 +311,8 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public boolean login(String user, String password, String CC) throws java.rmi.RemoteException {
         for (User userL : users) {
             if (userL.password.equals(password) && userL.user.equals(user)) {
-                for(Notifications not : Global.admin){
-                    not.estadoUser(user,"ON");
+                for (Notifications not : Global.admin) {
+                    not.estadoUser(user, "ON");
                 }
                 usersOn.add(userL);
                 return userL.CC.equals(CC);
@@ -806,17 +806,17 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             if (user.tipo.equals(eleicao.tipo)) {
                 user.addVoto(eleicao, mesa.departamento + " " + date.toString());
                 eleicao.addVoto(opcao);
-                for (Notifications not: Global.admin) {
-                    not.estadoUser(user.user,"OFF");
+                for (Notifications not : Global.admin) {
+                    not.estadoUser(user.user, "OFF");
                 }
-                for (User user1:usersOn) {
-                    if(user1.equals(user)){
+                for (User user1 : usersOn) {
+                    if (user1.equals(user)) {
                         usersOn.remove(user1);
                     }
                 }
                 if (Global.admin != null) {
                     for (Notifications notifications : Global.admin) {
-                        notifications.notVoto(user.user,nEleicao+1,mesa.departamento);
+                        notifications.notVoto(user.user, nEleicao + 1, mesa.departamento);
                     }
                 }
                 return "Voto com sucesso";
@@ -828,13 +828,14 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
     }
 
-    public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException{
-        ArrayList<String>s = new ArrayList<>();
-        for (User user: usersOn) {
+    public ArrayList<String> getUsersOnline() throws java.rmi.RemoteException {
+        ArrayList<String> s = new ArrayList<>();
+        for (User user : usersOn) {
             s.add(user.user);
         }
         return s;
     }
+
     /**
      * @inheritDoc
      */
@@ -851,9 +852,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         Eleicao eleicao = eleicoes.get(nEleicao);
         user.addVoto(eleicao, mesa.departamento + " " + date.toString());
         eleicao.addVoto(opcao);
-        for (Notifications not: Global.admin) {
-            not.estadoUser(user.user,"OFF");
-            not.notVoto(user.user,nEleicao+1,mesa.departamento);
+        for (Notifications not : Global.admin) {
+            not.estadoUser(user.user, "OFF");
+            not.notVoto(user.user, nEleicao + 1, mesa.departamento);
         }
     }
 
@@ -1065,24 +1066,24 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
 
     }
 
-    public ArrayList<String> getFullEleicaoInfo(int n) throws java.rmi.RemoteException{
+    public ArrayList<String> getFullEleicaoInfo(int n) throws java.rmi.RemoteException {
         Eleicao eleicao = getEleicao(n);
         ArrayList<String> s = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-        s.add("Titulo: "+eleicao.titulo);
-        s.add("Descricao: "+eleicao.descricao);
-        s.add("Tipo: "+eleicao.tipo);
-        s.add("Data Incial: "+ formatter.format(eleicao.inicio));
-        s.add("Data Final: "+formatter.format(eleicao.fim));
+        s.add("Titulo: " + eleicao.titulo);
+        s.add("Descricao: " + eleicao.descricao);
+        s.add("Tipo: " + eleicao.tipo);
+        s.add("Data Incial: " + formatter.format(eleicao.inicio));
+        s.add("Data Final: " + formatter.format(eleicao.fim));
         s.add("Listas participantes: ");
-        for (Lista l: eleicao.listas) {
-            s.add("-"+l.nome);
+        for (Lista l : eleicao.listas) {
+            s.add("-" + l.nome);
         }
         s.add("Votantes: ");
-        for(User user: users){
+        for (User user : users) {
             for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
                 if (entry.getKey().equals(eleicao)) {
-                    s.add("-Nome: "+user.user+ "Tipo: "+user.tipo+" Local: "+entry.getValue());
+                    s.add("-Nome: " + user.user + "Tipo: " + user.tipo + " Local: " + entry.getValue());
                 }
             }
         }
@@ -1168,29 +1169,35 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     //======================================================= FB API
 
     /**
-     *  @inheritDoc
+     * @inheritDoc
      */
-    public void AssociarFB(String token,String CC){
-        for (User user: users) {
+    public boolean AssociarFB(String token, String CC) throws java.rmi.RemoteException {
+        User final_user = null;
+        for (User user : users) {
             if (user.CC.equals(CC)) {
-                user.token = token;
+                final_user = user;
+            }
+            if (user.token.equals(token)) {
+                return false;
             }
         }
+        if (final_user == null) {
+            final_user.token = token;
+        }
+        return true;
     }
 
 
     /**
      * @inheritDoc
      */
-    public boolean LoginFB(String token, String CC){
-        for (User user: users) {
-            if(user.CC.equals(CC)){
-                if(user.token.equals(token)){
-                    return true;
-                }
+    public User LoginFB(String token) throws java.rmi.RemoteException {
+        for (User user : users) {
+            if (user.token.equals(token)) {
+                return user;
             }
         }
-        return false;
+        return null;
     }
 
 

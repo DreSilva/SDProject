@@ -1,6 +1,7 @@
 package meta2.models;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.Token;
 import com.github.scribejava.core.oauth.OAuthService;
 import models.DepMesa;
 import models.Eleicao;
@@ -25,6 +26,7 @@ import java.util.Date;
 import java.util.Properties;
 
 public class HeyBean extends UnicastRemoteObject implements Notifications {
+    private static final Token EMPTY_TOKEN = null;
     private Voto server;
     private String username; // username and password supplied by the user
     private String password;
@@ -44,6 +46,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
     private static final String apiSecret = "c4fcf2bd00fa673e8c8c6c6e4cd35707";
     private OAuthService service = null;
     WebSocketAnnotation webSocketAnnotation;
+    private Token token;
 
 
     public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -83,8 +86,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
         super();
         try {
             //readDeps();  mudar isto
-            clientAddress = "192.168.1.75";
-            serverAddress = "192.168.1.75";
+            clientAddress = "192.168.1.222";
+            serverAddress = "192.168.1.222";
             porto = 7001;
             System.setProperty("java.rmi.server.hostname", clientAddress);
             Registry reg = LocateRegistry.getRegistry(serverAddress, porto);
@@ -132,6 +135,9 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
                 .build();
         return service;
     }
+    public OAuthService getService() {
+        return this.service;
+    }
 
     public void setService(OAuthService service) {
         this.service = service;
@@ -151,6 +157,14 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
     public String getAuthorizationUrl() {
         return authorizationUrl;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    public Token getToken() {
+        return token;
     }
 
     public void setRoomnumber(String roomnumber) {
@@ -364,12 +378,12 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
         return this.server.getUsersOnline();
     }
 
-    public void AssociarFB(String token) {
-        this.server.AssociarFB(token, this.CC);
+    public boolean AssociarFB(String token) throws java.rmi.RemoteException {
+        return this.server.AssociarFB(token, this.CC);
     }
 
-    public boolean LoginFB(String token) {
-        return this.server.LoginFB(token, this.CC);
+    public User LoginFB(String token) throws java.rmi.RemoteException {
+        return this.server.LoginFB(token);
     }
 
     public ArrayList<String> infoEleicao(int elec) throws RemoteException {

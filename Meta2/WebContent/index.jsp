@@ -11,6 +11,6 @@
 <body>
     <p><a href="<s:url action="admin" />">Admin Console</a></p>
     <p><a href="<s:url action="loginnormal" />">Login</a></p>
-    <p><a href="<s:url action="loginfb" />">Login With Facebook</a></p>
+    <p><a href="<s:property value="authorizationUrl"/>">Login With Facebook</a></p>
 </body>
 </html>

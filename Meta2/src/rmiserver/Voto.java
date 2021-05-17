@@ -423,17 +423,17 @@ public interface Voto extends Remote {
      * associar token do fb ao user
      * @param token token fornecido pelo fb
      * @param CC user que vai ser associado o token
+     * @return
      */
-    public void AssociarFB(String token,String CC);
+    public boolean AssociarFB(String token, String CC) throws java.rmi.RemoteException;
 
     /**
      * login com FB
      * @param token token do fb
-     * @param CC user que deseja fazer login
      * @return
      */
 
-    public boolean LoginFB(String token,String CC);
+    public User LoginFB(String token) throws java.rmi.RemoteException;
 
     /**
      * Obter Informação sobre uma lista

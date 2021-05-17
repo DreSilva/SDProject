@@ -61,4 +61,15 @@ public class User implements Serializable {
         return user.equals(user1.user) && password.equals(user1.password)  && CC.equals(user1.CC);
     }
 
+    public String getCC() {
+        return CC;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUser() {
+        return user;
+    }
 }
