@@ -9,6 +9,7 @@
     <title>Choose Option</title>
 </head>
 <body>
+<s:fielderror name="tError"/>
     <p><a href="<s:url action="admin" />">Admin Console</a></p>
     <p><a href="<s:url action="loginnormal" />">Login</a></p>
     <p><a href="<s:property value="authorizationUrl"/>">Login With Facebook</a></p>

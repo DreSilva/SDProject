@@ -30,38 +30,51 @@ public class LoginFB extends ActionSupport implements SessionAware {
     }
 
     @Override
-    public String execute() throws RemoteException {
-        this.service = this.getHeyBean().getService();
+    public void validate() {
+        try {
+            this.service = this.getHeyBean().getService();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         Verifier verifier = new Verifier(this.code);
-
-        // Trade the Request Token and Verfier for the Access Token
         Token accessToken = service.getAccessToken(EMPTY_TOKEN, verifier);
-        this.getHeyBean().setToken(accessToken);
-
-        // Now let's go and ask for a protected resource!;
+        try {
+            this.getHeyBean().setToken(accessToken);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL, service);
         service.signRequest(accessToken, request);
         Response response = request.send();
         if (response.getCode() == 200) {
             String body = response.getBody();
             String id = body.split("[:}{,\"]")[11];
-            this.getHeyBean().setFBid(id);
-            this.user = this.getHeyBean().LoginFB(id);
-            if (this.user == null) {
-                System.out.println("a conta não está associada a nenhum user");
-                return ERROR;
-            } else {
-                this.getHeyBean().setUsername(this.user.getUser());
-                this.getHeyBean().setPassword(this.user.getPassword());
-                this.getHeyBean().setCC(this.user.getCC());
-                this.getHeyBean().setUserLogIn(1);
-                System.out.println("login com sucesso");
-                return SUCCESS;
+            try {
+                this.getHeyBean().setFBid(id);
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-        } else {
-            System.out.println("erro com a Api do fb");
-            return ERROR;
+            try {
+                this.user = this.getHeyBean().LoginFB();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            if (this.user == null) {
+                addFieldError("tError", "A conta não está associada a nenhum user");
+            }
         }
+
+    }
+
+    @Override
+    public String execute() throws RemoteException {
+        this.user = this.getHeyBean().LoginFB();
+        this.getHeyBean().setUsername(this.user.getUser());
+        this.getHeyBean().setPassword(this.user.getPassword());
+        this.getHeyBean().setCC(this.user.getCC());
+        this.getHeyBean().setUserLogIn(1);
+        System.out.println("login com sucesso");
+        return SUCCESS;
     }
 
     @Override

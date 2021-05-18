@@ -310,12 +310,12 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
      */
     public boolean login(String user, String password, String CC) throws java.rmi.RemoteException {
         for (User userL : users) {
-            if (userL.password.equals(password) && userL.user.equals(user)) {
+            if (userL.password.equals(password) && userL.user.equals(user) && userL.CC.equals(CC)) {
                 for (Notifications not : Global.admin) {
                     not.estadoUser(user, "ON");
                 }
                 usersOn.add(userL);
-                return userL.CC.equals(CC);
+                return true;
             }
         }
         return false;
@@ -1174,19 +1174,14 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public boolean AssociarFB(String token, String CC) throws java.rmi.RemoteException {
         User final_user = null;
         for (User user : users) {
-            System.out.println(user.user+" "+user.token);
             if (user.CC.equals(CC)) {
-                System.out.println("eNCONTREI");
                 final_user = user;
             }
             if (user.token.equals(token)) {
-                System.out.println("Aqui for somereason");
                 return false;
             }
         }
-        System.out.println("Vou fazer isto");
         final_user.setToken(token);
-        System.out.println("Adicionei");
         return true;
     }
 

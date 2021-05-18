@@ -8,6 +8,7 @@
 <title>LogIn</title>
 </head>
 <body>
+<s:fielderror name="tError"/>
 	<s:form action="login" method="post">
 		<s:text name="Username:" />
 		<s:textfield name="username" /><br>

@@ -25,6 +25,28 @@ public class LoginAction extends ActionSupport implements SessionAware {
     private static final Token EMPTY_TOKEN = null;
 
     @Override
+    public void validate() {
+        if (this.username.equals("") ) {
+            addFieldError("tError", "Username é obrigatorio");
+        }
+        if(this.password.equals("")){
+            addFieldError("tError", "Password é obrigatorio");
+        }
+        if(this.CC.equals("")){
+            addFieldError("tError", "CC é obrigatorio");
+        }
+        if(!this.username.equals("") && !this.password.equals("") && !this.CC.equals("")){
+            try {
+                if (!this.getHeyBean().checkUserExists()) {
+                    addFieldError("tError", "User não existe");
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     public String execute() throws RemoteException {
         this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb");
         this.authorizationUrl = this.service.getAuthorizationUrl(EMPTY_TOKEN);
@@ -35,7 +57,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
             this.getHeyBean().setCC(this.CC);
             String id = this.getHeyBean().getUserFBid(this.CC);
             if (id != null) {
-                this.getHeyBean().setCC(id);
+                this.getHeyBean().setFBid(id);
             }
             if (this.getHeyBean().checkUserExists()) {
                 eleicoes = new ArrayList<radioOptions>();

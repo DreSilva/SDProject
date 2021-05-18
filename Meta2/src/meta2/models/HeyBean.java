@@ -87,8 +87,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
         super();
         try {
             //readDeps();  mudar isto
-            clientAddress = "192.168.1.222";
-            serverAddress = "192.168.1.222";
+            clientAddress = "192.168.1.75";
+            serverAddress = "192.168.1.75";
             porto = 7001;
             System.setProperty("java.rmi.server.hostname", clientAddress);
             Registry reg = LocateRegistry.getRegistry(serverAddress, porto);
@@ -403,8 +403,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
         return this.server.AssociarFB(token, this.CC);
     }
 
-    public User LoginFB(String token) throws java.rmi.RemoteException {
-        return this.server.LoginFB(token);
+    public User LoginFB() throws java.rmi.RemoteException {
+        return this.server.LoginFB(this.FBid);
     }
 
     public ArrayList<String> infoEleicao(int elec) throws RemoteException {
