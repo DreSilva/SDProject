@@ -47,6 +47,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
     private OAuthService service = null;
     WebSocketAnnotation webSocketAnnotation;
     private Token token;
+    private String FBid = null;
 
 
     public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -137,6 +138,22 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
     }
     public OAuthService getService() {
         return this.service;
+    }
+
+    public String getFBid() {
+        return FBid;
+    }
+
+    public void setFBid(String FBid) {
+        this.FBid = FBid;
+    }
+
+    public static String getApiKey() {
+        return apiKey;
+    }
+
+    public static String getApiSecret() {
+        return apiSecret;
     }
 
     public void setService(OAuthService service) {
@@ -245,6 +262,10 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
     public ArrayList<String> getListasEleicao() throws RemoteException {
         return this.server.listarListasEleicaoWEB(Integer.parseInt(this.eleicao));
+    }
+
+    public String getUserFBid(String cc) throws java.rmi.RemoteException{
+        return this.server.getUserFBid(cc);
     }
 
     public void criarEleicao() throws RemoteException {

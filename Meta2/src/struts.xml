@@ -84,7 +84,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
     </action>
 
     <action name="doVoto" class="meta2.action.Votar" method="execute">
-      <result name="success">/index.jsp</result>
+      <result name="success">/IncentivoVoto.jsp</result>
       <result name="input">/escolherListaVotar.jsp</result>
     </action>
 

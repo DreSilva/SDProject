@@ -1206,6 +1206,20 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         return null;
     }
 
+    /**
+     * @inheritDoc
+     */
+
+    public String getUserFBid(String cc) throws java.rmi.RemoteException {
+        for (User user : users) {
+            if (user.CC.equals(cc)) {
+                return user.token;
+            }
+        }
+        return null;
+    }
+
+
 
     // ======================================================== Main
 

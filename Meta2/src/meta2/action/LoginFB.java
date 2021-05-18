@@ -45,6 +45,7 @@ public class LoginFB extends ActionSupport implements SessionAware {
         if (response.getCode() == 200) {
             String body = response.getBody();
             String id = body.split("[:}{,\"]")[11];
+            this.getHeyBean().setFBid(id);
             this.user = this.getHeyBean().LoginFB(id);
             if (this.user == null) {
                 System.out.println("a conta não está associada a nenhum user");

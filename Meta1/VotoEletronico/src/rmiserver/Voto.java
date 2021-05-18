@@ -51,6 +51,14 @@ public interface Voto extends Remote {
 
     public User LoginFB(String token) throws java.rmi.RemoteException;
 
+    /**
+     * obtém o fb id de um user caso exista
+     * @param cc cc do user
+     * @return fb id
+     * @throws java.rmi.RemoteException
+     */
+
+    public String getUserFBid(String cc) throws java.rmi.RemoteException;
 
     /**
      * Verifica se o user com o CC dado existe
