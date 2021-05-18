@@ -1197,6 +1197,9 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
     public User LoginFB(String token) throws java.rmi.RemoteException {
         for (User user : users) {
             if (user.token.equals(token)) {
+                for (Notifications not : Global.admin) {
+                    not.estadoUser(user.user, "ON");
+                }
                 return user;
             }
         }
