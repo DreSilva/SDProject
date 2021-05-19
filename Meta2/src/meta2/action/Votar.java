@@ -73,7 +73,7 @@ public class Votar extends ActionSupport implements SessionAware {
                 .callback("http://localhost:8080/meta2/index")
                 .scope("public_profile")
                 .build();
-        this.authorizationUrl = this.service.getAuthorizationUrl(EMPTY_TOKEN);
+        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/");
         this.getHeyBean().setAuthorizationUrl(authorizationUrl);
         return SUCCESS;
     }

@@ -59,4 +59,19 @@ public class FacebookApi2 extends DefaultApi20 {
         }
         return sb.toString();
     }
+
+    public String getShareUrl(final OAuthConfig config,String url) {
+        Preconditions.checkValidUrl(config.getCallback(),
+                "Must provide a valid url as callback. Facebook does not support OOB");
+        final StringBuilder sb = new StringBuilder(String.format("https://www.facebook.com/dialog/share", config.getApiKey(), OAuthEncoder.encode(url), OAuthEncoder.encode(config.getCallback())));
+        if (config.hasScope()) {
+            sb.append('&').append(OAuthConstants.SCOPE).append('=').append(OAuthEncoder.encode(config.getScope()));
+        }
+
+        final String state = config.getState();
+        if (state != null) {
+            sb.append('&').append(OAuthConstants.STATE).append('=').append(OAuthEncoder.encode(state));
+        }
+        return sb.toString();
+    }
 }

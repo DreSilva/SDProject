@@ -55,6 +55,8 @@ public abstract class DefaultApi20 implements Api {
      */
     public abstract String getAuthorizationUrl(OAuthConfig config);
 
+    public abstract String getShareUrl(OAuthConfig config, String url);
+
     /**
      * {@inheritDoc}
      */

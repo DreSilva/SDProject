@@ -145,6 +145,11 @@ public class OAuth10aServiceImpl extends OAuthService {
         return api.getAuthorizationUrl(requestToken);
     }
 
+    @Override
+    public String getShareUrl(Token emptyToken, String s) {
+        return api.getShareUrl(getConfig(),s);
+    }
+
     private String getSignature(final AbstractRequest request, final Token token) {
         final OAuthConfig config = getConfig();
         config.log("generating signature...");

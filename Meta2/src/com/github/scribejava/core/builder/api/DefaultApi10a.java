@@ -130,4 +130,6 @@ public abstract class DefaultApi10a implements Api {
     public OAuthService createService(final OAuthConfig config) {
         return new OAuth10aServiceImpl(this, config);
     }
+
+    public abstract String getShareUrl(OAuthConfig config, String s);
 }

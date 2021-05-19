@@ -107,4 +107,5 @@ public abstract class OAuthService {
      */
     public abstract String getAuthorizationUrl(Token requestToken);
 
+    public abstract String getShareUrl(Token emptyToken, String s);
 }
