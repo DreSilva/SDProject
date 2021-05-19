@@ -16,7 +16,7 @@
     <c:otherwise>
         <p><a href="<s:url action="vote"/>">Votar</a></p>
         <p><a href="<s:property value="authorizationUrl"/>">Associar conta do Facebook</a></p>
-        <p><a href="<s:url action="share" />">Share an election on Facebook</a></p>
+        <p><a href="<s:url action="shareEsta" />">Share statistics of finished Elections</a></p>
     </c:otherwise>
 </c:choose>
 

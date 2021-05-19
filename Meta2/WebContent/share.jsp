@@ -14,7 +14,7 @@
         <p>Precisa de fazer login para poder aceder!</p>
     </c:when>
     <c:otherwise>
-        <s:form action="shareelection" method="post">
+        <s:form action="loadEsta" method="post">
             <s:fielderror name="tError"/>
             <s:text name="Eleição que pretende partilhar"/>
             <s:radio label="Eleição" name="eleicao" list="eleicoes"

@@ -8,7 +8,7 @@
 </head>
 <body>
 <c:choose>
-    <c:when test="${HeyBean.adminLogIn==0}">
+    <c:when test="${HeyBean.userLogIn==0}">
         <p>Precisa de fazer login para poder aceder!</p>
     </c:when>
     <c:otherwise>

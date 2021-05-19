@@ -44,6 +44,7 @@ public class AssociarFB extends ActionSupport implements SessionAware {
             String body = response.getBody();
             String id = body.split("[:}{,\"]")[11];
             this.getHeyBean().setFBid(id);
+            this.getHeyBean().setUserLogIn(1);
             boolean flag = this.getHeyBean().AssociarFB(id);
             if (flag) {
                 System.out.println("Associado com sucesso");

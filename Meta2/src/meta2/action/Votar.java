@@ -78,6 +78,10 @@ public class Votar extends ActionSupport implements SessionAware {
         return SUCCESS;
     }
 
+    public String getAuthorizationUrl() {
+        return authorizationUrl;
+    }
+
     public void setLista(String lista) {
         this.lista = lista;
     }

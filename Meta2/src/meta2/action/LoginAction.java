@@ -37,6 +37,13 @@ public class LoginAction extends ActionSupport implements SessionAware {
         }
         if(!this.username.equals("") && !this.password.equals("") && !this.CC.equals("")){
             try {
+                this.getHeyBean().setUsername(this.username);
+                this.getHeyBean().setPassword(this.password);
+                this.getHeyBean().setCC(this.CC);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            try {
                 if (!this.getHeyBean().checkUserExists()) {
                     addFieldError("tError", "User não existe");
                 }
