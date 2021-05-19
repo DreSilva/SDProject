@@ -7,19 +7,11 @@
 </head>
 <body>
 
-
-<c:choose>
-    <c:when test="${HeyBean.adminLogIn==0}">
-        <p>Precisa de fazer login para poder aceder!</p>
-    </c:when>
-    <c:otherwise>
-        <c:forEach items="${eleicoes}" var="value" varStatus="status">
-            <s:form action="notifications/%{#attr.status.count}" method="post">
-                <button value="notficications" type="submit" >${value.value}</button>
-            </s:form>
-        </c:forEach>
-    </c:otherwise>
-</c:choose>
+<c:forEach items="${eleicoes}" var="value" varStatus="status">
+    <s:form action="notifications/%{#attr.status.count}" method="post">
+        <button value="notficications" type="submit" >${value.value}</button>
+    </s:form>
+</c:forEach>
 
 </body>
 </html>

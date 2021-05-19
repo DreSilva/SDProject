@@ -13,5 +13,8 @@
     <p><a href="<s:url action="admin" />">Admin Console</a></p>
     <p><a href="<s:url action="loginnormal" />">Login</a></p>
     <p><a href="<s:property value="authorizationUrl"/>">Login With Facebook</a></p>
+
+    <p><a href="<s:url action="goObterInformacaoPassada" />">Informação Eleicao Passada</a></p>
+    <p><a href="<s:url action="notificationsEleicao" />">Notificações Eleição</a></p>
 </body>
 </html>

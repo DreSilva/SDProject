@@ -87,8 +87,8 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
         super();
         try {
             //readDeps();  mudar isto
-            clientAddress = "194.210.25.232";
-            serverAddress = "194.210.25.232";
+            clientAddress = "192.168.1.75";
+            serverAddress = "192.168.1.75";
             porto = 7001;
             System.setProperty("java.rmi.server.hostname", clientAddress);
             Registry reg = LocateRegistry.getRegistry(serverAddress, porto);
@@ -136,6 +136,11 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
                 .build();
         return service;
     }
+
+    public int getIntEleicao(){
+        return Integer.parseInt(this.eleicao);
+    }
+
     public OAuthService getService() {
         return this.service;
     }

@@ -35,12 +35,13 @@ public class WebSocketAnnotation extends ActionSupport implements SessionAware {
 
     @OnOpen
     public void start(final Session session, @PathParam("room") final String room) throws RemoteException, InterruptedException {
+        HeyBean bean = new HeyBean();
         this.session = session;
         session.getUserProperties().put("room",room);
         sessions.put(String.valueOf(session.getId()),session);
         ArrayList<String > s;
         if(room.equals("0")) {
-            s = this.getHeyBean().getUsersOnline();
+            s = bean.getUsersOnline();
             this.sendMessage("Users conectados:", room);
             for (String s1: s) {
                 this.sendMessage("-"+s1,room);
@@ -48,7 +49,7 @@ public class WebSocketAnnotation extends ActionSupport implements SessionAware {
             }
         }
         else{
-            s = this.getHeyBean().infoEleicao(Integer.parseInt(room));
+            s = bean.infoEleicao(Integer.parseInt(room));
             for (String s1: s) {
                 this.sendMessage(s1,room);
                 Thread.sleep(50);
@@ -88,12 +89,12 @@ public class WebSocketAnnotation extends ActionSupport implements SessionAware {
     }
 
     public void setHeyBean(HeyBean heyBean) {
-        this.session2.put("heyBean", heyBean);
+        session2.put("heyBean", heyBean);
     }
 
     @Override
     public void setSession(Map<String, Object> session) {
-        this.session2 = session;
+        session2 = session;
     }
 
 }
