@@ -12,7 +12,6 @@ import rmiserver.Voto;
 import uc.sd.apis.FacebookApi2;
 import ws.WebSocketAnnotation;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -72,10 +71,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
     }
 
     public void readDeps() throws IOException {
-        String basePath = new File("").getAbsolutePath();
-        basePath = basePath.concat("\\config.properties");
-        System.out.println(basePath);
-        Properties prop = readPropertiesFile(basePath);
+        Properties prop = readPropertiesFile("D:\\One Drive\\OneDrive - Universidade de Coimbra\\Univerisdade\\UNI-Meu\\PL SD\\Projeto\\SDProject\\Meta2\\src\\config.properties");
 
         String portoInString = prop.getProperty("portoRMI");
         this.porto = Integer.parseInt(portoInString);
@@ -86,10 +82,7 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
     public HeyBean() throws RemoteException {
         super();
         try {
-            //readDeps();  mudar isto
-            clientAddress = "192.168.1.222";
-            serverAddress = "192.168.1.222";
-            porto = 7001;
+            readDeps();
             System.setProperty("java.rmi.server.hostname", clientAddress);
             Registry reg = LocateRegistry.getRegistry(serverAddress, porto);
             server = (Voto) reg.lookup("votacao");
@@ -414,6 +407,10 @@ public class HeyBean extends UnicastRemoteObject implements Notifications {
 
     public ArrayList<String> infoEleicao(int elec) throws RemoteException {
         return this.server.getFullEleicaoInfo(elec - 1);
+    }
+
+    public ArrayList<String> infoEleicaoVelha(int elec) throws RemoteException {
+        return this.server.getFullEleicaoVelhaInfo(elec - 1);
     }
 
 }

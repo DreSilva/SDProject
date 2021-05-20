@@ -7,10 +7,7 @@ import org.apache.struts2.interceptor.SessionAware;
 
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GoEditarEleicao extends ActionSupport implements SessionAware {
     private static final long serialVersionUID = 4L;
@@ -33,10 +30,16 @@ public class GoEditarEleicao extends ActionSupport implements SessionAware {
         tipo = s.get(2);
         String aux = s.get(3);
         String[] aux2 = aux.split(" ");
+        String aux3 = aux2[0];
+        int var = Integer.parseInt(aux3.substring(3,5))+1;
+        aux2[0]=aux3.substring(0,3)+ var +aux3.substring(5);
         dataInicial = new SimpleDateFormat("dd-MM-yyyy").parse(aux2[0]);
         horaI = aux2[1];
         aux = s.get(4);
         aux2 = aux.split(" ");
+        aux3 = aux2[0];
+        var = Integer.parseInt(aux3.substring(3,5))+1;
+        aux2[0]=aux3.substring(0,3)+ var +aux3.substring(5);
         dataFinal = new SimpleDateFormat("dd-MM-yyyy").parse(aux2[0]);
         horaF = aux2[1];
         return SUCCESS;

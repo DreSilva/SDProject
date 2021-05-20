@@ -1089,6 +1089,30 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
         }
         return s;
     }
+    public ArrayList<String> getFullEleicaoVelhaInfo(int n) throws java.rmi.RemoteException {
+        Eleicao eleicao = eleicoesVelhas.get(n);
+        ArrayList<String> s = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        s.add("Titulo: " + eleicao.titulo);
+        s.add("Descricao: " + eleicao.descricao);
+        s.add("Tipo: " + eleicao.tipo);
+        s.add("Data Incial: " + formatter.format(eleicao.inicio));
+        s.add("Data Final: " + formatter.format(eleicao.fim));
+        s.add("Listas participantes: ");
+        for (Lista l : eleicao.listas) {
+            s.add("-" + l.nome);
+        }
+        s.add("Votantes: ");
+        for (User user : users) {
+            for (Map.Entry<Eleicao, String> entry : user.localVoto.entrySet()) {
+                if (entry.getKey().equals(eleicao)) {
+                    s.add("-Nome: " + user.user + "Tipo: " + user.tipo + " Local: " + entry.getValue());
+                }
+            }
+        }
+        return s;
+    }
+
 
     /**
      * @inheritDoc
@@ -1140,7 +1164,7 @@ public class RMIServer extends UnicastRemoteObject implements Voto {
             prop.load(fis);
 
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         } finally {
             assert fis != null;
             fis.close();

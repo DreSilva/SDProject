@@ -38,7 +38,7 @@ public class RemoveMesasEleicao extends ActionSupport implements SessionAware {
     @Override
     public String execute() throws Exception {
         for (String mesa: this.mesa) {
-            this.getHeyBean().removeMesaEleicao(Integer.parseInt(mesa));
+            this.getHeyBean().removeMesaEleicao(0);
         }
         return SUCCESS;
     }

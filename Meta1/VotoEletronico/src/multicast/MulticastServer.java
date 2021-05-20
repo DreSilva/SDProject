@@ -194,7 +194,7 @@ public class MulticastServer extends Thread {
                         }
                     }
 
-                } catch (ConnectException e) {
+                } catch (ConnectException | InterruptedException e) {
                     //recuperação em caso de falha do rmi
                     Date now = new Date();
                     Date after = new Date();

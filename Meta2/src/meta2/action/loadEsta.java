@@ -36,7 +36,7 @@ public class loadEsta extends ActionSupport implements SessionAware {
                 .scope("public_profile")
                 .build();
         int n_election=Integer.parseInt(eleicao);
-        ArrayList<String> arrOfStr = this.getHeyBean().infoEleicao(n_election);
+        ArrayList<String> arrOfStr = this.getHeyBean().infoEleicaoVelha(n_election);
         String statistics= "";
         for(String a : arrOfStr){
             statistics=statistics+a+'\n';
