@@ -74,7 +74,7 @@ public class Votar extends ActionSupport implements SessionAware {
                 .scope("public_profile")
                 .build();
         int nEleicao = this.getHeyBean().getIntEleicao()+1;
-        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/notifications/"+nEleicao);
+        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/notifications/"+nEleicao,null);
         this.getHeyBean().setAuthorizationUrl(authorizationUrl);
         return SUCCESS;
     }

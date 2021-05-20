@@ -146,7 +146,7 @@ public class OAuth10aServiceImpl extends OAuthService {
     }
 
     @Override
-    public String getShareUrl(Token emptyToken, String s) {
+    public String getShareUrl(Token emptyToken, String s, String text) {
         return api.getShareUrl(getConfig(),s);
     }
 

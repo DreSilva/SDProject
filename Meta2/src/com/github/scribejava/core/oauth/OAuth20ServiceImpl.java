@@ -104,8 +104,8 @@ public class OAuth20ServiceImpl extends OAuthService {
     }
 
     @Override
-    public String getShareUrl(Token emptyToken, String s) {
-        return api.getShareUrl(getConfig(),s);
+    public String getShareUrl(Token emptyToken, String s, String text) {
+        return api.getShareUrl(getConfig(),s,text);
     }
 
     public DefaultApi20 getApi() {

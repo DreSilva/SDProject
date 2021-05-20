@@ -13,7 +13,6 @@ import org.apache.struts2.interceptor.SessionAware;
 import uc.sd.apis.FacebookApi2;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class loadEsta extends ActionSupport implements SessionAware {
                 .callback("http://localhost:8080/meta2/login")
                 .scope("public_profile")
                 .build();
-        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/");
+        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/", null);
         this.getHeyBean().setAuthorizationUrl(authorizationUrl);
         return SUCCESS;
     }

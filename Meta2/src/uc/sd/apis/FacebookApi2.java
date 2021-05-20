@@ -31,18 +31,18 @@ public class FacebookApi2 extends DefaultApi20 {
 
                 Preconditions.checkEmptyString(response, "Response body is incorrect. Can't extract a token from an empty string");
                 try {
-                	
+
                     JSONObject json = (JSONObject) JSONValue.parse(response);
                     String token = (String) json.get("access_token");
 
                     return new Token(token, "", response);
-                } catch (Exception e){
+                } catch (Exception e) {
                     throw new OAuthException("Response body is incorrect. Can't extract a token from this: '" + response + "'", null);
                 }
             }
         };
     }
-        
+
     @Override
     public String getAuthorizationUrl(final OAuthConfig config) {
         Preconditions.checkValidUrl(config.getCallback(),
@@ -60,7 +60,7 @@ public class FacebookApi2 extends DefaultApi20 {
         return sb.toString();
     }
 
-    public String getShareUrl(final OAuthConfig config,String url) {
+    public String getShareUrl(final OAuthConfig config, String url, String text) {
         Preconditions.checkValidUrl(config.getCallback(),
                 "Must provide a valid url as callback. Facebook does not support OOB");
         final StringBuilder sb = new StringBuilder(String.format("https://www.facebook.com/dialog/share?app_id=%s&display=%s&href=%s&redirect_uri=%s", config.getApiKey(), "page", OAuthEncoder.encode(url), OAuthEncoder.encode(config.getCallback())));
