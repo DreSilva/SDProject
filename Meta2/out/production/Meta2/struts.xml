@@ -245,7 +245,8 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result name="success">/escolherEleicaoPassada.jsp</result>
     </action>
 
-    <action name="escolherEleicaoPassada" class="meta2.action.InfoEleicaoVelha" method="execute">
+    <action name="escolherEleicaoPassada/{id}" class="meta2.action.InfoEleicaoVelha" method="execute">
+      <param name="eleicao">{1}</param>
       <result name="success">/infoEleicaoVelha.jsp</result>
       <result name="input">/escolherEleicaoPassada.jsp</result>
     </action>

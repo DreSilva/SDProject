@@ -6,12 +6,12 @@
     <title>Escolher Eleicao Passada</title>
 </head>
 <body>
-<s:form action="escolherEleicaoPassada" method="post">
-    <s:text name="Eleição Passada"/>
-    <s:radio name="eleicao" list="eleicoes"
-             listKey="key" listValue="value"/><br>
-    <s:submit onclick=""/>
-</s:form>
+
+<c:forEach items="${eleicoes}" var="value" varStatus="status">
+    <s:form action="escolherEleicaoPassada/%{#attr.status.count}" method="post">
+        <button value="notficications" type="submit" >${value.value}</button>
+    </s:form>
+</c:forEach>
 
 
 </body>

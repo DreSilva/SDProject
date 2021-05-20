@@ -26,35 +26,40 @@ public class LoginAction extends ActionSupport implements SessionAware {
 
     @Override
     public void validate() {
-        if (this.username.equals("") ) {
-            addFieldError("tError", "Username é obrigatorio");
-        }
-        if(this.password.equals("")){
-            addFieldError("tError", "Password é obrigatorio");
-        }
-        if(this.CC.equals("")){
-            addFieldError("tError", "CC é obrigatorio");
-        }
-        if(!this.username.equals("") && !this.password.equals("") && !this.CC.equals("")){
-            try {
-                this.getHeyBean().setUsername(this.username);
-                this.getHeyBean().setPassword(this.password);
-                this.getHeyBean().setCC(this.CC);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        if(username!=null) {
+            if (this.username.equals("")) {
+                addFieldError("tError", "Username é obrigatorio");
             }
-            try {
-                if (!this.getHeyBean().checkUserExists()) {
-                    addFieldError("tError", "User não existe");
+            if (this.password.equals("")) {
+                addFieldError("tError", "Password é obrigatorio");
+            }
+            if (this.CC.equals("")) {
+                addFieldError("tError", "CC é obrigatorio");
+            }
+            if (!this.username.equals("") && !this.password.equals("") && !this.CC.equals("")) {
+                try {
+                    this.getHeyBean().setUsername(this.username);
+                    this.getHeyBean().setPassword(this.password);
+                    this.getHeyBean().setCC(this.CC);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
-            } catch (RemoteException e) {
-                e.printStackTrace();
+                try {
+                    if (!this.getHeyBean().checkUserExists()) {
+                        addFieldError("tError", "User não existe");
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     @Override
     public String execute() throws RemoteException {
+        if(username==null){
+            return SUCCESS;
+        }
         this.service = this.getHeyBean().getService("http://localhost:8080/meta2/associarfb");
         this.authorizationUrl = this.service.getAuthorizationUrl(EMPTY_TOKEN);
         this.getHeyBean().setAuthorizationUrl(authorizationUrl);

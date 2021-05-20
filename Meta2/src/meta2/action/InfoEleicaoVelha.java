@@ -47,12 +47,13 @@ public class InfoEleicaoVelha extends ActionSupport implements SessionAware {
         return SUCCESS;
     }
 
+
     public ArrayList<String> getInfos() {
         return infos;
     }
 
     public void setEleicao(String eleicao) {
-        this.eleicao = eleicao;
+        this.eleicao = String.valueOf(Integer.parseInt(eleicao)-1);
     }
 
     public List<radioOptions> getEleicoes() {

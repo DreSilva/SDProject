@@ -20,7 +20,7 @@ public class loadEsta extends ActionSupport implements SessionAware {
     private static final long serialVersionUID = 4L;
     private static final Token EMPTY_TOKEN = null;
     private Map<String, Object> session;
-    private String username = null, password = null, CC = null;
+    private String username = null, password = null, CC = null,eleicao=null;
     private List<radioOptions> eleicoes;
     private OAuthService service;
     private String authorizationUrl;
@@ -34,7 +34,7 @@ public class loadEsta extends ActionSupport implements SessionAware {
                 .callback("http://localhost:8080/meta2/login")
                 .scope("public_profile")
                 .build();
-        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/", null);
+        this.authorizationUrl = this.service.getShareUrl(EMPTY_TOKEN,"http://votacao.com:8080/meta2/escolherEleicaoPassada/"+eleicao, null);
         this.getHeyBean().setAuthorizationUrl(authorizationUrl);
         return SUCCESS;
     }
@@ -51,6 +51,10 @@ public class loadEsta extends ActionSupport implements SessionAware {
         if (!session.containsKey("heyBean"))
             this.setHeyBean(new HeyBean());
         return (HeyBean) session.get("heyBean");
+    }
+
+    public void setEleicao(String eleicao) {
+        this.eleicao = String.valueOf(Integer.parseInt(eleicao)+1);
     }
 
     public void setHeyBean(HeyBean heyBean) {
